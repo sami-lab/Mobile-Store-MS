@@ -1,0 +1,78 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <UserSecretsId>aspnet-Mobile_Store_MS-C3F36A30-A5B3-4C1A-81D4-A5EE5807C115</UserSecretsId>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <RootNamespace>Mobile_Store_MS</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\Email\**" />
+    <Compile Remove="wwwroot\lib\font-awesome\**" />
+    <Compile Remove="wwwroot\vendor\**" />
+    <Content Remove="wwwroot\Email\**" />
+    <Content Remove="wwwroot\lib\font-awesome\**" />
+    <Content Remove="wwwroot\vendor\**" />
+    <EmbeddedResource Remove="wwwroot\Email\**" />
+    <EmbeddedResource Remove="wwwroot\lib\font-awesome\**" />
+    <EmbeddedResource Remove="wwwroot\vendor\**" />
+    <None Remove="wwwroot\Email\**" />
+    <None Remove="wwwroot\lib\font-awesome\**" />
+    <None Remove="wwwroot\vendor\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20200320115503_AddingModelSchema.cs" />
+    <Compile Remove="Data\Migrations\20200320115503_AddingModelSchema.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200326091517_DBFinished.cs" />
+    <Compile Remove="Data\Migrations\20200326091517_DBFinished.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200326092448_DBFinished.cs" />
+    <Compile Remove="Data\Migrations\20200326092448_DBFinished.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200328181505_addingModelField.cs" />
+    <Compile Remove="Data\Migrations\20200328181505_addingModelField.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200423155825_Adding ApprovedBy Field.cs" />
+    <Compile Remove="Data\Migrations\20200423155825_Adding ApprovedBy Field.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200423162913_SettingPurchaseUser relation.cs" />
+    <Compile Remove="Data\Migrations\20200423162913_SettingPurchaseUser relation.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200423163651_SettingPurchaseUser relation.cs" />
+    <Compile Remove="Data\Migrations\20200423163651_SettingPurchaseUser relation.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200423165425_SettingPurchaseUser relation.cs" />
+    <Compile Remove="Data\Migrations\20200423165425_SettingPurchaseUser relation.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200423170316_Setting OrderUser Relation.cs" />
+    <Compile Remove="Data\Migrations\20200423170316_Setting OrderUser Relation.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200426094640_Finalizing DB.cs" />
+    <Compile Remove="Data\Migrations\20200426094640_Finalizing DB.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200426104239_Final.cs" />
+    <Compile Remove="Data\Migrations\20200426104239_Final.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200503104727_Adding Chat Messages Class.cs" />
+    <Compile Remove="Data\Migrations\20200503104727_Adding Chat Messages Class.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\css\font-face.css" />
+    <Content Remove="wwwroot\css\style.css" />
+    <Content Remove="wwwroot\css\style.css.map" />
+    <Content Remove="wwwroot\css\style.scss" />
+    <Content Remove="wwwroot\css\theme.css" />
+    <Content Remove="wwwroot\js\chat.js" />
+    <Content Remove="wwwroot\js\SignalRHandler.js" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="SendGrid" Version="9.13.2" />
+    <PackageReference Include="Stripe.net" Version="36.8.0" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="wwwroot\%40microsoft\" />
+  </ItemGroup>
+
+</Project>

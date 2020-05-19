@@ -1,0 +1,10 @@
+﻿@model IEnumerable<Mobile_Store_MS.ViewModel.GroupBYCompany>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+@await Html.PartialAsync("~/Views/Shared/Products.cshtml", Model)
+
+

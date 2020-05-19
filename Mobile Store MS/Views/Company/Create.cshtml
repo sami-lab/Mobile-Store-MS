@@ -1,0 +1,60 @@
+﻿@model Mobile_Store_MS.ViewModel.CompanyViewModel.CompanyViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Create";
+}
+
+
+<br /><br/>
+<h4>Create Company</h4>
+<hr />
+<div class="row d-flex justify-content-center align-items-center " >
+    <div class="col-md-4 border">
+        <form asp-action="Create" asp-controller="Company" method="post" class="mt-3" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Com_name" class="control-label"></label>
+                <input asp-for="Com_name" class="form-control" />
+                <span asp-validation-for="Com_name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="com_country" class="control-label"></label>
+                <input asp-for="com_country" class="form-control" />
+                <span asp-validation-for="com_country" class="text-danger"></span>
+            </div>
+
+            <div class="form-group row">
+                <label asp-for="Photo" class="col-12 col-form-label"></label>
+                <div class="col-12">
+                    <div class="custom-file">
+                        <input asp-for="Photo" class="form-control custom-file-input">
+                        <label class="custom-file-label">Choose File...</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary btn-block" />
+                <a asp-action="Index"  class="btn btn-primary btn-block">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a> ||
+    <a asp-action="Create" asp-controller="Vendor">Add Vendor</a>
+</div>
+<script>
+            $(document).ready(function () {
+                $('.custom-file-input').on("change", function () {
+                    var fileName = $(this).val().split("\\").pop();
+                    $(this).next('.custom-file-label').html(fileName);
+                });
+            });
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

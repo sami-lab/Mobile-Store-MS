@@ -1,0 +1,81 @@
+﻿@model IEnumerable<Mobile_Store_MS.ViewModel.GroupByStock>
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<br />
+@foreach (var s in Model)
+{
+    <div class="bg-info p-3 rounded d-flex justify-content-between">
+        <h3 class="text-light font-weight-bold"> @s.StoreName @s.RefNo  </h3>
+        <a asp-controller="Purchasing" asp-action="Create" asp-route-store_id="@s.store_id" class="text-light m-1 align-self-end">Create new Purchasing</a>
+    </div>
+    @if (s.Models.Any())
+    {
+        <div class="container-fluid py-2">
+            <div style="overflow-x:scroll">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Models.First().id)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Models.First().Com_name)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Models.First().model_name)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Models.First().Quantity)
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in s.Models)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.id)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Com_name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.model_name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Quantity)
+                                </td>
+                                <td>
+                                    <a asp-controller="Purchasing" asp-action="Create" asp-route-store_id="@s.store_id" asp-route-modelId="@item.modelId" asp-route-PhoneId="@item.Phoneid">Add Stock</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    else
+    {
+        <div class="card">
+            <div class="card-header">
+                No Stock Added yet
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">
+                    Use the button below to Add new Purchasing
+                </h5>
+                <a class="btn btn-primary mb-3" style="width:auto" asp-action="Create"
+                   asp-controller="Purchasing">Create new Purchasing</a>
+            </div>
+        </div>
+
+    }
+    <hr />
+    <br />
+}

@@ -1,0 +1,91 @@
+﻿@model Mobile_Store_MS.ViewModel.Account.LoginViewModel
+
+@{   
+    ViewData["Title"] = "Login";
+}
+<div id="logreg-forms">
+    <div class="social">
+        <h1 class="h3 mb-3 mt-3 font-weight-normal" style="text-align: center"> Sign in</h1>
+       
+        <div class="social-login">
+            @{
+
+                if (Model.ExternalLogins.Count != 0)
+                {
+                    <p style="text-align:center"> OR  </p>
+                    <form method="post" asp-action="ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
+                        <div>
+                            @foreach (var provider in Model.ExternalLogins)
+                            {
+                                <button type="submit" class="btn  btn-block btn-primary"
+                                        name="provider" value="@provider.Name"
+                                        title="Sign in using your @provider.DisplayName account">
+                                    Sign in using your @provider.DisplayName
+                                </button>
+                            }
+                        </div>
+                    </form>
+                }
+            }
+        </div>
+
+    </div>
+    <form class="form-signin" asp-controller="Account" asp-action="Login" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" id="inputPassword" class="form-control" placeholder="Password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <label asp-for="RememberMe">
+                    <input asp-for="RememberMe" />
+                    @Html.DisplayNameFor(m => m.RememberMe)
+                </label>
+            </div>
+        </div>
+
+        <button class="btn btn-success btn-block" type="submit"><i class="fas fa-sign-in-alt"></i> Sign in</button>
+        <a href="#" id="forgot_pswd">Forgot password?</a>
+        <hr>
+        <!-- <p>Don't have an account!</p>  -->
+        <a class="btn btn-primary text-white btn-block" asp-controller="Account" asp-action="Register" id="btn-signup"><i class="fas fa-user-plus"></i> Sign up New Account</a>
+    </form>
+    <form asp-controller="Account" asp-action="ForgotPassword" method="post" class="form-reset">
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" id="resetEmail" placeholder="Email address" required="" autofocus="" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit">Reset Password</button>
+        <a href="#" id="cancel_reset"><i class="fas fa-angle-left"></i> Back</a>
+
+    </form>
+
+
+    <br>
+
+</div>
+
+
+@section Scripts{
+    <link href="~/css/Login.css" rel="stylesheet" />
+}
+<script>
+    function toggleResetPswd(e) {
+        e.preventDefault();
+        $('#logreg-forms .form-signin').toggle() // display:block or none
+        $('#logreg-forms .form-reset').toggle() // display:block or none
+        $('#logreg-forms .social').toggle()
+        
+    }
+    $('#logreg-forms #forgot_pswd').click(toggleResetPswd);
+    $('#logreg-forms #cancel_reset').click(toggleResetPswd);
+</script>

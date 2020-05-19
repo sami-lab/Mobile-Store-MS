@@ -1,0 +1,18 @@
+﻿@model Mobile_Store_MS.ViewModel.ModelsViewModel.ModelViewModel
+
+<div>
+    <h4>Model Details</h4>
+    <hr />
+    @await Html.PartialAsync("~/Views/CompanyModel/Presenting.cshtml", Model)
+</div>
+<div>
+       @Html.ActionLink("Edit", "Edit", new { id = Model.modelId })   ||
+        <a asp-action="Index">Back to List</a>   ||
+        <a asp-controller="Quantity" asp-action="BrandStock" asp-route-id="@Model.modelId">Stock Of this Brand</a>   ||
+        @if (User.IsInRole("Admin") || User.IsInRole("Super Admin"))
+        {
+            @await Html.PartialAsync("~/Views/Shared/Modal.cshtml", Model.modelId)
+
+        }
+   
+</div>

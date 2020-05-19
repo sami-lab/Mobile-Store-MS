@@ -1,0 +1,207 @@
+﻿@model Mobile_Store_MS.ViewModel.OrdersViewModel.EditOrderViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+<hr />
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <input asp-for="ExistingQuantity" hidden />
+    <input asp-for="Existing_store_id" hidden />
+    <input asp-for="cus_id" hidden />
+    <input asp-for="order_id" hidden />
+    <div class="bg-light m-3 p-5">
+        <h1 class="text-center mt-3 text-info">Edit Order</h1>
+        <div class="row d-flex justify-content-around">
+            <div class="col-md-5 col-lg-5 col-sm-12">
+                <div class="form-group">
+                    <label asp-for="cus_name" class="control-label"></label>
+                    <input asp-for="cus_name" class="form-control" />
+                    <span asp-validation-for="cus_name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="cus_phone" class="control-label"></label>
+                    <input asp-for="cus_phone" class="form-control" />
+                    <span asp-validation-for="cus_phone" class="text-danger"></span>
+                </div>
+
+                @if (User.IsInRole("Admin") || User.IsInRole("Super Admin") || User.IsInRole("Employee"))
+                {
+                    <label class="border font-weight-bolder font-italic text-center mt-4 text-danger" style="font-family:'Times New Roman', Times, serif">If Customer already Purchase from Shop Just Write their RefNo# Otherwise Leave it Empty</label>
+                    <div class="form-group row">
+                        <label asp-for="store_id" class="control-label col-6"></label>
+                        <div class="col-12">
+                            <select asp-for="store_id" id="store_id" class="custom-select mr-sm-2"
+                                    asp-items="@(new SelectList( @ViewBag.Stores,"store_id","StoreName"))">
+                                <option value="">Please Select</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="store_id" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CustRef" class="control-label"></label>
+                        <input asp-for="CustRef" readonly min="1" class="form-control" />
+                        <span id="CusRef1" class="btn-link">Enable Field</span>
+                        <span asp-validation-for="CustRef" class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group row">
+                        <label asp-for="CityName" class="control-label ml-3"></label>
+                        <div class="col-12">
+                            <select asp-for="CityId" class="col-12 custom-select mr-sm-2"
+                                    asp-items="@(new SelectList( @ViewBag.cities,"id","city"))">
+                                <option value="">Please Select</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="CityId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group row col-12">
+                        <label asp-for="StrretAddress" class="control-label"></label>
+                        <textarea asp-for="StrretAddress" cols="4" rows="2" required placeholder="Street Adress" class="form-control w-100"></textarea>
+                        <span asp-validation-for="StrretAddress" class="text-danger"></span>
+                    </div>
+                    <div class="form-group row">
+                        <label asp-for="store_id" class="control-label col-12"></label>
+                        <div class="col-12">
+                            <select asp-for="store_id" class="custom-select mr-sm-2"
+                                    asp-items="@(new SelectList( @ViewBag.Stores,"store_id","StoreName"))">
+                                <option value="">Please Select</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="store_id" class="text-danger"></span>
+                    </div>
+
+
+                    <input asp-for="CustRef" readonly min="1" hidden class="form-control disabled" />
+
+                }
+
+
+            </div>
+            <div class="col-md-5 col-lg-5 col-sm-12">
+                <div class="form-group row">
+                    <label asp-for="com_Name" class="control-label col-6"></label>
+                    <div class="col-12">
+                        <select id="CompanyId" asp-for="Phoneid" class="custom-select mr-sm-2"
+                                asp-items="@(new SelectList( @ViewBag.Companies,"Phoneid","Com_name"))">
+                            <option value="">Please Select</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="com_Name" class="text-danger"></span>
+                </div>
+                <div class="form-group row">
+                    <label asp-for="model_name" class="control-label col-6"></label>
+                    <div class="col-12">
+                        <select id="modelId" asp-for="modelId" class="custom-select mr-sm-2"
+                                asp-items="@(new SelectList(string.Empty,"modelId","model_name","--Select--"))">
+                            <option value="">Please Select</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="modelId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Date" class="control-label"></label>
+                    <input asp-for="Date" readonly class="form-control" />
+                    <span asp-validation-for="Date" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Quantity" class="control-label"></label>
+                    <input asp-for="Quantity" min="1" class="form-control" />
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Amount" class="control-label"></label>
+                    <input id="price" asp-for="Amount" readonly class="form-control" />
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+            </div>
+
+        </div>
+        <div>
+            <div class="form-group d-flex m-auto justify-content-end flex-row ">
+                @if (User.IsInRole("Super Admin") || User.IsInRole("Admin") || User.IsInRole("Employee"))
+                {
+                    <a asp-action="Index" style="border-radius: 1.5rem;  margin-top: 1%; margin-right:2%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600;  cursor: pointer; width:20%; text-align:center;">Cancel</a>
+                }
+                else
+                {
+                    <a asp-action="MyOrders" style="border-radius: 1.5rem;  margin-top: 1%; margin-right:2%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600;  cursor: pointer; width:20%; text-align:center;">Cancel</a>
+                }
+                <input type="submit" value="Update" style="border-radius: 1.5rem;  margin-right:8%; margin-top: 1%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600; width:20%; cursor: pointer;" />
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+
+
+
+
+@if (User.IsInRole("Super Admin") || User.IsInRole("Admin") || User.IsInRole("Employee"))
+{
+    <a asp-action="Index">Back to Orders</a>
+    <a asp-action="Edit" asp-controller="Customer" asp-route-id="@Model.cus_id">Update Customer Data</a>
+
+}
+else
+{
+    <a asp-action="MyOrders">Back to Orders</a>
+}
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function () {
+            $("#CompanyId").change(async function () {
+                $("#price").val(0);
+                await data();
+                await CalPrice();
+            })
+            $('#modelId').change(async function () {
+                $("#price").val(0);
+                await CalPrice();
+            });
+            $('#Quantity').change(async function () {
+                await CalPrice();
+            });
+            $('#CityId').change(async function () {
+                console.log($('#CityId').val());
+                await GetStoreId();
+            })
+
+           
+        });
+        window.onload = async function () {
+            await data();
+        }
+        async function data() {
+            await $.getJSON("/Order/GetAllModels", { PhoneId: $("#CompanyId").val() }, function (data) {
+                $("#modelId").empty();
+                $.each(data, function (index, row) {
+                    $("#modelId").append("<option value='" + row.modelId + "'>" + row.model_name + '</option>')
+                });
+            });
+        }
+
+        async function CalPrice() {
+            const modelId = $('#modelId').val();
+            if (modelId.toString() != null) {
+                await $.getJSON("/Order/Price", { modelId: $("#modelId").val(), Quantity: $("#Quantity").val() }, function (data) {
+                    $("#price").val(data);
+                });
+            }
+        }
+        async function GetStoreId() {
+            await $.getJSON("/Order/GetStoreByCityId", { cityId: $('#CityId').val() }, function (data) {
+                $('store_id').val(data);
+            });
+        }
+    </script>
+}
+
+

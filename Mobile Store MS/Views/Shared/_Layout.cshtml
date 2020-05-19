@@ -1,0 +1,494 @@
+﻿@using Mobile_Store_MS.Data
+@inject SignInManager<ApplicationUser> SignInManager
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/popper.js/umd/popper.js"></script>
+    <link href="~/lib/fontawesome-free-5.13.0-web/css/all.min.css" rel="stylesheet" />
+    <script src="~/lib/fontawesome-free-5.13.0-web/js/all.min.js"></script>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/Notifications.js"></script>
+    <link href="~/css/admin.css" rel="stylesheet" />
+    <script src="~/js/script.js"></script>
+</head>
+<body>
+    @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin") || User.IsInRole("Super Admin") || User.IsInRole("Employee"))
+    {
+        <div class="page-wrapper chiller-theme toggled">
+            <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
+                <i class="fas fa-bars"></i>
+            </a>
+            <nav id="sidebar" class="sidebar-wrapper">
+                <div class="sidebar-content">
+                    <div class="sidebar-brand">
+                        <a asp-controller="Home" asp-action="admin">Mobile Shop</a>
+                        <div id="close-sidebar">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                    <div class="sidebar-header row">
+                        <div class="user-pic" id="userpic">
+                            <img class="img-responsive img-rounded" src="~/Image/emp.jpg" alt="User picture">
+                        </div>
+                        <div class="user-info">
+                            <span class="user-name" style="font-size:smaller">
+                                <strong> @User.Identity.Name</strong>
+                            </span>
+
+                            @if (User.IsInRole("Super Admin"))
+                            {
+                                <span class="user-role"> Administrator </span>
+                            }
+                            else if (User.IsInRole("Admin"))
+                            {
+                                <span class="user-role"> Admin </span>
+                            }
+                            else if (User.IsInRole("Employee"))
+                            {
+                                <span class="user-role"> Employee </span>
+                            }
+                            else
+                            {
+                                <span class="user-role"> User </span>
+                            }
+                            <span class="user-status">
+                                <i class="fa fa-circle text-success"></i>
+                                <span>Online</span>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- sidebar-header  -->
+                    <div class="sidebar-search">
+                        <div>
+                            <form id="search-form" class="input-group" method="get" asp-controller="Order" asp-action="MyOrders">
+                                <input type="text" name="Cusref" required min="1" class="form-control search-menu" placeholder="Search Order">
+                                <div class="input-group-append">
+                                    <button class="input-group-text" type="submit">
+                                        <i class="fa fa-search" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </form>
+                            <script>
+                                document.getElementById("search-form").onsubmit = function (e) {
+                                    if (e.target.Cusref.value.length == 0 && parseInt(e.target.Cusref.value) <= 0) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            </script>
+                        </div>
+                    </div>
+                    <!-- sidebar-search  -->
+                    <div class="sidebar-menu">
+                        <ul>
+                            <li class="header-menu">
+                                <span>General</span>
+                            </li>
+                            <li class="sidebar-dropdown">
+                                <a href="#">
+                                    <i class="fa fa-tachometer-alt"></i>
+                                    <span>Dashboard</span>
+                                    <span class="badge badge-pill badge-warning">New</span>
+                                </a>
+                                <div class="sidebar-submenu">
+                                    <ul>
+                                        <li>
+                                            <a asp-controller="Home" asp-action="Index">
+                                                User Home
+                                                <span class="badge badge-pill badge-success">Pro</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a asp-controller="Home" asp-action="admin">Admin Home</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="sidebar-dropdown">
+                                <a href="#">
+                                    <i class="fa fa-shopping-cart"></i>
+                                    <span>Orders</span>
+                                    <span class="badge badge-pill badge-danger">1</span>
+                                </a>
+                                <div class="sidebar-submenu">
+                                    <ul>
+                                        <li>
+                                            <a asp-controller="Order" asp-action="StoreOrders">
+                                                Details
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a asp-controller="Order" asp-action="Create">Create Order</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="sidebar-dropdown">
+                                <a href="#">
+                                    <i class="far fa-money-bill-alt"></i>
+                                    <span>Purchasing</span>
+                                </a>
+                                <div class="sidebar-submenu">
+                                    <ul>
+                                        <li>
+                                            <a asp-controller="Purchasing" asp-action="StorePurchasing">
+                                                Details
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a asp-controller="Purchasing" asp-action="Create">Create Purchasing</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="sidebar-dropdown">
+                                <a href="#">
+                                    <i class="fa fa-shopping-cart"></i>
+                                    <span>Customers</span>
+                                </a>
+                                <div class="sidebar-submenu">
+                                    <ul>
+                                        <li>
+                                            <a asp-controller="Customer" asp-action="Index">
+                                                Details
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a asp-controller="Customer" asp-action="Create">Create</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="sidebar-dropdown">
+                                <a href="#">
+                                    <i class="far fa-copyright"></i>
+                                    <span>Companies</span>
+                                </a>
+                                <div class="sidebar-submenu">
+                                    <ul>
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Super Admin"))
+                                        {
+                                            <li>
+                                                <a asp-controller="Company" asp-action="Create">Add Company</a>
+                                            </li>
+                                        }
+
+                                        <li>
+                                            <a asp-controller="Company" asp-action="Index">Company Details</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="sidebar-dropdown">
+                                <a href="#">
+                                    <i class="fas fa-mobile"></i>
+                                    <span>Models</span>
+                                </a>
+                                <div class="sidebar-submenu">
+                                    <ul>
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Super Admin"))
+                                        {
+                                            <li>
+                                                <a asp-controller="CompanyModel" asp-action="Create">Add Model</a>
+                                            </li>
+                                        }
+
+                                        <li>
+                                            <a asp-controller="CompanyModel" asp-action="Index">Model Details</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="sidebar-dropdown">
+                                <a href="#">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Vendors</span>
+                                </a>
+                                <div class="sidebar-submenu">
+                                    <ul>
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Super Admin"))
+                                        {
+                                            <li>
+                                                <a asp-controller="Vendor" asp-action="Create">Add Vendor</a>
+                                            </li>
+                                        }
+
+                                        <li>
+                                            <a asp-controller="Vendor" asp-action="Index">Vendor Details</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="sidebar-">
+                                @if (User.IsInRole("Super Admin"))
+                                {
+                                    <a asp-controller="Quantity">
+                                        <i class="fas fa-business-time"></i>
+                                        <span>Stock</span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Quantity" asp-action="StoreStock">
+                                        <i class="fas fa-business-time"></i>
+                                        <span>Stock</span>
+                                    </a>
+                                }
+
+                            </li>
+
+                            <li class="header-menu">
+                                <span>Extra</span>
+                            </li>
+                            <li>
+                                <!-- sidebar-header  -->
+                                <div class="sidebar-search">
+                                    <div>
+                                        <form id="search-form1" class="input-group" method="get" asp-controller="Administration" asp-action="GetUserById">
+                                            <input type="text" name="id" required min="1" class="form-control search-menu" placeholder="Search User">
+                                            <div class="input-group-append">
+                                                <button class="input-group-text" type="submit">
+                                                    <i class="fa fa-search" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </form>
+                                        <script>
+                                            document.getElementById("search-form1").onsubmit = function (e) {
+                                                if (e.target.Cusref.value.length == 0) {
+                                                    e.preventDefault();
+                                                }
+                                            }
+                                        </script>
+                                    </div>
+                                </div>
+                                <!-- sidebar-search  -->
+                            </li>
+                            <li class="sidebar-dropdown">
+                                <a href="#">
+                                    <i class="fas fa-user-shield"></i>
+                                    <span>Administration</span>
+                                </a>
+                                <div class="sidebar-submenu">
+                                    <ul>
+                                        @if (User.IsInRole("Super Admin"))
+                                        {
+                                            <li>
+                                                <a asp-controller="Administration" asp-action="AddEmployee">Add Employee</a>
+                                            </li>
+                                            <li>
+                                                <a asp-controller="Administration" asp-action="GetAllRoles">All Roles</a>
+                                            </li>
+                                        }
+                                        else if (User.IsInRole("Admin") || User.IsInRole("Employee"))
+                                        {
+                                            <li>
+                                                <a asp-controller="Account" asp-action="Register">Add Member</a>
+                                            </li>
+                                        }
+
+                                        <li>
+                                            <a asp-controller="Administration" asp-action="ListUsers">All Users</a>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </li>
+                            <li>
+                                <a asp-controller="Store" asp-action="GetEmployees">
+                                    <i class="fa fa-calendar"></i>
+                                    <span>Get Employees</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-controller="Store" asp-action="GetStock">
+                                    <i class="fa fa-folder"></i>
+                                    <span>Get Stock</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- sidebar-menu  -->
+                </div>
+                <!-- sidebar-content  -->
+                <div class="sidebar-footer">
+
+                    <div class="dropup " style="position:relative">
+                        <a href="#" data-toggle="dropdown" data-target="notification_dropdown" id="loadNotification">
+                            <i class="fa fa-bell"></i>
+                            <span class="badge badge-pill badge-success notification" id="NotificationsCount">0</span>
+                        </a>
+                        <ul class="dropdown-menu list-unstyled rounded shadow" style="overflow-y:scroll; width: 40vw; height:80vh; position:absolute; left:10%; bottom:-2%; " id="notification_dropdown">
+
+
+                            <li class="shadow" style="border-bottom:1px solid rgba(0,0,0,.1);  padding:8px 0;" id="load">
+                                <a href="#" class="btn btn-outline-dark text-primary w-100" >
+                                    Load More
+                                </a>
+                            </li>
+
+
+                        </ul>
+                    </div>
+
+                    <a asp-controller="Home" asp-action="CreateMessages">
+                        <i class="fa fa-envelope "></i>
+                        <span class="badge badge-pill badge-warning notification" id="messagesCount">0</span>
+                    </a>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <a asp-controller="Home" asp-action="Profile" title="Profile">
+                            <i class="fas fa-user-circle"></i>
+                            <span class="badge-sonar"></span>
+                        </a>
+                        <a asp-controller="Account" asp-action="Logout" title="Logout">
+                            <i class="fa fa-power-off"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Register" title="Register">
+                            <i class="fas fa-user-circle"></i>
+                            <span class="badge-sonar"></span>
+                        </a>
+                        <a asp-controller="Account" asp-action="Login" title="Login">
+                            <i class="fa fa-power-off"></i>
+                        </a>
+
+                    }
+
+                </div>
+            </nav>
+            <!-- sidebar-wrapper  -->
+            <main class="page-content">
+                <div class="container-fluid">
+                    @if (IsSectionDefined("Scripts"))
+                    {
+                        @RenderSection("Scripts")
+                    }
+
+                    @RenderBody()
+                </div>
+            </main>
+            <!-- page-content" -->
+        </div>
+    }
+    else
+    {
+        <h4>Please Login To Continue</h4>
+        <a class="btn btn-primary " asp-controller="Account" asp-action="Login">Login</a>
+    }
+
+    <script>
+        let page = 1,count=1; 
+        const dataArray = [];
+        const loadButton = document.getElementById('load');
+        window.onload = async function () {
+            //Profile
+            const req1 = await fetch('/Home/GetProfile');
+            const data1 = await req1.json();
+            if (data1 != null) {
+                document.querySelector('#userpic img').src = '/Image/' + data1;
+            }
+            else {
+                document.querySelector('#userpic img').src = '/Image/emp.jpg';
+            }
+
+            //Count Messages
+            const messagesCount = await fetch('/Home/GetUnreadMessagesCount');
+            const messagesCountData = await messagesCount.json();
+            if (messagesCountData != null) {
+                document.querySelector('#messagesCount').textContent = messagesCountData;
+            }
+            else {
+                document.querySelector('#messagesCount').textContent = 0;
+            }
+
+            //Count Notifications
+            const Notifications = await fetch('/Home/GetUnreadNotificationsCount');
+            const NotificationsCountData = await Notifications.json();
+            if (NotificationsCountData != null) {
+                document.querySelector('#NotificationsCount').textContent = NotificationsCountData;
+            }
+            else {
+                document.querySelector('#NotificationsCount').textContent = 0;
+            }
+        }
+
+
+        loadButton.addEventListener('click', async function () {
+           
+            if (page > 1) {
+                const load = await fetch('/Home/UserNotifications/pageNo?'+page );
+                const loadData = await load.json();
+                dataArray.push(...loadData.notifications);
+                AddNotification(dataArray, loadData.pageNo, loadData.totalNotification);
+                //AddNotification(loadData);
+            }
+        });
+
+
+        document.getElementById('loadNotification').addEventListener('click', async function () {
+            if(count > 1) return
+            count++;
+            let req2 = await fetch('/Home/UserNotifications').then(d => d.json()).then(data2 => {
+                dataArray.push(...data2.notifications);
+                AddNotification(dataArray, data2.pageNo, data2.totalNotification);
+            });
+            //const data2 = await req2.json();
+            //console.log(data2.notifications);
+            //AddNotification(data2);
+
+        });
+
+        function AddNotification(data, pageNo, totalNotification) {
+            page = pageNo + 1;
+            //page = data.pageNo+1;
+            const ul = document.getElementById('notification_dropdown');
+            ul.innerHTML = ` <li class="shadow" style="border-bottom:1px solid rgba(0,0,0,.1);  padding:8px 0;" id="load">
+                                <a href="#" class="btn btn-outline-dark text-primary w-100" >
+                                    Load More
+                                </a>
+                            </li>`;
+            if (data != null) {
+                data.reverse();
+                data.forEach(x => {
+                    let read = '';
+                    const date = new Date(x.when);
+                    var time = (new Date() - date) / 36e5;
+                    var when = Math.floor(Math.abs(time));
+                    let dateString = when + "h ago";
+                    if (when >= 24) dateString = Math.floor(Math.abs(when / 24)) + "d ago";
+                    else if (when == 0) dateString = Math.floor(Math.abs(time * 60)) + "m ago";
+                    if (x.read == false) read = "bg_dark";
+                     const li = `<li class="icon m-1 list-unstyled d-flex ${read}" style="border-bottom:1px solid rgba(0,0,0,.1);  padding:1px 0;">
+                           <a href="${x.url}">
+                               <p class="text">  <span class="font-weight-bolder">${x.heading} </span> ${x.text} </br> <span class="not_time">${dateString}</span ></p>
+                            </a>
+                         </li >`;
+                    ul.innerHTML += li;
+                });
+
+                var totalNotifications = parseInt(totalNotification);
+                var countNotifications = document.getElementById("notification_dropdown").childNodes.length -1;
+                document.getElementById("notification_dropdown").childNodes[countNotifications - 1].scrollIntoView();
+                if ( parseInt(countNotifications) >= totalNotifications)
+                {
+                    document.getElementById('load').style.display = "none"
+                }
+
+            }
+            else {
+                document.getElementById('load').style.display = "none"
+               
+            }
+
+        }
+    </script>
+</body>
+</html>

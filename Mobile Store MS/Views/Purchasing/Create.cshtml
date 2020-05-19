@@ -1,0 +1,162 @@
+﻿@model Mobile_Store_MS.ViewModel.PurchasingViewModel.PurchasingViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h4>Purchasing</h4>
+<hr />
+
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="bg-light m-2">
+        <h1 class="text-center mt-3 text-info">Purchasing</h1>
+        <div class="row d-flex justify-content-around">
+            <div class="col-md-5 col-lg-5 col-sm-12">
+                <div class="form-group row">
+                    <label asp-for="store_id" class="control-label col-6"></label>
+                    <div class="col-12">
+                        <select asp-for="store_id" class="custom-select mr-sm-2"
+                                asp-items="@(new SelectList( @ViewBag.Stores,"store_id","StoreName"))">
+                            <option value="">Please Select</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="store_id" class="text-danger"></span>
+                </div>
+                <div class="form-group row">
+                    <label asp-for="Com_name" class="control-label col-6"></label>
+                    <div class="col-12">
+                        <select id="CompanyId" asp-for="Phoneid" class="custom-select mr-sm-2"
+                                asp-items="@(new SelectList( @ViewBag.Companies,"Phoneid","Com_name"))">
+                            <option value="">Please Select</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="Phoneid" class="text-danger"></span>
+                </div>
+                <div class="form-group row">
+                    <label asp-for="modelName" class="control-label col-6"></label>
+                    <div class="col-12">
+                        <select id="modelId" asp-for="modelId" class="custom-select mr-sm-2"
+                                asp-items="@(new SelectList(string.Empty,"modelId","model_name","--Select--"))">
+                            <option value="">Please Select</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="modelId" class="text-danger"></span>
+                </div>
+                <div class="form-group row">
+                    <label asp-for="VendorName" class="control-label col-6"></label>
+                    <div class="col-12">
+                        <select id="VendorId" asp-for="vendor_id" class="custom-select mr-sm-2"
+                                asp-items="@(new SelectList(string.Empty,"vendor_id","VendorName","--Select--"))">
+                            <option value="">Please Select</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="vendor_id" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Date" class="control-label"></label>
+                    <input asp-for="Date" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly class="form-control" />
+                    <span asp-validation-for="Date" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-5 col-lg-5 col-sm-12">
+                <div class="form-group">
+                    <label asp-for="Quantity" class="control-label"></label>
+                    <input asp-for="Quantity" min="1" class="form-control" />
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Sale Price of each Model</label>
+                    <input id="eachPrice" readonly class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Sale Price</label>
+                    <input id="price" readonly class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label"> Purchase Price of each Model</label>
+                    <input id="Purchaseprice" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Amount" class="control-label"></label>
+                    <input asp-for="Amount" readonly class="form-control" />
+                    <label id='profit' class="control-label">Profit: <span>0</span> </label>
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+            </div>
+
+        </div>
+        <div class="">
+            <div class="form-group d-flex m-auto justify-content-end flex-row ">
+                <a asp-action="Index" style="border-radius: 1.5rem;  margin-top: 1%; margin-right:2%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600;  cursor: pointer; width:20%; text-align:center;">Cancel</a>
+                <input type="submit" value="Create" style="border-radius: 1.5rem;  margin-right:8%; margin-top: 1%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600; width:20%; cursor: pointer;" />
+            </div>
+        </div>
+    </div>
+</form>
+ 
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<script>
+    $(document).ready(function () {
+        $("#CompanyId").change(async function () {
+            $("#price").val(0);
+            $("eachPrice").val(0);
+            $("#Quantity").val(0);
+            await data();
+        })
+        //To Update Price
+        $('#Quantity').change(function () {
+            const modelId = $('#modelId').val();
+            if (modelId.toString() != null) {
+                $.getJSON("/Order/Price", { modelId: $("#modelId").val(), Quantity: $("#Quantity").val() }, function (data) {
+                    $("#price").val(data);
+                    $('#eachPrice').val(data / $('#Quantity').val())
+                });
+            }
+            if ($('#Purchaseprice').val() != null) {
+                const PurchaseAmount = $("#Quantity").val() * $('#Purchaseprice').val();
+                console.log(PurchaseAmount);
+                $('#Amount').val(PurchaseAmount);
+            }
+
+        });
+        $('#Purchaseprice').bind('input',function () {
+            const PurchaseAmount = $("#Quantity").val() * $('#Purchaseprice').val();
+            $('#Amount').val(PurchaseAmount);
+            const Saleprice = $('#price').val();
+            const PurchasePrice = $('#Amount').val();
+            const profit = Saleprice - PurchasePrice;
+            console.log(profit);
+            $('#profit span').text(profit);
+        })
+       
+    });
+    window.onload = async function () {
+        var CompanyId = $("#CompanyId").val();    
+        if (CompanyId != '') {
+            await data();
+        }
+    }
+    async function data() {
+        await $.getJSON("/Order/GetAllModels", { PhoneId: $("#CompanyId").val() }, function (data) {
+            $("#modelId").empty();
+            $.each(data, function (index, row) {
+                $("#modelId").append("<option value='" + row.modelId + "'>" + row.model_name + '</option>')
+            });
+        });
+        await $.getJSON("/Purchasing/GetAllVendors", { PhoneId: $("#CompanyId").val() }, function (data) {
+            $("#VendorId").empty();
+
+            $.each(data, function (index, row) {
+
+                $("#VendorId").append("<option value='" + row.vendorId + "'>" + row.vendor_name + '</option>')
+            });
+        });
+    }
+</script>

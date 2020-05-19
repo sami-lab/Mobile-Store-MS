@@ -1,0 +1,660 @@
+﻿@model Mobile_Store_MS.ViewModel.dashboard
+@{
+    ViewData["Title"] = "Admin";
+}
+
+<div>
+    <div class="pt-5">
+        <div class="w-100">
+            <div style="background-color:lawngreen">
+                <div class="row py-3" style="border-left:5px solid blue; background-color:aliceblue;">
+                    <div class="col-md-12">
+                        <div class="d-flex justify-content-between">
+                            <h2 class="font-weight-bold text-capitalize">overview</h2>
+                            <button class="btn btn-primary px-4">
+                                <i class="fa fa-plus"></i>Add item
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="" style="padding-top: 80px; padding-bottom: 80px; padding-left:10px; padding-right:5px;">
+                    <div class="row col-md-12">
+                        <div class="mx-auto col-12 col-sm-5 bg-white shadow col-md-5  mb-3" style="border-left:10px solid blue">
+                            <div class="d-flex justify-content-around  align-items-center p-4">
+
+                                <div class="font-weight-bolder text-capitalize">
+                                    <h5 class="text-success  mt-0 mb-0">Total Purchasing (Monthly)</h5>
+                                    <h2 class="font-weight-600  mt-1" style="font-size: 30px; font-family: Georgia, 'Times New Roman', Times, serif;">@Model.LastMonthPurchasing</h2>
+                                </div>
+                                <i class="fas fa-download fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="mx-auto col-12 col-sm-5 bg-white shadow col-md-5  mb-3" style="border-left:10px solid green">
+                            <div class="d-flex justify-content-around align-items-center p-4">
+
+                                <div class="font-weight-bolder text-capitalize">
+                                    <h5 class="text-success  mt-0 mb-0">Total Sales (Monthly)</h5>
+                                    <h2 class="font-weight-600  mt-1" style="font-size: 30px; font-family: Georgia, 'Times New Roman', Times, serif;">@Model.LastMonthSales</h2>
+                                </div>
+                                <i class="fas fa-cart-arrow-down fa-3x "></i>
+                            </div>
+                        </div>
+                        <div class="mx-auto col-12 col-sm-5 bg-white shadow col-md-5  mb-3" style="border-left:10px solid blue">
+                            <div class="d-flex justify-content-around align-items-center p-4">
+
+                                <div class="font-weight-bolder text-capitalize">
+                                    <h5 class="text-success  mt-0 mb-0">Total Purchasing</h5>
+                                    <h2 class="font-weight-600  mt-1" style="font-size: 30px; font-family: Georgia, 'Times New Roman', Times, serif;">@Model.TotalPurchasingCount</h2>
+                                </div>
+                                <i class="fas fa-comments-dollar fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="mx-auto col-12 col-sm-5 bg-white shadow col-md-5  mb-3" style="border-left:10px solid green">
+                            <div class="d-flex justify-content-around align-items-center p-4">
+
+                                <div class="font-weight-bolder text-capitalize">
+                                    <h5 class="text-success  mt-0 mb-0">Total Orders</h5>
+                                    <h2 class="font-weight-600  mt-1" style="font-size: 30px; font-family: Georgia, 'Times New Roman', Times, serif;">@Model.TotalSalesCount</h2>
+                                </div>
+                                <i class="fab fa-amazon-pay fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="mx-auto col-12 col-sm-5 bg-white shadow col-md-5  mb-3" style="border-left:10px solid blue">
+                            <div class="d-flex justify-content-around align-items-center p-4">
+
+                                <div class="font-weight-bolder text-capitalize">
+                                    <h5 class="text-success  mt-0 mb-0">Total Purchasing</h5>
+                                    <h2 class="font-weight-600  mt-1" style="font-size: 30px; font-family: Georgia, 'Times New Roman', Times, serif;">@Model.TotalPurchasing</h2>
+                                </div>
+                                <i class="fas fa-warehouse fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="mx-auto col-12 col-sm-5 bg-white shadow col-md-5  mb-3" style="border-left:10px solid green">
+                            <div class="d-flex justify-content-around align-items-center p-4">
+
+                                <div class="font-weight-bolder text-capitalize">
+                                    <h5 class="text-success  mt-0 mb-0">Total Sales</h5>
+                                    <h2 class="font-weight-600  mt-1" style="font-size: 30px; font-family: Georgia, 'Times New Roman', Times, serif;">
+                                        @Model.TotalSales
+                                    </h2>
+                                </div>
+                                <i class="fas fa-hand-holding-usd fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="mx-auto col-12 col-sm-5 bg-white shadow col-md-5  mb-3" style="border-left:10px solid blue">
+                            <div class="d-flex justify-content-around align-items-center p-4">
+
+                                <div class="font-weight-bolder text-capitalize">
+                                    <h5 class="text-success  mt-0 mb-0">Profit (Monthly)</h5>
+                                    <h2 class="font-weight-600  mt-1" style="font-size: 30px; font-family: Georgia, 'Times New Roman', Times, serif;">@Model.MonthlyProfit</h2>
+                                </div>
+                                <i class="fas fa-balance-scale-right fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="mx-auto col-12 col-sm-5 bg-white shadow col-md-5  mb-3" style="border-left:10px solid green">
+                            <div class="d-flex justify-content-around align-items-center p-4">
+
+                                <div class="font-weight-bolder text-capitalize">
+                                    <h5 class="text-success  mt-0 mb-0">Total Profit</h5>
+                                    <h2 class="font-weight-600  mt-1" style="font-size: 30px; font-family: Georgia, 'Times New Roman', Times, serif;">@Model.TotalProfit</h2>
+                                </div>
+                                <i class="fas fa-dollar-sign fa-3x"></i>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+            <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+            <div class="mt-5" id="chartContainer" style="height: 370px; width: 100%;"></div>
+
+            <div class="mt-5" id="chartContainer1" style="height: 370px; width: 100%;"></div>
+            @{
+                var p1 = @Html.Raw(Json.Serialize(Model.Sales));
+                var p2 = @Html.Raw(Json.Serialize(Model.Purchasings));
+            }
+
+
+            <input type="hidden" id="PassingToJavaScript1" value=@p1>
+            <input type="hidden" id="PassingToJavaScript2" value=@p2>
+
+            <div class="row mt-5">
+                <div class="col-lg-9 col-sm-12">
+                    <div class="rounded" style="background-color:#428BCA; display:flex; justify-content:space-between; align-items:center; margin-top:-20px">
+                        <h3 class="font-weight-bold" style=" color:white; margin-left:5px;">Total Users: @Model.TotalUsers</h3>
+                        <div style=" background-color:white; margin:10px;">
+                            <a asp-controller="Administration" asp-action="ListUsers" class="btn btn-default btn-xs"><i class="fas fa-info-circle" title="Details"></i> Details</a>
+                        </div>
+                    </div>
+                    <div class="table-responsive mb-2">
+                        <table class="table table-hover table-striped table-earning">
+                            <thead>
+                                <tr>
+                                    <th>@Html.DisplayNameFor(modelItem => Model.User.First().Id)</th>
+                                    <th>@Html.DisplayNameFor(modelItem => Model.User.First().FullName)</th>
+                                    <th>@Html.DisplayNameFor(modelItem => Model.User.First().Email)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.User)
+                                {
+                                    <tr>
+                                        <td>@item.Id</td>
+                                        <td>@item.FullName</td>
+                                        <td>@item.Email</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="rounded" style="background-color:#428BCA; display:flex; justify-content:space-between; align-items:center; margin-top:-20px">
+                        <h3 class="font-weight-bold" style=" color:white; margin-left:5px;">Total Employees: @Model.TotalEmployees</h3>
+                        <div style=" background-color:white; margin:10px;">
+                            <a asp-controller="Store" asp-action="GetEmployees" class="btn btn-default btn-xs"><i class="fas fa-info-circle" title="Details"></i> Details</a>
+                        </div>
+                    </div>
+                    <div class="table-responsive mb-2">
+                        <table class="table table-hover table-striped table-earning">
+                            <thead>
+                                <tr>
+                                    <th>@Html.DisplayNameFor(modelItem => Model.Employees.First().id)</th>
+                                    <th>@Html.DisplayNameFor(modelItem => Model.Employees.First().Email)</th>
+                                    <th>@Html.DisplayNameFor(modelItem => Model.Employees.First().StoreName)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Employees)
+                                {
+                                    <tr>
+                                        <td>@item.id</td>
+                                        <td>@item.Email</td>
+                                        <td>@item.StoreName</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-12">
+                    <h2 class="mb-2">Companies and Brands</h2>
+                    <div class="au-card au-card--bg-blue au-card-top-countries m-b-40">
+                        <div class="au-card-inner">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <tbody>
+                                        @foreach (var item in Model.CompaniesData)
+                                        {
+                                           
+                                        <tr>
+                                           
+                                            <td> <a asp-controller="Home" asp-action="Models" asp-route-id="@item.PhoneID">@item.ComapanyName</a></td>
+                                                <td class="text-right">@item.BrandsTotal</td>
+                                            
+                                        </tr>
+
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Orders-->
+            <div class="container-fluid row">
+                <div class="panel panel-primary filterable">
+                    <div class="rounded" style="background-color:#428BCA; display:flex; justify-content:space-between; align-items:center; margin-top:-20px">
+                        <h3 class="font-weight-bold" style=" color:white; margin-left:5px;">Total Orders: @Model.TotalSalesCount</h3>
+                        <div style=" background-color:white; margin:10px;">
+                            <a asp-controller="Orders" asp-action="StoreOrders" class="btn btn-default btn-xs"><i class="fas fa-info-circle" title="Details"></i> Details</a>
+                        </div>
+                    </div>
+                    <table class="table table-hover table-striped">
+                        <thead>
+
+                            <tr>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Orders.First().order_id)</th>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Orders.First().cus_name)</th>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Orders.First().model_name)</th>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Orders.First().StoreName)</th>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Orders.First().Date)</th>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Orders.First().Quantity)</th>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Orders.First().Amount)</th>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Orders.First().orderStatus)</th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Orders)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.order_id)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.cus_name) @Html.DisplayFor(modelItem => item.CustRef)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.com_Name) @Html.DisplayFor(modelItem => item.model_name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.StoreName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Date)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Quantity)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Amount)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.orderStatus)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!--Purchasings-->
+            <div class=" mt-5 container-fluid row">
+                <div class="panel panel-primary filterable">
+                    <div class="rounded" style="background-color:#428BCA; display:flex; justify-content:space-between; align-items:center; margin-top:-20px">
+                        <h3 class="font-weight-bold" style=" color:white; margin-left:5px;">Total Purchasings: @Model.TotalPurchasingCount</h3>
+                        <div style=" background-color:white; margin:10px;">
+                            <a asp-controller="Purchasing" asp-action="StorePurchasing" class="btn btn-default btn-xs"><i class="fas fa-info-circle" title="Details"></i> Details</a>
+                        </div>
+                    </div>
+                    <table class="table table-hover table-striped">
+                        <thead>
+
+                            <tr>
+                                <th>ID</th>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Purchasing.First().StoreName)</th>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Purchasing.First().modelName)</th>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Purchasing.First().VendorName)</th>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Purchasing.First().Date)</th>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Purchasing.First().Quantity)</th>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Purchasing.First().Amount)</th>
+                                <th>@Html.DisplayNameFor(modelItem => Model.Purchasing.First().takenBy)</th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Purchasing)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.purchase_id)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.StoreName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Com_name) @Html.DisplayFor(modelItem => item.modelName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.VendorName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Date)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Quantity)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Amount)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.takenBy)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+
+            <!--Store Statistics-->
+            <div class="w-100 ">
+                @foreach (var store in Model.Stores)
+                {
+                <div class="container-fluid bg-white  p-3 shadow">
+                    <div class="p-2 mb-2 mt-4 d-flex justify-content-between bg-info rounded" style="border-left:10px solid green">
+                        <h3>  @store.StoreID - @store.StoreName </h3>
+                        <div>
+                            <a asp-controller="Store" asp-action="Index" asp-route-store_id="@store.StoreID" class="btn btn-default btn-xs"><i class="fas fa-info-circle" title="Details"></i> Details</a>
+
+                        </div>
+                    </div>
+                    <!--Cards-->
+                    <div class="row  d-flex justify-content-center">
+                        <div class="col-lg-4 col-md-4 col-sm-6  p-3 ">
+                            <div class="card  border-0 h-100 bg-light">
+                                <div class="d-flex justify-content-between h-100 bg-light shadow p-3">
+                                    <div class="bg-success" style="width:20%;">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h4>Last Month Sale</h4>
+                                        <h2>@store.MonthSales</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6  p-3">
+                            <div class="card   border-0 h-100 bg-light">
+                                <div class="d-flex justify-content-between h-100 bg-light shadow p-3">
+                                    <div class=" bg-primary" style="width:20%">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h4>Item Sold (Monthly)</h4>
+                                        <h2>@store.MonthSalesCount</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6  p-3">
+                            <div class="card  border-0 h-100  bg-light">
+                                <div class="d-flex  justify-content-between h-100 bg-light shadow p-3">
+                                    <div class="bg-info" style="width:20%">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h4>Average Monthly sale</h4>
+                                        <h3>@store.AverageMonthlySale</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-4 col-md-4 col-sm-6  py-2">
+                            <div class="card  border-0 h-100  bg-light">
+                                <div class="d-flex  justify-content-between h-100 bg-light shadow p-3">
+                                    <div class="bg-success" style="width:20%">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h4>Monthly Purchasing</h4>
+                                        <h2>@store.MonthPurchasing</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6  py-2">
+                            <div class="card  border-0 h-100  bg-light">
+                                <div class="d-flex  justify-content-between h-100 bg-light shadow p-3">
+                                    <div class="bg-primary" style="width:20%">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h4>Item Purchased (Monthly)</h4>
+                                        <h2>@store.MonthPurchasingCount</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6  py-2">
+                            <div class="card  border-0 h-100 bg-light ">
+                                <div class="d-flex  justify-content-between h-100 bg-light shadow p-3">
+                                    <div class="bg-info" style="width:20%">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h4>Average Purchasing</h4>
+                                        <h3>@store.AverageMonthlyPurchasing</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-4 col-md-4 col-sm-6  py-2">
+                            <div class="card border-0 h-100 bg-light">
+                                <div class="d-flex  justify-content-between h-100 bg-light shadow p-3">
+                                    <div class="bg-success" style="width:20%">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h4>Last Month Profit</h4>
+                                        <h2>@store.MonthlyProfit</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6  py-2">
+                            <div class="card  border-0 h-100 bg-light">
+                                <div class="d-flex justify-content-between h-100 bg-light shadow p-3">
+                                    <div class=" bg-primary" style="width:20%">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h4>Total Employees</h4>
+                                        <h2>@store.TotalEmployees</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6  py-2">
+                            <div class="card border-0  h-100 bg-light ">
+                                <div class="d-flex  justify-content-between h-100 bg-light shadow p-3">
+                                    <div class="bg-info" style="width:20%">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h4>Total Brands Count</h4>
+                                        <h2>@store.TotalBrands</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6  py-2">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="d-flex  justify-content-between h-100 bg-light shadow p-3">
+                                    <div class="bg-success" style="width:20%">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h5>Annual Purchasing</h5>
+                                        <h3>@store.AnnualPurchasing</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6  py-2">
+                            <div class="card  border-0 bg-light h-100">
+                                <div class="d-flex justify-content-between h-100 bg-light shadow p-3">
+                                    <div class=" bg-primary" style="width:20%">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h4>Annual Sales</h4>
+                                        <h3>@store.AnnualSales</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6  py-2">
+                            <div class="card border-0 h-100 bg-light">
+                                <div class="d-flex  justify-content-between h-100 bg-light shadow p-3">
+                                    <div class="bg-info" style="width:20%">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h4>Annual Profit</h4>
+                                        <h3>@store.AnnualProfit</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6  py-2">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="d-flex  justify-content-between h-100 bg-light shadow p-3">
+                                    <div class="bg-success" style="width:20%">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h4>@store.CompletedOrders Orders Completed</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6  py-2">
+                            <div class="card  border-0 bg-light h-100">
+                                <div class="d-flex justify-content-between h-100 bg-light shadow p-3">
+                                    <div class=" bg-primary" style="width:20%">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h4>@store.ProcessOrders Orders is in Process</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6  py-2">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="d-flex  justify-content-between h-100 bg-light shadow p-3">
+                                    <div class="bg-info" style="width:20%">
+
+                                    </div>
+                                    <div class="align-self-center ml-1" style="width:75%;">
+                                        <h4>@store.PendingOrders Pending Orders</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+   
+    <script>
+        window.addEventListener ?
+            window.addEventListener("load", yourFunction, false) :
+            window.attachEvent && window.attachEvent("onload", yourFunction);
+        function yourFunction() {
+            let dataPoints1 = [];
+            var dataPoints = [];
+
+            var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                theme: "light2",
+                title: {
+                    text: "Daily Sales Data"
+                },
+                axisY: {
+                    title: "RUPEES",
+                    titleFontSize: 24,
+                    includeZero: false,
+                    prefix: "RS",
+                    crosshair: {
+                        enabled: true,
+                        valueFormatString: "$#,##0.##",
+                        snapToDataPoint: true
+                    }
+                },
+                axisX: {
+                    crosshair: {
+                        enabled: true,
+                        snapToDataPoint: true
+                    }
+                },
+                data: [{
+                    type: "line",
+                    yValueFormatString: "RS#,##0.##",
+                    xValueFormatString: "MMM DD YYYY",
+                    dataPoints: dataPoints
+                }]
+            });
+
+            var chart1 = new CanvasJS.Chart("chartContainer1", {
+                animationEnabled: true,
+                theme: "light2",
+                title: {
+                    text: "Daily Sales Data"
+                },
+                axisY: {
+                    title: "RUPEES",
+                    titleFontSize: 24,
+                    includeZero: false,
+                    prefix: "RS",
+                    crosshair: {
+                        enabled: true,
+                        valueFormatString: "$#,##0.##",
+                        snapToDataPoint: true
+                    }
+                },
+                axisX: {
+                    crosshair: {
+                        enabled: true,
+                        snapToDataPoint: true
+                    }
+                },
+                data: [{
+                    type: "line",
+                    yValueFormatString: "RS#,##0.##",
+                    xValueFormatString: "MMM DD YYYY",
+                    dataPoints: dataPoints1
+                }]
+            });
+
+            function addData(data, data1) {
+                data = JSON.parse(data);
+                data1 = JSON.parse(data1);
+                Array.from(data).forEach(d => {
+                    dataPoints.push({
+                        x: new Date(d.day),
+                        y: d.amount
+                    });
+                });
+
+                Array.from(data1).forEach(d => {
+                    dataPoints1.push({
+                        x: new Date(d.day),
+                        y: d.amount
+                    });
+                });
+                chart.render();
+                chart1.render();
+
+            }
+
+
+            var p = document.getElementById('PassingToJavaScript1').value;
+            var q = document.getElementById('PassingToJavaScript2').value;
+            addData(p, q);
+            //$.getJSON("/home/json", addData);
+
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('.page-content').css("background-color", "#E5E5E5");
+        });
+
+    </script>
+
+
+
+}

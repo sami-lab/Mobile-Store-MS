@@ -1,0 +1,90 @@
+﻿@model IEnumerable<Mobile_Store_MS.ViewModel.CompanyViewModel.CompanyViewModel>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Company Details";
+}
+
+<h1>Company Details</h1>
+
+
+@if (Model.Any())
+{
+    <p>
+        <a class="btn btn-primary mb-3" style="width:auto" asp-action="Create"
+           asp-controller="Company">Create new Company</a>
+    </p>
+    @foreach (var item in Model)
+    {
+        var photoPath = "~/image/" + (item.Photopath ?? "download.jpg");
+        <div class = "d-flex justify-content-center">
+           <div class="col-8  card mb-3">
+            <div class="card-header text-center font-weight-bold text-primary">
+                @item.Phoneid  : @item.Com_name
+            </div>
+            <div class="row card-body text-center">
+                <div class="col-4">
+                    <img class="card-img-top" width="70" height="150" src="@photoPath" asp-append-version="true" />
+                </div>
+
+                <div class="col-8 border">
+                    <h4><span class="border-bottom"><b>Company ID </b></span><br /> @item.Phoneid</h4>
+                    <h4><span class="border-bottom"><b>Company Name</b></span><br/>  @item.Com_name</h4>
+                    <h4><span class="border-bottom"><b class="border-bottom">Company Destination</b></span><br />  @item.com_country</h4>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                
+                <form method="post" asp-action="Delete" asp-route-id="@item.Phoneid">
+                    <a asp-controller="Vendor" asp-action="Create"
+                       asp-route-PhoneId="@item.Phoneid" class="btn btn-primary">
+                        Add Vendor
+                    </a>
+                    <a asp-controller="CompanyModel" asp-action="Create"
+                       asp-route-PhoneId="@item.Phoneid" class="btn btn-primary">
+                        Add Model
+                    </a>
+                    <a asp-controller="Company" asp-action="Details"
+                       asp-route-id="@item.Phoneid" class="btn btn-primary">
+                        Details
+                    </a>
+                    <a asp-controller="Company" asp-action="Edit"
+                       asp-route-id="@item.Phoneid" class="btn btn-primary">
+                        Edit
+                    </a>
+
+                    <span id="confirmDeleteSpan_@item.Phoneid" style="display:none">
+                        <span><b>Are you sure you want to delete?</b></span>
+                        <button type="submit" class="btn btn-danger">Yes</button>
+                        <a href="#/" class="btn btn-primary"
+                           onclick="confirmDelete('@item.Phoneid', false)">No</a>
+                    </span>
+
+                    <span id="deleteSpan_@item.Phoneid">
+                        <a href="#/" class="btn btn-danger"
+                           onclick="confirmDelete('@item.Phoneid', true)">Delete</a>
+                    </span>
+                </form>
+            </div>
+        </div></div>
+    }
+}
+else
+{
+    <div class="card">
+        <div class="card-header">
+            No Company Added yet
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">
+                Use the button below to Add new Company
+            </h5>
+            <a class="btn btn-primary mb-3" style="width:auto" asp-action="Create"
+               asp-controller="Company">Create new Company</a>
+        </div>
+    </div>
+}
+
+@section Scripts{
+    <script src="~/js/CustomScript.js"></script>
+}

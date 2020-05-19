@@ -1,0 +1,148 @@
+﻿@model Mobile_Store_MS.ViewModel.PurchasingViewModel.PurchasingViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+<div id="invoice">
+    <div class="toolbar hidden-print" id="hidediv">
+        <div class="text-right">
+            <button id="printInvoice" class="btn btn-info"><i class="fa fa-print"></i> Print</button>
+            <input type="hidden" name="ExportData" />
+            <button class="btn btn-info" id="btnSubmit"><i class="far fa-file-pdf"></i> Export as PDF</button>
+
+
+        </div>
+        <hr>
+    </div>
+    <div class="invoice">
+        <div>
+            <header>
+                <div class="row d-flex justify-content-around">
+                    <div class="col-6">
+                        <a href="/Home" target="_blank">
+                            <img src="~/Image/Logo.png" class="img-fluid w-50 h-50" data-holder-rendered="true" />
+                        </a>
+                    </div>
+                    <div class="col-6 text-right">
+                        <h2 class="mt-0 mb-0 text-right">
+                            <a target="_blank" href="#">
+                                @Model.takenBy
+                            </a>
+                        </h2>
+                        <div>@Model.StoreAdress</div>
+                        <div>@Model.StorePhone</div>
+                        <div>@Model.StoreName</div>
+                    </div>
+                </div>
+            </header>
+            <main>
+                <div class="row d-flex justify-content-around mb-4">
+                    <div class="col text-left">
+                        <div class="text-gray-light">INVOICE TO:</div>
+                        <h2 class="text-left mb-0 mt-0">@Model.VendorName</h2>
+                        <div class="address">@Model.VendorPhone</div>
+                    </div>
+                    <div class="col text-right">
+                        <h1 class="mt-0" style="color: #3989c6">INVOICE @Model.purchase_id</h1>
+                        <div class="date">Date of Invoice: @Model.Date.ToString("yyyy-MM-dd")</div>
+                    </div>
+                </div>
+                <table border="0" cellspacing="0" cellpadding="0" class="w-100 table-sm table-responsive-sm">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th class="text-left font-weight-bold">DESCRIPTION</th>
+                            <th class="text-left font-weight-bold">Each Model Price</th>
+                            <th class="text-right font-weight-bold">Quantity</th>
+                            <th class="text-right font-weight-bold">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="no">01</td>
+                            <td class="text-left">
+                                <h3>
+                                    <a asp-controller="CompanyModel" asp-action="Details" asp-route-id="@Model.modelId" target="_blank">
+                                        @Model.Com_name @Model.modelName
+                                    </a>
+                                </h3>
+
+                            </td>
+                            @{
+                                var eachPrize = Model.Amount / Model.Quantity;
+                            }
+                            <td class="total">@eachPrize</td>
+                            <td class="unit">@Model.Quantity</td>
+                            <td class="total">@Model.Amount</td>
+                        </tr>
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td colspan="2">SUBTOTAL</td>
+                            <td>@Model.Amount</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td colspan="2">Shipping Price</td>
+                            <td>Free</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td colspan="2">GRAND TOTAL</td>
+                            <td>@Model.Amount</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="thanks">Thank you!</div>
+
+            </main>
+            <footer>
+                Invoice was created on a computer and is valid without the signature and seal.
+            </footer>
+        </div>
+        <!--DO NOT DELETE THIS div. IT is responsible for showing footer always at the bottom-->
+        <div></div>
+    </div>
+</div>
+
+<div>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.purchase_id }) |
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts{
+
+    <link href="~/css/Invoice.css" rel="stylesheet" />
+    <script src="~/lib/JSpdf/jspdf.min.js"></script>
+    <script src="~/js/html2canvas.min (1).js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#printInvoice').click(function () {
+                Popup($('.invoice')[0].outerHTML);
+                function Popup(data) {
+                    window.print();
+                    return true;
+                }
+            });
+                 
+            $("#btnSubmit").click(function () {
+
+                var Pagewidth = $('.invoice').width();
+                var Pageheight = $('.invoice').height();
+                html2canvas(document.querySelector('.invoice')).then(function (canvas) {
+                    var img = canvas.toDataURL('image/png');
+                    var doc = new jsPDF('p', 'px', [Pagewidth, Pageheight]);
+              
+                    doc.addImage(img, 'JPEG', 5, 5);
+                    doc.save('invoice.pdf');
+                });
+
+            });
+
+        });
+
+    </script>
+
+}

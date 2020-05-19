@@ -1,0 +1,86 @@
+﻿@model Mobile_Store_MS.ViewModel.ModelsViewModel.ModelViewModel
+<link href="~/css/ModelPage.css" rel="stylesheet" />
+<div class="container">
+    <div class="card">
+        <div class="container-fliud">
+            <div class="wrapper row">
+                <div class="preview col-md-6">
+
+                    @if (Model.Images.Any())
+                    {
+                        var imgkey = 1;
+                    <div class="preview-pic tab-content">
+                        @foreach (var item in Model.Images)
+                        {
+                            string ClassName = "active";
+                            if (imgkey > 1)
+                            { ClassName = ""; }
+                            imgkey++;
+                            var photoPath = "~/image/" + (item.Image_Path ?? "download.jpg");
+                           <div class="tab-pane @ClassName" id='pic-@item.imageId'><img src="@photoPath" style="max-height:333px; max-width: 100%;  display:block; margin:auto" asp-append-version="true" /></div>
+                        }
+                    </div>
+                    <ul class="preview-thumbnail nav nav-tabs d-flex justify-content-around">
+            
+                        @foreach (var item in Model.Images)
+                        {
+                           
+                            var photoPath = "~/image/" + (item.Image_Path ?? "download.jpg");
+                        <li class="active" ><a data-target="#pic-@item.imageId" data-toggle="tab"><img src="@photoPath" width="100" height="100" asp-append-version="true" /></a></li>
+                        }
+                    </ul>
+
+                    }
+                    else
+                    {
+                        <img src="~/Image/download.png" />
+                    }
+
+
+                </div>
+                <div class="details col-md-6">
+                    <h3 class="product-title">@Model.CompanyName @Model.model_name</h3>
+                    <div class="product-description  mr-5">
+                        <h5> KEY FEATURES:</h5>
+                        <ul>
+                            <li>1 Year Brand Warranty</li>
+                            <li>RAM: @Html.DisplayFor(model => model.RAM) @Html.DisplayFor(model => model.RAMCapacity)</li>
+                            <li>Internal Storage: @Html.DisplayFor(model => model.internal_storage) @Html.DisplayFor(model => model.ROMCapacity)</li>
+                            <li>@Html.DisplayFor(model => model.Display)  Display</li>
+                            <li>@Html.DisplayFor(model => model.ProcessorName)  Processor</li>
+                            @if (Model.Front_Cam != null && Model.back_cam != null)
+                            {
+                                <li> Camera Back/Front:  :@Html.DisplayFor(model => model.back_cam)/@Html.DisplayFor(model => model.Front_Cam) </li>
+                            }
+                            else if (Model.back_cam != null)
+                            {
+                                <li>Back Camera : @Html.DisplayFor(model => model.back_cam)</li>
+                            }
+                            @if (Model.front_flash)
+                            {
+                                <li>Front Flash:  Yes</li>}
+                            @if (Model.FingerPrint)
+                            {
+                                <li>Finger Print: Yes</li>}
+                            <li> Battery: @Html.DisplayFor(model => model.Battery)</li>
+                            <li>Broadband: @Html.DisplayFor(model => model.Networktype)</li>
+                            @if (Model.Android != null)
+                            {
+                                <li>Android Version:@Html.DisplayFor(model => model.Android) </li>
+                            }
+                           
+                            <li>  @Html.DisplayNameFor(model => model.SimType) :@Html.DisplayFor(model => model.SimType)</li>
+                        </ul>
+
+                    </div>
+                        <h4 class="price">current price: <span> RS  @Html.DisplayFor(model => model.Price)</span></h4>
+
+                        <div class="action m-2">
+                            <a class="add-to-cart btn btn-default" asp-controller="Order" asp-action="Create" asp-route-PhoneId="@Model.PhoneId" asp-route-ModelId="@Model.modelId">Buy Now</a>                          
+                            <a class="add-to-cart  btn btn-primary" asp-controller="CompanyModel" asp-action="Index">Back to List</a>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>

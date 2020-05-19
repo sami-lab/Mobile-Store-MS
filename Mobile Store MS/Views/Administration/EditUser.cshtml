@@ -1,0 +1,200 @@
+﻿@model Mobile_Store_MS.ViewModel.Administrator.EditUserViewModel
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authorizationservice
+@{
+    ViewData["Title"] = "Edit";
+    var photoPath = "~/image/" + (Model.Existingphotopath ?? "emp.jpg");
+}
+
+<div class="container register">
+    <div class="row">
+        <div class="col-md-3 register-left">
+            <img src="https://image.ibb.co/n7oTvU/logo_white.png" asp-append-version="true" alt="" />
+            <h3>Welcome</h3>
+            <p>Thank You For Joining the best SmartPhone Market</p>
+            <a asp-controller="Home" asp-action="Index" style="border: none; border-radius: 1.5rem; padding:10px; padding-left:30px; padding-right:30px; background: #f8f9fa; font-weight: bold; color: #383d41; margin-top: 30%; margin-bottom: 3%; cursor: pointer;">Explore</a><br />
+
+        </div>
+        <div class="col-md-9 register-right">
+            <h3 class="register-heading">Edit Profile</h3>
+            <form  method="post" enctype="multipart/form-data">
+                <div class="row register-form">
+                    <div class="col-md-6">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group">
+                            <label asp-for="FullName" class="control-label"></label>
+                            <input asp-for="FullName" placeholder="Full Name *" class="form-control" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Email" class="control-label"></label>
+                            <input asp-for="Email" placeholder="Email *" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-group row">
+                            <label asp-for="City" class="control-label ml-3"></label>
+                            <div class="col-12">
+                                <select asp-for="cityId" class="col-12 custom-select mr-sm-2"
+                                        asp-items="@(new SelectList( @ViewBag.cities,"id","city"))">
+                                    <option value="">Please Select</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="cityId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="StreetAdress" class="control-label"></label>
+                            <input asp-for="StreetAdress" placeholder="Street Address" class="form-control" />
+                            <span asp-validation-for="StreetAdress" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <div class="col-md-4 d-block m-auto">
+                                <img class=" rounded-circle " style="width:10rem; height:10rem;" id="img1" src="@photoPath" asp-append-version="true" />
+                            </div>
+                            <label asp-for="Photo" class="col-12 col-form-label"></label>
+                            <div class="col-12">
+                                <div class="custom-file">
+                                    <input asp-for="Photo" class="form-control custom-file-input">
+                                    <label class="custom-file-label">Choose File...</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="PhoneNumber" class="control-label"></label>
+                            <input asp-for="PhoneNumber" placeholder="Email *" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Super Admin"))
+                    {
+                        <div class="form-group col-12">
+                            <label asp-for="store_id" class="control-label ml-3"></label>
+                            <div class="col-12">
+                                <select asp-for="store_id" class="custom-select mr-sm-2"
+                                        asp-items="@(new SelectList( @ViewBag.Stores,"store_id","StoreName"))">
+                                    <option value="">Please Select</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="store_id" class="text-danger"></span>
+                        </div>
+                    }
+                    <input type="submit" class="btnRegister" value="Edit" />
+                    <div>
+                        @if (User.IsInRole("Super Admin"))
+                        {
+                            <a asp-controller="Account" asp-action="ChangePassword" asp-route-id="@Model.Id" class="ml-1">Change Password</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Account" asp-action="ChangePassword" class="ml-3">Change Password</a>
+
+                        }
+                        @if (User.IsInRole("Admin") || User.IsInRole("Super Admin") || User.IsInRole("Employee"))
+                        {
+
+                            <a asp-controller="Administration" asp-action="GetUserById" asp-route-id="@Model.Id" class="ml-1">Back to Profile</a>
+                            <a asp-controller="Administration" asp-action="ListUsers"  class="ml-1">Back to List</a>
+                        }
+
+                        else
+                        {
+                            <a asp-controller="Home" asp-action="Profile" class="ml-3">Back to Profile</a>
+                        }
+                    </div>
+                </div>
+            </form>
+            @if (User.IsInRole("Admin") || User.IsInRole("Super Admin") )
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h3>User Roles</h3>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Roles.Any())
+                        {
+                            foreach (var role in Model.Roles)
+                            {
+                                <h5 class="card-title">@role</h5>
+                            }
+                        }
+                        else
+                        {
+                            <h5 class="card-title">None at the moment</h5>
+                        }
+                    </div>
+                    
+                        <div class="card-footer">
+                            <a asp-action="ManageRoles" asp-controller="Administration" asp-route-userId="@Model.Id" style="width:auto" class="btn btn-primary">
+                                Manage Roles
+                            </a>
+                        </div>
+                    
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h3>User Claims</h3>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Claims.Any())
+                        {
+                            foreach (var claim in Model.Claims)
+                            {
+                                <h5 class="card-title">@claim</h5>
+                            }
+                        }
+                        else
+                        {
+                            <h5 class="card-title">None at the moment</h5>
+                        }
+                    </div>
+                    @if ((await authorizationservice.AuthorizeAsync(User, "abcUser")).Succeeded)
+                    {
+                        <div class="card-footer">
+                            <a asp-action="ManageClaims" asp-controller="Administration" asp-route-userId="@Model.Id" style="width:auto" class="btn btn-primary">
+                                Manage Claims
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+    <div>
+        <a asp-controller="Home" asp-action="Index" class="text-light">Back to Home</a>
+    </div>
+</div>
+
+
+
+
+
+@section Scripts{
+        <link href="~/css/Register.css" rel="stylesheet" />
+    <script>
+        $(document).ready(function () {
+            $('.custom-file-input').on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+                readURL(this);
+            });
+
+            function readURL(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        //alert(e.target.result);
+                        $('#img1').attr('src', e.target.result);
+                    }
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+        });
+    </script>
+    } 

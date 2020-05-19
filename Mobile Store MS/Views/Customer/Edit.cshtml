@@ -1,0 +1,78 @@
+﻿@model Mobile_Store_MS.ViewModel.CustomerViewModel.CustomerViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Edit Customer</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="@Model.cus_id" hidden />
+            <div class="form-group">
+                <label asp-for="cus_name" class="control-label"></label>
+                <input asp-for="cus_name" class="form-control" />
+                <span asp-validation-for="cus_name" class="text-danger"></span>
+            </div>
+            <input asp-for="CustRef" hidden class="form-control" />
+            <div class="form-group">
+                <label asp-for="cus_phone" class="control-label"></label>
+                <input asp-for="cus_phone" class="form-control" />
+                <span asp-validation-for="cus_phone" class="text-danger"></span>
+            </div>
+            <h4>Address</h4>
+            <hr />
+            <div class="form-group">
+                <label asp-for="Address.Country" class="control-label"></label>
+                <input asp-for="Address.Country" class="form-control" />
+                <span asp-validation-for="Address.Country" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address.State" class="control-label"></label>
+                <input asp-for="Address.State" class="form-control" />
+                <span asp-validation-for="Address.State" class="text-danger"></span>
+            </div>
+            <div class="form-group row">
+                <label asp-for="Address.City" class="control-label ml-3"></label>
+                <div class="col-12">
+                    <select asp-for="Address.cityId" class="col-12 custom-select mr-sm-2"
+                            asp-items="@(new SelectList( @ViewBag.cities,"id","city"))">
+                        <option value="">Please Select</option>
+                    </select>
+                </div>
+                <span asp-validation-for="Address.cityId" class="text-danger"></span>
+            </div>
+          
+            <div class="form-group">
+                <label asp-for="Address.StreetAddress" class="control-label"></label>
+                <input asp-for="Address.StreetAddress" class="form-control" />
+                <span asp-validation-for="Address.StreetAddress" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    @if (User.IsInRole("Super Admin") || User.IsInRole("Admin") || User.IsInRole("Employee"))
+    {
+        <a asp-action="Index" asp-controller="Order">Back to Orders</a>
+        <a asp-action="Index">Back to List</a>
+        @await Html.PartialAsync("~/Views/Shared/Modal.cshtml", Model.cus_id)
+    }
+    else
+    {
+        <a asp-action="MyOrders" asp-controller="Order">Back to Orders</a>
+    }
+
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

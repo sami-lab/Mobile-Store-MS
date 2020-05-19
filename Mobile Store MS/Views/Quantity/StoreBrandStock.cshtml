@@ -1,0 +1,41 @@
+﻿@model Mobile_Store_MS.ViewModel.StockViewModel
+
+@{
+    ViewData["Title"] = "StoreBrandStock";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div>
+    <h4>StockViewModel</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StoreName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StoreName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Com_name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Com_name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.model_name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.model_name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Quantity)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Quantity)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-controller="Purchasing" asp-action="Create" asp-route-store_id="@Model.store_id" asp-route-modelId="@Model.modelId" asp-route-PhoneId="@Model.Phoneid">Add Stock</a>
+    <a asp-action="Index">Back to List</a>
+</div>

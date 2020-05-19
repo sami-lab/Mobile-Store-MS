@@ -1,0 +1,53 @@
+﻿@model IEnumerable<Mobile_Store_MS.ViewModel.GroupBYCompany>
+
+
+@foreach (var s in Model)
+{
+    <div class="bg-info p-3 rounded mt-5">
+        <h3 class="text-light font-weight-bold"> @s.CompanyName </h3>
+    </div>
+
+    <hr />
+
+    @if (s.Models.Any())
+    {
+    <div class="container-fluid py-2">
+        <div style="overflow-x:scroll">
+            <div class=" d-flex  flex-row flex-nowrap mb-2 ">
+                @foreach (var item in s.Models)
+                {
+                    var photoPath = "~/image/" + (item.ImageName ?? "download.png");
+
+                <div class="card shadow col-lg-3 col-md-3 col-sm-6 col-12 m-3">
+                    <a class="card-link text-decoration-none" asp-controller="CompanyModel" asp-action="Details" asp-route-id="@item.modelId">
+
+                        <div class="card-header font-weight-bolder text-center text-capitalize">
+                            @item.CompanyName @item.model_name
+                        </div>
+                        <img src="@photoPath" class="card-img-top img-fluid" style="height: 15rem;" alt="Image" asp-append-version="true" />
+                        <div class="card-body">
+                            <p class="card-text text-center text-dark">@item.CompanyName @item.model_name @item.RAM @item.RAMCapacity + @item.internal_storage @item.ROMCapacity with @item.Display Display , @item.Battery Battery and @item.ProcessorName Processor </p>
+
+                        </div>
+                    </a>
+                    <div class="card-footer text-center">
+                        <a asp-controller="Order" asp-action="Create" asp-route-Phoneid="@item.PhoneId" asp-route-ModelId="@item.modelId" class="card-link">Buy Now</a>
+                        <a asp-controller="CompanyModel" asp-action="Details" asp-route-id="@item.modelId" class="card-link">Details</a>
+
+                    </div>
+
+                </div>
+                }
+            </div>
+            </div>
+    </div>
+    }
+    else
+    {
+        <h5>Sorry No Model Register Yet in this Company</h5>
+    }
+    <hr />
+    <br />
+}
+
+

@@ -1,0 +1,249 @@
+﻿@using Mobile_Store_MS.Data
+@inject IConfiguration Configuration
+@inject SignInManager<ApplicationUser> SignInManager
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title> @ViewBag.Title </title>
+
+
+    <environment include="Development">
+        <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"
+              asp-fallback-href="~/lib/twitter-bootstrap/css/bootstrap.css"
+              asp-fallback-test-class="sr-only"
+              asp-fallback-test-property="position"
+              asp-fallback-test-value="absolute"
+              asp-suppress-fallback-integrity="true">
+    </environment>
+    <!-- Google font -->  
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,900" rel="stylesheet">
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/popper.js/umd/popper.js"></script>
+    <link href="~/lib/fontawesome-free-5.13.0-web/css/all.min.css" rel="stylesheet" />
+    <script src="~/lib/fontawesome-free-5.13.0-web/js/all.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+</head>
+<body>
+
+    <!-- Navbar-->
+    <header class="header" style="margin-bottom:100px">
+        <nav class="navbar  navbar-light active navbar-expand-lg fixed-top py-3  " style="background-color:rgb(63, 187, 192);">
+            <div class="container">
+                <a asp-controller="Home" class="navbar-brand text-uppercase font-weight-bold">Mobile Shop</a>
+                <button type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler navbar-toggler-right"><i class="fa fa-bars"></i></button>
+
+                <div id="navbarSupportedContent" class="collapse navbar-collapse">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item active"><a asp-controller="Home" asp-action="Index" class="nav-link text-uppercase font-weight-bold">Home <span class="sr-only">(current)</span></a></li>
+                        <li class="nav-item dropdown">
+                            <a href="#" class="nav-link text-uppercase font-weight-bold  dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                               id="navbarDropdownMenuLink">Companies</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+
+                            </div>
+                        </li>
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item "><a asp-controller="Order" asp-action="MyOrders" class="nav-link text-uppercase font-weight-bold">Order</a></li>
+                        }
+                        <li class="nav-item dropdown">
+                            <a href="#/" class="nav-link text-uppercase font-weight-bold dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="navbarDropdownMenuLink1"><img class="rounded-circle mr-1 mb-1" width="25" height="25" src="/Image/emp.png" asp-append-version="true"/>Account</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink1">
+                                @if (SignInManager.IsSignedIn(User))
+                                {
+                                    <a class="dropdown-item" asp-controller="Home" asp-action="Profile">Profile</a>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Logout">Logout</a>
+                                }
+                                else
+                                {
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Register">Register</a>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Login">Login</a>
+                                }
+                            </div>
+                        </li>
+                        <li class="nav-item"><a asp-controller="Home" asp-action="AboutUs" class="nav-link text-uppercase font-weight-bold">About</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div>
+        @RenderBody()
+    </div>
+
+    <!--Details-->
+    <div class="container mt-4">
+        <!--About-->
+        <div class="cemetery_title">
+            <h2 class="text-center">Who We Are</h2>
+            <p class="description text-center ">We are a boutique digital transformation consultancy and software development company that provides cutting edge engineering solutions, helping Fortune 500 companies and enterprise clients untangle complex issues that always emerge during their digital evolution journey. Since 2007 we have been a visionary and a reliable software engineering partner for world-class brands.</p>
+        </div>
+        <hr />
+        <!--Companies-->
+        <div>
+            <h2 class="text-center mt-3 mb-3"><span style="border-bottom-color:black; border-bottom-width:1px; border-bottom-style:solid">Available Companies</span></h2>
+            <div class="d-flex justify-content-center align-items-center flex-wrap  mb-2 " id="cards">
+
+            </div>
+        </div>
+    </div>
+
+
+    <!--trust building-->
+    <div class="row mt-5 mb-5 text-center">
+        <div class="col-md-3 col-lg-3 col-12 text-white  p-5" style="background-color:#9B65C3">
+            <i class="fas fa-truck" style="width:60px; height:50px;"></i>
+            <h3>EXPRESS DELIVERY</h3> <br />
+            <p>SAME DAY IN KARACHI NEXT DAY IN OTHER CITIES</p>
+        </div>
+        <div class="col-md-3 col-lg-3 col-12 text-white  p-5" style="background-color:#000000">
+            <i class="fas fa-tags" style="width:60px; height:50px;"></i>
+            <h3>GUARANTEE SERVICE</h3> <br />
+            <p>We’re always there for you with easy to use self-service tools across all devices and 24/7 support.</p>
+        </div>
+        <div class="col-md-3 col-lg-3 col-12 text-white  p-5" style="background-color:#F34A69">
+            <i class="fas fa-paper-plane" style="width:60px; height:50px;"></i>
+            <h3>100% MONEY BACK</h3> <br />
+            <p>We commit to provide the lowest fares with our ‘Price Beat Guarantee’</p>
+        </div>
+        <div class="col-md-3 col-lg-3 col-12 text-white  p-5" style="background-color:#4baff2">
+            <i class="fab fa-product-hunt" style="width:60px; height:50px;"></i>
+            <h3>PRODUCTS OFFERS</h3> <br />
+            <p>High Quality Phone!!. You will get what you paid for’</p>
+        </div>
+    </div>
+    <!--Help Section-->
+    <div class="jumbotron row  d-flex flex-row justify-content-around mt-4">
+        <div class="align-self-center row col-md-6 col-sm-4 col-12">
+            <h4>We're Always Ready To Help</h4>
+            <p>Reach out to us through any of these support channels</p>
+        </div>
+        <div class="d-flex flex-row justify-content-center justify-lg-content-between  justify-content-md-between justify-content-sm-center row col-md-6 col-sm-8 col-12">
+            <div class="card text-center shadow bg-transparent m-2" style="border:0">
+                <a href="https://api.whatsapp.com/send?phone=923062219739" class="stretched-link text-decoration-none"> </a>
+                <div class="card-body">
+                    <i class="fab fa-whatsapp" style="width:50px; height:50px"></i>
+                    <pre>@Configuration["Phone"]</pre>
+                </div>
+            </div>
+            <div class="card text-center shadow bg-transparent m-2" style="border:0">
+                <a href="mailto:@Configuration["Email"]" class="stretched-link text-decoration-none"> </a>
+                <div class="card-body">
+                    <i class="fas fa-envelope-open-text" style="width:50px; height:50px"></i>
+                    <pre>@Configuration["Email"]</pre>
+                </div>
+            </div>
+            <div class="card text-center shadow bg-transparent m-2" style="border:0">
+                <a href="tel:@Configuration["Phone"]" class="stretched-link text-decoration-none"> </a>
+                <div class="card-body">
+                    <i class="fas fa-phone-volume" style="width:50px; height:50px"></i>
+                    <pre class="overflow-auto">@Configuration["Phone"]</pre>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="page-footer font-small unique-color-dark pt-4">
+
+        <!-- Footer Elements -->
+        <div>
+
+            <div class="row container-fluid">
+                <div class=" col-md-4 col-lg-4 col-12">
+                    <h4 class="font-weight-bolder"> <span class="badge badge-success"></span>HELP AND INFORMATION</h4>
+                    <p>
+                        Got Question? Call us on <br /><br />
+
+                        <b class="font-italic">@Configuration["Phone"] </b><br /><br />
+                        <i class="fas fa-map-marker-alt"></i> @Configuration["Address"]<br />
+                    </p>
+                </div>
+                <div class=" col-md-4 col-lg-4 col-12">
+                    <h4 class="font-weight-bolder"> <span class="badge badge-success"></span>SAVE PAYMENT METHODS</h4>
+                    <img src="~/Image/IMGBIN_cash-on-delivery-payment-bank-money-png_DCmTbpZr.png" width="150" height="150" asp-append-version="true" />
+                    <img src="~/Image/images (2).png" class="imageThumbnail m-1" width="150" height="150" asp-append-version="true" />
+                </div>
+                <div class=" col-md-4 col-lg-4 col-12">
+                    <h4 class="font-weight-bolder"> <span class="badge badge-success"></span>CONTACT INFO</h4>
+                    <div class="d-flex flex-row">
+                        <i class="fas fa-phone-volume rounded" style="width:50px; height:50px"></i>
+                        <div class="ml-3">
+                            <a href="tel:@Configuration["Phone"]" class="text-decoration-none">
+                                <h5>Phone</h5>
+                                <pre>@Configuration["Phone"]</pre>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <i class="fas fa-envelope-open-text rounded" style="width:50px; height:50px"></i>
+                        <div class="ml-3">
+                            <a href="mailto:@Configuration["Email"]" class="stretched-link text-decoration-none">
+                                <h5>Email</h5>
+                                <pre>@Configuration["Email"]</pre>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call to action -->
+            <div class="footer-copyright text-white text-center py-3  bg-dark">
+                © @DateTime.Now.Year :<a asp-controller="Home" asp-action="Index"> Mobile Store System</a>
+            </div>
+        </div>
+    </footer>
+
+    @if (IsSectionDefined("Scripts"))
+    {
+        RenderSection("Scripts");
+    }
+
+    <script>
+        window.onload = async function () {
+
+            const req = await fetch('/CompanyModel/GetCompanies');
+            const data = await req.json();
+            data.forEach(row => {
+                var PhoneId = parseInt(row.phoneid);
+                document.querySelector("#navbarDropdownMenuLink+div").innerHTML +=
+                    `<a class="dropdown-item" href=/Home/Models/${PhoneId}>${row.com_name}</a >`;
+
+                let image = `<img class="card-img-top " src="/Image/download.png" asp-append-version="true"  alt="Card image cap">`;
+                if (row.photopath != null) {
+                    image = `<img class="card-img-top" src="/Image/${row.photopath}" asp-append-version="true" alt="Card image cap">`;
+                }
+                let link = `<a class='stretched-link text-decoration-none' href='/Home/Models/${PhoneId}'>See Brands</a>`
+
+                document.querySelector('#cards').innerHTML += `<div class="card col-lg-3 col-md-3 col-sm-6 col-12 m-1">
+                                                                             ${image}
+                                                                             <div class="card-body text-center">
+                                                                                  <h5 class="card-title">${row.com_name}</h5>
+                                                                              ${link}
+                                                                              </div>
+                                                                              <div class="card-footer text-center">
+                                                                                  <small class="text-muted text center">A Brand of ${row.com_country}</small>
+                                                                             </div>
+                                                                    </div>`
+            })
+
+            const req1 = await fetch('/Home/GetProfile');
+            const data1 = await req1.json();
+            if (data1 != null) {
+                document.querySelector('#navbarDropdownMenuLink1 img').src = '/Image/' + data1;
+            } else {
+                document.querySelector('#navbarDropdownMenuLink1 img').src = '/Image/emp.jpg';
+            }
+        }
+    </script>
+</body>
+</html>

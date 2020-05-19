@@ -1,0 +1,80 @@
+﻿@model Mobile_Store_MS.ViewModel.CompanyViewModel.EditCompanyViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+    var photoPath = "~/Image/" + (Model.Existingphotopath ?? "download.jpg");
+    var existingPhoto = "Choose File...";
+    if (Model.Existingphotopath != null)
+    {
+        string[] array= Model.Existingphotopath.Split("\\");
+        existingPhoto = array[array.Length - 1].Split("_")[1];
+    }
+}
+
+<h1>Edit</h1>
+
+<h4>Edit Company</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" asp-controller="Company" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="Phoneid" hidden />
+            <input asp-for="Existingphotopath" hidden />
+            <div class="form-group">
+                <label asp-for="Com_name" class="control-label"></label>
+                <input asp-for="Com_name" class="form-control" />
+                <span asp-validation-for="Com_name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="com_country" class="control-label"></label>
+                <input asp-for="com_country" class="form-control" />
+                <span asp-validation-for="com_country" class="text-danger"></span>
+            </div>
+            <div class="form-group row">
+                <label asp-for="Photo" class="col-sm-2 col-form-label"></label>
+                <div class="col-sm-10">
+                    <div class="custom-file">
+                        <input asp-for="Photo" class="form-control custom-file-input">
+                        <label class="custom-file-label">@existingPhoto</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <img class="imageThumbnail" id="img1" src="@photoPath" asp-append-version="true" />
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+<script>
+            $(document).ready(function () {
+                $('.custom-file-input').on("change", function () {
+                    var fileName = $(this).val().split("\\").pop();
+                    $(this).next('.custom-file-label').html(fileName);
+                    readURL(this);
+                });
+
+                function readURL(input) {
+                    if (input.files && input.files[0]) {
+                        var reader = new FileReader();
+
+                        reader.onload = function (e) {
+                            //alert(e.target.result);
+                            $('#img1').attr('src', e.target.result);
+                        }
+
+                        reader.readAsDataURL(input.files[0]);
+                    }
+                }
+            });
+</script>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,291 @@
+﻿@model Mobile_Store_MS.ViewModel.ModelsViewModel.EditViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+    List<String> Capacity = new List<string>() { "MB", "GB", "TB" };  
+}
+<h1>Edit</h1>
+
+<hr />
+<div>
+
+    <form asp-action="Edit" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input asp-for="modelId" hidden class="form-control" />
+        <div class="row d-flex justify-content-around">
+            <div class="col-md-5 col-lg-5 border  col-sm-12">
+                <div class="form-group">
+                    <label asp-for="model_name" class="control-label"></label>
+                    <input asp-for="model_name" class="form-control" />
+                    <span asp-validation-for="model_name" class="text-danger"></span>
+                </div>
+                <div class="form-group row">
+                    <label asp-for="PhoneId" class="control-label col-6"></label>
+                    <div class="col-12">
+                        <select asp-for="PhoneId" class="custom-select mr-sm-2"
+                                asp-items="@(new SelectList( @ViewBag.Companies,"Phoneid","Com_name"))">
+                            <option value="">Please Select</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="PhoneId" class="text-danger"></span>
+                </div>
+                <div class="form-group row">
+                    <label asp-for="mob_type" class="col-12 col-form-label"></label>
+                    <div class="col-12">
+                        <select asp-for="mob_type" class="custom-select mr-sm-2"
+                                asp-items="Html.GetEnumSelectList<mob_type>()">
+                            <option value="">Please Select</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="mob_type" class="text-danger col-12"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="RAM" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="RAM" class="form-control" />
+                        <div class="input-group-append ">
+                            <select asp-for="RAMCapacity" class="custom-select mr-sm-2"
+                                    asp-items="@(new SelectList( @Capacity))">
+                                <option value="">Select</option>
+                            </select>
+                            <span asp-validation-for="RAMCapacity" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <span asp-validation-for="RAM" class="text-danger"></span>
+                </div>
+                <div class="form-group  mb-3">
+                    <label asp-for="internal_storage" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="internal_storage" class="form-control" />
+                        <div class="input-group-append ">
+                            <select asp-for="ROMCapacity" class="custom-select mr-sm-2"
+                                    asp-items="@(new SelectList( @Capacity))">
+                                <option value="">Select</option>
+                            </select>
+                            <span asp-validation-for="ROMCapacity" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <span asp-validation-for="internal_storage" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Display" class="control-label"></label>
+                    <input asp-for="Display" class="form-control" />
+                    <span asp-validation-for="Display" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Front_Cam" class="control-label"></label>
+                    <input asp-for="Front_Cam" class="form-control" />
+                    <span asp-validation-for="Front_Cam" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="back_cam" class="control-label"></label>
+                    <input asp-for="back_cam" class="form-control" />
+                    <span asp-validation-for="back_cam" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="LaunchDate" class="control-label"></label>
+                    <input asp-for="LaunchDate"  class="form-control" />
+                    <span asp-validation-for="LaunchDate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-5 col-lg-5  border col-sm-12">
+                <div class="form-group">
+                    <label asp-for="ProcessorName" class="control-label "></label>
+                    <input asp-for="ProcessorName" class="form-control" />
+                    <span asp-validation-for="ProcessorName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Android" class="control-label"></label>
+                    <input asp-for="Android" class="form-control" />
+                    <span asp-validation-for="Android" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SimType" class="control-label"></label>
+                    <input asp-for="SimType" class="form-control" />
+                    <span asp-validation-for="SimType" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Networktype" class="control-label"></label>
+                    <input asp-for="Networktype" class="form-control" />
+                    <span asp-validation-for="Networktype" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Battery" class="control-label"></label>
+                    <input asp-for="Battery" class="form-control" />
+                    <span asp-validation-for="Battery" class="text-danger"></span>
+                </div>
+                <div class="form-group row">
+
+                    @Html.LabelFor(model => model.front_flash, htmlAttributes: new { @class = "control-label col-md-4" })
+
+                    <div class="d-flex justify-content-between">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            @Html.RadioButtonFor(x => x.front_flash, true, htmlAttributes: new { @class = "custom-control-input", name = "frontCam", id = "front1" })
+                            <label class="custom-control-label" for="front1">Yes</label>
+                        </div>
+                        <!-- Default inline 2-->
+                        <div class="custom-control custom-radio custom-control-inline">
+                            @Html.RadioButtonFor(x => x.front_flash, false, htmlAttributes: new { @class = "custom-control-input", name = "frontCam", id = "front2" })
+                            <label class="custom-control-label" for="front2">No</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.FingerPrint, htmlAttributes: new { @class = "control-label col-md-4" })
+                    <div class="d-flex justify-content-between">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            @Html.RadioButtonFor(x => x.FingerPrint, true, htmlAttributes: new { @class = "custom-control-input", name = "inlineDefaultRadiosExample", id = "defaultInline1" })
+                            <label class="custom-control-label" for="defaultInline1">Yes</label>
+                        </div>
+                        <!-- Default inline 2-->
+                        <div class="custom-control custom-radio custom-control-inline">
+                            @Html.RadioButtonFor(x => x.FingerPrint, false, htmlAttributes: new { @class = "custom-control-input", name = "inlineDefaultRadiosExample", id = "defaultInline2" })
+                            <label class="custom-control-label" for="defaultInline2">No</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Price" class="control-label"></label>
+                    <input asp-for="Price" class="form-control" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+
+                <div class="form-group row d-flex justify-content-around">
+                    <label asp-for="Photos" class="col-sm-2 col-12 col-form-label"></label>
+                    <a href="#/" class="btn btn-primary col-6" data-toggle="modal" data-target="#myModal">Edit Images</a>
+                </div>
+                <input id="length" hidden value=@Model.ExistingImagesPath.Count />
+                <div id="myModal" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header ">
+                                <h4 class="modal-title">Edit Images</h4>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <div class="modal-body">
+
+                                @if (Model.ExistingImagesPath.Any())
+                                {
+                                    <div class="uploadForm d-flex flex-row flex-nowrap">
+                                        @foreach (var item in Model.ExistingImagesPath)
+                                        {
+                                            var PhotoPath = "~/image/" + item.Image_Path;
+                                            <div id="img_@item.imageId" class="border px-3 mb-3" style="position:relative;">
+                                                <button type="button" class="close" onclick="RemoveImg(this.parentElement)" style="position: absolute; right:0; top:0;">&times;</button>
+                                                <img src="@PhotoPath" alt="Image" height="100" width="80" asp-append-version="true" />
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+
+                                    <div class="uploadForm d-flex flex-row flex-nowrap">
+                                        <label>No Existing Image exist</label>
+                                    </div>
+                                }
+
+                                <div class="custom-file">
+                                    <input asp-for="Photos" multiple accept="image/x-png,image/gif,image/jpeg" class="form-control custom-file-input">
+                                    <label class="custom-file-label">Choose File...</label>
+                                    <button type="button" class="btn btn-success m-2" onclick="RemoveNewImages()">Reset Uploaded Images</button>
+                                    <button type="button" class="btn btn-success m-2" data-dismiss="modal">Done</button>
+                                    <br />
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="form-group row justify-content-around">
+                    <input type="submit" value="Edit" class="btn btn-primary col-md-5 col-sm-12" />
+                    <a asp-action="Index" class="btn btn-primary col-md-5 col-sm-12 ">Cancel</a>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<script>
+    var length = document.querySelector('#length').value;
+    var orignalLength = length;
+    $(document).ready(function () {
+      
+        $('.custom-file-input').on('change',  function () {         
+            filePreview(this);
+            var fileLabel = $(this).next('.custom-file-label');
+            var files = $(this)[0].files;
+            if (files.length > 1) {
+                fileLabel.html(length + " files selected");             
+                console.log("Photos length", files.length)
+            }
+            else {
+                if(length < 4)
+                fileLabel.html(files[0].name);
+            }
+        })
+    })    
+      function filePreview(input) {
+      
+        var files = input.files;       
+         
+        if (input.files && input.files[0]) {
+           
+            for (let i = 0; i < files.length; i++) {
+                var reader = new FileReader();
+                                      
+                if (length >= 4) {
+                    alert('Only 4 Images are allowed');    
+                    return;
+                }
+                length++;  
+                console.log(length);
+                reader.onload = function (e) {                 
+                    $('.uploadForm label').remove();
+                    $('.uploadForm').append(`<div  style="position:relative;" id="img_${(Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase()}" class="border px-3 mb-3 mr-2 Customs">
+                                                <img src=${e.target.result}  height="100" width="80"   asp-append-version="true" />
+                                       </div>`);
+                };
+                reader.readAsDataURL(input.files[i]);
+            }
+        }
+    }
+   
+    async function RemoveImg(e) {
+        console.log(e.id.split('_')[1]);
+
+        await $.post("/CompanyModel/RemoveImage", { imgId: e.id.split('_')[1]}, function (data) {
+            if (data == true) {
+                $('.uploadForm #' + e.id).remove();
+                length--;
+                orignalLength--;
+                console.log(length);
+            }
+            else { $('.uploadForm label').add("Could not Remove Image"); }
+        });
+       
+    }
+    function RemoveNewImages() {
+        var input = $("#Photos");
+        length = orignalLength;
+        $('.Customs').empty();
+        $('.custom-file-label').html("Choose File..");                   
+         input.replaceWith(input.val('').clone(true));
+       
+    }
+</script>

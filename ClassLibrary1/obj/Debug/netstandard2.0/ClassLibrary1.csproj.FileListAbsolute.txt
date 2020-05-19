@@ -1,0 +1,6 @@
+C:\Users\smsam\source\repos\Mobile Store MS\ClassLibrary1\bin\Debug\netstandard2.0\ClassLibrary1.deps.json
+C:\Users\smsam\source\repos\Mobile Store MS\ClassLibrary1\bin\Debug\netstandard2.0\ClassLibrary1.dll
+C:\Users\smsam\source\repos\Mobile Store MS\ClassLibrary1\obj\Debug\netstandard2.0\ClassLibrary1.csprojAssemblyReference.cache
+C:\Users\smsam\source\repos\Mobile Store MS\ClassLibrary1\obj\Debug\netstandard2.0\ClassLibrary1.csproj.CoreCompileInputs.cache
+C:\Users\smsam\source\repos\Mobile Store MS\ClassLibrary1\obj\Debug\netstandard2.0\ClassLibrary1.AssemblyInfoInputs.cache
+C:\Users\smsam\source\repos\Mobile Store MS\ClassLibrary1\obj\Debug\netstandard2.0\ClassLibrary1.AssemblyInfo.cs

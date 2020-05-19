@@ -1,0 +1,104 @@
+﻿@model Mobile_Store_MS.ViewModel.Store.StoreViewModel
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Store Details</h4>
+    <hr />
+    <dl class="row">
+
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StoreName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StoreName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Date)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Date)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CityName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CityName)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SupportNo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SupportNo)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Lat)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Lat)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Lng)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Lng)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CompleteAddress)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CompleteAddress)
+        </dd>
+    </dl>
+
+
+
+</div>
+
+<div>
+    <form method="post" asp-action="Delete" asp-route-id="@Model.store_id">
+        @Html.ActionLink("Back to List", "Index") |
+        @Html.ActionLink("Edit", "Edit", new { id = Model.store_id }) |
+        @Html.ActionLink("Details", "Details", new { id = Model.store_id }) |
+        @Html.ActionLink("Stock Details", "StoreStock", "Quantity", new { store_id = Model.store_id })
+        @Html.ActionLink("Store Employees", "GetEmployees", "Store", new { store_id = Model.store_id })
+        @if (User.IsInRole("Super Admin"))
+        {
+            <a asp-controller="Administration" asp-action="AddEmployee"
+               asp-route-store_id="@Model.store_id" class="btn btn-link">
+                Add Employee
+            </a>
+        }
+        else if (User.IsInRole("Admin"))
+        {
+            <a asp-controller="Register" asp-action="Account"
+               asp-route-store_id="@Model.store_id" class="btn btn-link">
+                Add Employee
+            </a>
+        }
+        @if (User.IsInRole("Super Admin"))
+        {
+            <span id="confirmDeleteSpan_@Model.store_id" style="display:none">
+                <span><b>Are you sure you want to delete?</b></span>
+                <button type="submit" class="btn btn-danger">Yes</button>
+                <a href="#/" class="btn btn-primary"
+                   onclick="confirmDelete('@Model.store_id', false)">No</a>
+            </span>
+
+            <span id="deleteSpan_@Model.store_id">
+                <a href="#/"
+                   onclick="confirmDelete('@Model.store_id', true)">Delete</a>
+            </span>
+        }
+    </form>
+</div>
+@section Scripts{
+    <script src="~/js/CustomScript.js"></script>
+}

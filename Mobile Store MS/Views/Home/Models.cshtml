@@ -1,0 +1,11 @@
+﻿@model IEnumerable<Mobile_Store_MS.ViewModel.GroupBYCompany>
+
+@{  
+    ViewData["Title"] = "Brand Details";
+}
+
+<h1>Models</h1>
+
+<div style="margin-top:100px;" class="container">
+    @await Html.PartialAsync("~/Views/Shared/Products.cshtml", Model)
+</div>

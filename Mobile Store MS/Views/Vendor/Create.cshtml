@@ -1,0 +1,49 @@
+﻿@model Mobile_Store_MS.ViewModel.VendorViewModel.VendorViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>VendorViewModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>          
+            <div class="form-group">
+                <label asp-for="ven_name" class="control-label"></label>
+                <input asp-for="ven_name"autocomplete="off" class="form-control" />
+                <span asp-validation-for="ven_name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ven_phone" class="control-label"></label>
+                <input asp-for="ven_phone" type="tel" class="form-control" />
+                <span asp-validation-for="ven_phone" class="text-danger"></span>
+            </div>
+            <div class="form-group row">
+                <label asp-for="PhoneId" class="control-label col-6"></label>
+                <div class="col-12">
+                    <select id="CompanyId" asp-for="PhoneId" class="custom-select mr-sm-2"
+                            asp-items="@(new SelectList( @ViewBag.Companies,"Phoneid","Com_name"))">
+                        <option value="">Please Select</option>
+                    </select>
+                </div>
+                <span asp-validation-for="PhoneId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a> ||
+    <a asp-action="Create" asp-controller="Company">Create Company</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

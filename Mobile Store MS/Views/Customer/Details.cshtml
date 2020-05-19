@@ -1,0 +1,83 @@
+﻿@model Mobile_Store_MS.ViewModel.CustomerViewModel.CustomerViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+  
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.cus_id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.cus_id)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.cus_name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.cus_name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CustRef)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CustRef)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.cus_phone)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.cus_phone)
+        </dd>
+        @if (Model.Address != null)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Address.Country)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Address.Country)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Address.State)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Address.State)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Address.City)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Address.City)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Address.StreetAddress)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Address.StreetAddress)
+            </dd>
+        }
+
+    </dl>
+</div>
+<div>
+    @if (User.IsInRole("Super Admin") || User.IsInRole("Admin") || User.IsInRole("Employee"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.cus_id">Edit</a>
+        <a asp-action="Index" asp-controller="Order">Back to Orders</a>
+        <a asp-action="Index">Back to List</a>
+        @await Html.PartialAsync("~/Views/Shared/Modal.cshtml", Model.cus_id)
+    }
+    else
+    {      
+        <a asp-action="MyOrders" asp-controller="Order">Back to Orders</a>
+    }
+
+</div>
+@section Scripts{
+    <script src="~/js/CustomScript.js"></script>
+}

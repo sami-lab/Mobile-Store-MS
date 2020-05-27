@@ -10,6 +10,7 @@ using Mobile_Store_MS.Data.Model.Customer;
 using Mobile_Store_MS.Data.Model.Messages;
 using Mobile_Store_MS.Data.Model.Order;
 using Mobile_Store_MS.Hubs;
+using Mobile_Store_MS.Services;
 using Mobile_Store_MS.ViewModel.MessagesViewModel;
 using Mobile_Store_MS.ViewModel.Orders;
 using Mobile_Store_MS.ViewModel.OrdersViewModel;
@@ -124,13 +125,12 @@ namespace Mobile_Store_MS.Data.Repositeries
            
 
             string StoreName = util.GetAllStores().FirstOrDefault(x => x.store_id == c.store_id).StoreName;
-            //await hubContext.Groups.AddToGroupAsync(user.Id, StoreName + user.store_id);
-            //_hubContext.Clients.Group(StoreName + c.store_id).SendAsync("sendNotificationToGroup");  
+            c.StoreName = StoreName;
             var users= Usermanager.Users.Where(x => x.store_id == c.store_id).ToList();
 
             NotificationsViewModel n = new NotificationsViewModel();
             n.heading = "Order #" + model.order_id;
-            n.Text = "Order With Status " + c.orderStatus + "is Placed";
+            n.Text = "Order With Status " + c.orderStatus + " is Placed";
             n.Url = Url.Action("Details", "Order", new { id = model.order_id });
             n.read = false;
             n.When = DateTime.Now;
@@ -142,7 +142,7 @@ namespace Mobile_Store_MS.Data.Repositeries
                 n.UserId = em.Id;
                 await util.AddNotification(n);             
             }
-           
+      
             return model.order_id;
         }
 

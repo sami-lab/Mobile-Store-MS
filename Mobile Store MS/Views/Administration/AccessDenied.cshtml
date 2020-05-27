@@ -3,10 +3,12 @@
     ViewData["Title"] = "Access Denied";
 }
 
-<div class=" d-flex justify-content-center align-items-center">
-    <h1 class="text-danger text-center">Access Denied</h1>
-    <h6 class="text-danger text-center">You do not have persmission to view this resource</h6>
-    <img src="~/Image/noaccess.png" alt="img" asp-append-version="true" style="height:300px; width:300px" />
+<div class="d-flex justify-content-center align-items-center">
+    <div>
+        <h1 class="text-danger text-center">Access Denied</h1>
+        <h6 class="text-danger text-center">You do not have persmission to view this resource</h6>
+        <img src="~/Image/noaccess.png" alt="img" asp-append-version="true" style="height:300px; width:300px" />
+        <a asp-action="Index" asp-controller="Home">Back To Home</a>
+    </div>
 </div>
-
 

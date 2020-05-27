@@ -48,23 +48,36 @@ namespace Mobile_Store_MS.Controllers
         [HttpGet]
         public async Task<IActionResult> Register()
         {
-            if (User.IsInRole("Super Admin")) return RedirectToAction("AddEmployee", "Administration");
-            ViewBag.cities = util.getCities();
-            if (Signinmanager.IsSignedIn(User) && User.IsInRole("Admin"))
+            if (Signinmanager.IsSignedIn(User))
             {
-                if (!User.HasClaim(claim => claim.Type == "Create User" && claim.Value == "true"))
+                if (User.IsInRole("Super Admin") || User.IsInRole("Admin")) return RedirectToAction("AddEmployee", "Administration");
+                else if (User.IsInRole("Employee"))
                 {
-                    return Forbid();
-                    //return RedirectToAction("~/Administration/AccessDenied.cshtml");
+                    if (!User.HasClaim(claim => claim.Type == "Create User" && claim.Value == "true"))
+                    {
+                        return Forbid();
+                        //return RedirectToAction("~/Administration/AccessDenied.cshtml");
+                    }
+                    else
+                    {
+                        ViewBag.cities = util.getCities();
+                        ViewBag.Stores = util.GetAllStores();
+                        var LoginUser = await Usermanager.GetUserAsync(User);
+                        RegisterViewModel r = new RegisterViewModel();
+                        if (LoginUser.store_id != null)
+                            r.store_id = LoginUser.store_id;
+                        return View(r);
+                    }
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Account");
                 }
             }
+
+
+            ViewBag.cities = util.getCities();
             ViewBag.Stores = util.GetAllStores();
-            var LoginUser = await Usermanager.GetUserAsync(User);
-            RegisterViewModel r = new RegisterViewModel();
-            if (LoginUser.store_id != null)
-                r.store_id = LoginUser.store_id;
-
-
             return View();
         }
 
@@ -74,6 +87,8 @@ namespace Mobile_Store_MS.Controllers
         {
             if (ModelState.IsValid)
             {
+                var LoginUser = await Usermanager.GetUserAsync(User);
+
                 var user = new ApplicationUser
                 {
                     FullName = model.FullName,
@@ -85,32 +100,20 @@ namespace Mobile_Store_MS.Controllers
                     Photopath = util.ProcessPhotoproperty(model.Photo),
                     isactive= true
                 };
-                if (Signinmanager.IsSignedIn(User) && User.IsInRole("Admin") || User.IsInRole("Super Admin"))
+                if (Signinmanager.IsSignedIn(User) && User.IsInRole("Employee"))
                 {
-
                     if (!User.HasClaim(claim => claim.Type == "Create User" && claim.Value == "true"))
                     {
                         return Forbid();
-                        //return RedirectToAction("~/Administration/AccessDenied.cshtml");
                     }
-                    // Groups
-                    //ChatHub chat = new ChatHub();
-                   //var group= util.GetAllStores().Select(x=> new { x.StoreName ,x.store_id}).FirstOrDefault(x=> x.store_id==model.store_id);
-                    //await chat.JoinGroup(group.StoreName + group.store_id);
-                    var LoginUser = await Usermanager.GetUserAsync(User);
-                    user.store_id = model.store_id;
+                    user.store_id = LoginUser.store_id;
                     user.addedBy = LoginUser.Id;
                 }
 
                 var result = await Usermanager.CreateAsync(user, model.Password);
-                if (!(Signinmanager.IsSignedIn(User) && User.IsInRole("Admin") || User.IsInRole("Super Admin")))
-                {                  
-                    var roles = await Usermanager.AddToRoleAsync(user, "User");
-                }
-                else if(Signinmanager.IsSignedIn(User) && model.store_id != null && User.IsInRole("Admin"))
-                {
-                    var roles = await Usermanager.AddToRoleAsync(user, "Employee");
-                } 
+                var roles = await Usermanager.AddToRoleAsync(user, "User");
+             
+               
                 if (result.Succeeded)
                 {
                     var token = await Usermanager.GenerateEmailConfirmationTokenAsync(user);
@@ -120,12 +123,7 @@ namespace Mobile_Store_MS.Controllers
 
                     string str = await ViewToStringRenderer.RenderViewToStringAsync(HttpContext.RequestServices, $"~/Views/Template/Email_Confirmation.cshtml", confirmationLink);
 
-                    
                     await _emailSender.SendEmailAsync(user.Email, "Email Confirmation",str);
-                    if (Signinmanager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Super Admin")))
-                    {
-                        return RedirectToAction("ListUsers", "Administration");
-                    }
                     ViewBag.PageTitle = "Email Confirmation";
                     ViewBag.Title = "Registration successful";
                     ViewBag.Message = "Before you can Login, please confirm your " +
@@ -183,11 +181,7 @@ namespace Mobile_Store_MS.Controllers
             {
                 string str = await ViewToStringRenderer.RenderViewToStringAsync(HttpContext.RequestServices, $"~/Views/Template/Welcome.cshtml", user.FullName);
                 await _emailSender.SendEmailAsync(user.Email, "Welcome To Mobile Store", str);
-                if(user.store_id != null)
-                {
-                  string StoreName=  util.GetAllStores().FirstOrDefault(x => x.store_id == user.store_id).StoreName;
-                   await hubContext.Groups.AddToGroupAsync(user.Id,StoreName+user.store_id);
-                }
+              
                 return View("EmailConfirmed");
             }
 
@@ -390,7 +384,7 @@ namespace Mobile_Store_MS.Controllers
                 info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
 
             if (signInResult.Succeeded)
-            {
+            {             
                 return LocalRedirect(returnUrl);
             }
             // If there is no record in AspNetUserLogins table, the user may not have
@@ -414,6 +408,7 @@ namespace Mobile_Store_MS.Controllers
                         };
 
                         await Usermanager.CreateAsync(user);
+                        await Usermanager.AddToRoleAsync(user, "User");
                     }
 
                     // Add a login (i.e insert a row for the user in AspNetUserLogins table)
@@ -456,7 +451,7 @@ namespace Mobile_Store_MS.Controllers
                 }
                 else
                 {
-                    return View("~Administration/AccessDenied.cshtml");
+                    return Forbid();
                 }
             }
             else

@@ -1,4 +1,5 @@
-﻿using Mobile_Store_MS.ViewModel.PurchasingViewModel;
+﻿using Microsoft.AspNetCore.Mvc;
+using Mobile_Store_MS.ViewModel.PurchasingViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Mobile_Store_MS.Data.Interfaces
     {
         List<PurchasingViewModel> GetDetails();
         PurchasingViewModel GetDetail(int id);
-        int addPurchasing(PurchasingViewModel c);
+        Task<int> addPurchasing(PurchasingViewModel c, IUrlHelper Url);
         int Update(EditPurchasingViewModel emp);
         bool delete(int id);
     }

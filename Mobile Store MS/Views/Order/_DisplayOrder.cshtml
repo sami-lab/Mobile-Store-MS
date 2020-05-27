@@ -1,0 +1,26 @@
+﻿
+@model IEnumerable<Mobile_Store_MS.ViewModel.Orders.Products>
+<table class="table">
+    
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr class="card d-flex">
+            <td>
+                <input asp-for="@item.isSelected" />
+            </td>
+            <td>
+                <input hidden asp-for="@item.Phoneid" />  <input hidden asp-for="@item.modelId" />
+                @Html.DisplayFor(modelItem => item.com_Name)   @Html.DisplayFor(modelItem => item.model_name)
+            </td>
+            <td>
+                <input asp-for="@item.Quantity" />
+            </td>
+            <td>
+                <input class="disabled" readonly asp-for="@item.price" />
+            </td>
+        </tr>
+            
+        }
+    </tbody>
+</table>

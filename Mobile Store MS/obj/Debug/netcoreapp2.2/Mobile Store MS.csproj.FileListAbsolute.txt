@@ -67,7 +67,6 @@ C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp
 C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Account\Login.g.cshtml.cs
 C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Account\ResetPassword.g.cshtml.cs
 C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Account\ResetPasswordConfirmation.g.cshtml.cs
-C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Administration\AccessDenied.g.cshtml.cs
 C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Administration\CreateRole.g.cshtml.cs
 C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Administration\GetAllRoles.g.cshtml.cs
 C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Administration\EditRole.g.cshtml.cs
@@ -103,3 +102,6 @@ C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp
 C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Template\ResetPassword.g.cshtml.cs
 C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Template\Welcome.g.cshtml.cs
 C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Template\Email_Confirmation.g.cshtml.cs
+C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Template\OrderConfirmation.g.cshtml.cs
+C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Administration\AccessDenied.g.cshtml.cs
+C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Order\_DisplayOrder.g.cshtml.cs

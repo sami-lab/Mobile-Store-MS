@@ -36,25 +36,16 @@ namespace Mobile_Store_MS.Security
 
             if (!context.User.IsInRole("Super Admin"))
             {
-                //int LoginUserClaimValue;
-                //var c = await userManager.GetClaimsAsync(LoginUser);
-                //foreach (Claim claim in ClaimStore.claimstore)
-                //{
-                   //if(claim.Type == c.Select(x=> x.Type))
-                //}
-
-                //var c= await userManager.GetClaimsAsync(LoginUser);
-                //string r=
-                //int n;
-                //bool isNumeric = int.TryParse(c.Select(l=> l.Value), out n);
-                if (!await userManager.IsInRoleAsync(user, "Super Admin") && !await userManager.IsInRoleAsync(user, "Admin"))
+                if (context.User.IsInRole("User") && loggedInAdminId == adminIdBeingEdited) context.Succeed(requirement);
+                if (!await userManager.IsInRoleAsync(user, "Super Admin") && !await userManager.IsInRoleAsync(user, "Admin") && context.User.HasClaim(claim => claim.Type == "Edit User" && claim.Value == "true"))
                 {
-                    context.Succeed(requirement);
+                    if (context.User.IsInRole("Employee") && !await userManager.IsInRoleAsync(user, "User"))  context.Fail();
+                    else context.Succeed(requirement);
                 }
                 else
                 {
-                    // context.User.HasClaim(claim => claim.Type == "Edit Role" && claim.Value == "true")
-                    context.Fail();
+                    await Task.CompletedTask;
+                    //context.Fail();
                 }
 
             }

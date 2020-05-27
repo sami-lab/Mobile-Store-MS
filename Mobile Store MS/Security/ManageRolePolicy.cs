@@ -35,7 +35,7 @@ namespace Mobile_Store_MS.Security
 
             if (!context.User.IsInRole("Super Admin"))
             {
-                if (!await userManager.IsInRoleAsync(user, "Super Admin") && !await userManager.IsInRoleAsync(user, "Admin"))
+                if (!await userManager.IsInRoleAsync(user, "Super Admin") || !await userManager.IsInRoleAsync(user, "Admin"))
                 {
                     context.Succeed(requirement);
                 }

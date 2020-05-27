@@ -172,7 +172,7 @@ namespace Mobile_Store_MS.Controllers
             if (result != null) return Json(result);
             else { return Json(false); }
         }
-        [AllowAnonymous]
+      
         public JsonResult RemoveImage(int imgId)
         {
             bool result = util.RemoveImage(imgId);

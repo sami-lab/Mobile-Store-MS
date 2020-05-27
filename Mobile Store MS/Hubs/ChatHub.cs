@@ -26,8 +26,8 @@ namespace Mobile_Store_MS.Hubs
             string userid = Context.UserIdentifier;
             var claims = new Claim(ClaimTypes.NameIdentifier, userid).Value;
             var claimss = new Claim(ClaimTypes.NameIdentifier, user.Id).Value;
-            await Clients.User(claims).SendAsync("ReceiveMessage", message.UserName, message);
-            await Clients.User(claimss).SendAsync("ReceiveMessage", message.UserName, message);
+            await Clients.User(claims).SendAsync("ReceiveMessage", message.UserName,null, message);
+            await Clients.User(claimss).SendAsync("ReceiveMessage", message.UserName, Context.User.Identity.Name, message);
            
         }
 

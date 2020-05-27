@@ -14,6 +14,7 @@ using Mobile_Store_MS.Data;
 using Mobile_Store_MS.Hubs;
 using Mobile_Store_MS.Services;
 using Mobile_Store_MS.ViewModel.Administrator;
+using Newtonsoft.Json;
 
 namespace Mobile_Store_MS.Controllers
 {
@@ -39,20 +40,23 @@ namespace Mobile_Store_MS.Controllers
             _emailSender = emailSender;
             util = new utilities(db, hostingEnvironment, configuration);
         }
-        [Authorize(Roles = "Super Admin")]
+        [Authorize(Roles = "Super Admin,Admin")]
         public IActionResult AddEmployee()
         {
             RegisterEmployeeViewModel r = new RegisterEmployeeViewModel();
 
             foreach (var role in Rolemanager.Roles)
             {
-                UserRoles user = new UserRoles()
+                if (User.IsInRole("Super Admin") || User.IsInRole("Admin") && role.Name != "Admin" && role.Name != "Super Admin")
                 {
-                    RoleId = role.Id,
-                    RoleName = role.Name,
-                    isSelected = false
-                };
-                r.Roles.Add(user);
+                    UserRoles user = new UserRoles()
+                    {
+                        RoleId = role.Id,
+                        RoleName = role.Name,
+                        isSelected = false
+                    };
+                    r.Roles.Add(user);
+                }
             }
             foreach (Claim claim in ClaimStore.claimstore)
             {
@@ -70,7 +74,7 @@ namespace Mobile_Store_MS.Controllers
             return View(r);
         }
         [HttpPost]
-        [Authorize(Roles = "Super Admin")]
+        [Authorize(Roles = "Super Admin,Admin")]
         public async Task<IActionResult> AddEmployee(RegisterEmployeeViewModel model)
         {
             if (ModelState.IsValid)
@@ -96,11 +100,22 @@ namespace Mobile_Store_MS.Controllers
                 var result = await Usermanager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    foreach (var role in model.Roles.Where(x => x.isSelected))
+                    {
+                        if (User.IsInRole("Admin") && role.RoleName == "Admin" && role.RoleName == "Super Admin")
+                        {
+                            await Usermanager.DeleteAsync(user);
+                            return Forbid();
+                        }
+                    }
+
+
                     var roles = await Usermanager.AddToRolesAsync(user, model.Roles.Where(x => x.isSelected).Select(y => y.RoleName));
 
                     if (!roles.Succeeded)
                     {
-                        ModelState.AddModelError("", "Cannot add selected roles to user! Edit User and Insert Roles from there");
+                        ModelState.AddModelError("", "Cannot add selected roles to user! Try Again");
+                        await Usermanager.DeleteAsync(user);
                         return View(model);
                     }
                     // Add all the claims that are selected on the UI
@@ -159,8 +174,8 @@ namespace Mobile_Store_MS.Controllers
         {
             return View();
         }
+
         [Authorize(Roles = "Super Admin")]
-        [AllowAnonymous]
         public IActionResult CreateRole()
         {
             return View();
@@ -185,13 +200,15 @@ namespace Mobile_Store_MS.Controllers
             }
             return View(model);
         }
-        [AllowAnonymous]
+
+        [Authorize(Roles = "Super Admin,Admin")]
         public IActionResult GetAllRoles()
         {
             var model = Rolemanager.Roles;
             return View(model);
         }
-        [Authorize(Roles = "Super Admin")]
+
+        [Authorize(Roles = "Super Admin,Admin")]
         public async Task<IActionResult> EditRole(string id)
         {
             // Find the role by Role ID
@@ -224,6 +241,39 @@ namespace Mobile_Store_MS.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        [Authorize(Roles = "Super Admin")]
+        public async Task<IActionResult> EditRole(EditRoleViewModel model)
+        {
+            var role = await Rolemanager.FindByIdAsync(model.Id);
+
+            if (role == null)
+            {
+                ViewBag.ErrorMessage = $"Role with Id = {model.Id} cannot be found";
+                return View("NotFound");
+            }
+            else
+            {
+                role.Name = model.RoleName;
+
+                // Update the Role using UpdateAsync
+                var result = await Rolemanager.UpdateAsync(role);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("GetAllRoles");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+
+                return View(model);
+            }
+
+        }
+
         [Authorize(Policy = "EditRole")]
         public async Task<IActionResult> EditUsersInRole(string roleId)
         {
@@ -236,27 +286,33 @@ namespace Mobile_Store_MS.Controllers
                 ViewBag.ErrorMessage = $"Role with Id = {roleId} cannot be found";
                 return View("NotFound");
             }
-
+         
             var model = new List<UserRoleViewModel>();
 
             foreach (var user in Usermanager.Users)
             {
-                var userRoleViewModel = new UserRoleViewModel
+                if (User.IsInRole("Super Admin") || User.IsInRole("Admin") && !(await Usermanager.IsInRoleAsync(user,"Admin") || await Usermanager.IsInRoleAsync(user, "Super Admin")) )
                 {
-                    UserId = user.Id,
-                    UserName = user.UserName
-                };
+                    var userRoleViewModel = new UserRoleViewModel
+                    {
+                        UserId = user.Id,
+                        UserName = user.UserName
+                    };
 
-                if (await Usermanager.IsInRoleAsync(user, role.Name))
-                {
-                    userRoleViewModel.IsSelected = true;
-                }
-                else
-                {
-                    userRoleViewModel.IsSelected = false;
-                }
+                    if (await Usermanager.IsInRoleAsync(user, role.Name))
+                    {
+                        userRoleViewModel.IsSelected = true;
+                    }
+                    else
+                    {
+                        userRoleViewModel.IsSelected = false;
+                    }
 
-                model.Add(userRoleViewModel);
+                    model.Add(userRoleViewModel);
+                }
+               
+
+
             }
 
             return View(model);
@@ -313,17 +369,114 @@ namespace Mobile_Store_MS.Controllers
             if (limit == null) limit = 10;
 
             int skip = (int)((pageNo - 1) * limit);
-            int totalUser = Usermanager.Users.Where(x => x.isactive == true).Count();
-            decimal totalpages = totalUser / Convert.ToInt32(limit);
-            ViewBag.TotalPages = Math.Floor(totalpages);
+            int totalUser = Usermanager.Users.Where(x => x.isactive == true && x.store_id ==null).Count();
+            decimal totalpages = (decimal)totalUser / (decimal)limit;
+            ViewBag.TotalPages = Math.Ceiling(totalpages);
             ViewBag.CurrentPage = pageNo;
             if (skip >= totalUser)
             {
                 ViewBag.ErrorMessage = "The Page you are Looking For Could not be found";
                 return View("NotFound");
             }
-            var model = Usermanager.Users.Where(x => x.isactive == true).Skip(skip).Take((int)limit);
+            var model = Usermanager.Users.Where(x => x.isactive == true && x.store_id == null).Skip(skip).Take((int)limit);
+            var cities= util.getCities();
+            ViewBag.cities = cities;
+            TempData["cities"] = JsonConvert.SerializeObject(cities);
             return View(model);
+        }
+
+        public ActionResult Search(int? pageNo, int? limit,string searchList, string FullName, string Email, string Id, string PhoneNumber,int City)
+        {
+            if (pageNo == null) pageNo = 1;
+            if (limit == null) limit = 30;
+            int skip = (int)((pageNo - 1) * limit);
+
+            ViewBag.CurrentPage = pageNo;
+            var data = new List<ApplicationUser>();
+            int totalUsers;
+            decimal totalpages;
+            switch (searchList)
+            {
+
+                case "FullName":
+                    data = FullName != null ? Usermanager.Users.Where(x => x.FullName.ToLower().Contains(FullName.ToLower()) && x.isactive == true && x.store_id ==null).ToList() :null;
+                    totalUsers = Usermanager.Users.Where(x => x.FullName.ToLower().Contains(FullName.ToLower()) && x.isactive == true && x.store_id == null).Count();
+                    totalpages = (decimal)totalUsers / (decimal)limit;
+                    ViewBag.TotalPages = Math.Ceiling(totalpages);
+                    break;
+                case "Email":
+                    data = Email != null ? Usermanager.Users.Where(x => x.Email.ToLower().Contains(Email.ToLower()) && x.isactive == true && x.store_id == null).ToList() : null;
+                    totalUsers = Usermanager.Users.Where(x => x.Email.ToLower().Contains(Email.ToLower()) && x.isactive == true && x.store_id == null).Count();
+                    totalpages = (decimal)totalUsers / (decimal)limit;
+                    ViewBag.TotalPages = Math.Ceiling(totalpages);
+                    break;
+                case "Id":
+                    data = Id != null ? Usermanager.Users.Where(x => x.Id.ToLower().Contains(Id.ToLower()) && x.isactive == true && x.store_id == null).ToList() : null;
+                    totalUsers = Usermanager.Users.Where(x =>  x.Id.ToLower().Contains(Id.ToLower()) && x.isactive == true && x.store_id == null).Count();
+                    totalpages = (decimal)totalUsers / (decimal)limit;
+                    ViewBag.TotalPages = Math.Ceiling(totalpages);
+                    break;
+                case "PhoneNumber":
+                    data = PhoneNumber != null ? Usermanager.Users.Where(x => x.PhoneNumber.ToLower().Contains(PhoneNumber.ToLower()) && x.isactive == true && x.store_id == null).ToList() : null;
+                    totalUsers = Usermanager.Users.Where(x => x.PhoneNumber.ToLower().Contains(PhoneNumber.ToLower()) && x.isactive == true && x.store_id == null).Count();
+                    totalpages = (decimal)totalUsers / (decimal)limit;
+                    ViewBag.TotalPages = Math.Ceiling(totalpages);
+                    break;
+                case "City":
+                    data = City.ToString() != null ? Usermanager.Users.Where(x => x.City == City && x.isactive == true && x.store_id == null).ToList() : null;
+                    totalUsers = Usermanager.Users.Where(x => x.City==City && x.isactive == true && x.store_id == null).Count();
+                    totalpages = (decimal)totalUsers / (decimal)limit;
+                    ViewBag.TotalPages = Math.Ceiling(totalpages);
+                    break;
+                default:
+                    data =  Usermanager.Users.Where(x => x.isactive==false && x.store_id == null).ToList();
+                    totalUsers = Usermanager.Users.Where(x => x.isactive == false && x.store_id == null).Count();
+                    totalpages = (decimal)totalUsers / (decimal)limit;
+                    ViewBag.TotalPages = Math.Ceiling(totalpages);
+                    break;
+            }
+            ViewBag.cities = JsonConvert.DeserializeObject((string)TempData["cities"]);
+            TempData.Keep();
+            return View("ListUsers", data);
+        }
+
+        public ActionResult Sort(int? pageNo, int? limit,string sortBy, string order)
+        {
+            if (pageNo == null) pageNo = 1;
+            if (limit == null) limit = 30;
+
+            int skip = (int)((pageNo - 1) * limit);
+            int totalUsers  = Usermanager.Users.Where(x => x.isactive == true && x.store_id == null).Count();
+
+            decimal totalpages = (decimal)totalUsers / (decimal)limit;
+            ViewBag.TotalPages = Math.Ceiling(totalpages);
+            ViewBag.CurrentPage = pageNo;
+            if (skip >= totalUsers)
+            {
+                ViewBag.ErrorMessage = "The Page you are Looking For Could not be found";
+                return View("NotFound");
+            }
+           
+            var data = Usermanager.Users.Where(x => x.isactive == true && x.store_id == null).Skip(skip).Take((int)limit).ToList();
+
+            switch (sortBy)
+            {
+                case "Email":
+                    data = order == "Des" ? data.OrderByDescending(x => x.Email).ToList() : data.OrderBy(x => x.Email).ToList();
+                    break;
+                case "FullName":
+                    data = order == "Des" ? data.OrderByDescending(x => x.FullName).ToList() : data.OrderBy(x => x.FullName).ToList();
+                    break;
+                case "City":
+                    data = order == "Des" ? data.OrderByDescending(x => x.City).ToList() : data.OrderBy(x => x.City).ToList();
+                    break;
+                default:
+                    break;
+
+            }
+            ViewBag.cities = JsonConvert.DeserializeObject((string)TempData["cities"]);
+            TempData.Keep();
+            return View("ListUsers", data);
         }
 
         [Authorize(Roles = "Admin,Super Admin,Employee")]
@@ -383,6 +536,7 @@ namespace Mobile_Store_MS.Controllers
 
         [HttpGet]
         [Authorize(Policy = "EditAdmin")]
+        [Route("Account/EditUser/{id}")]
         public async Task<IActionResult> EditUser(string id)
         {
 
@@ -426,6 +580,7 @@ namespace Mobile_Store_MS.Controllers
 
         [HttpPost]
         [Authorize(Policy = "EditAdmin")]
+        [Route("Account/EditUser/{id}")]
         public async Task<IActionResult> EditUser(EditUserViewModel model)
         {
             var user = await Usermanager.FindByIdAsync(model.Id);
@@ -446,7 +601,7 @@ namespace Mobile_Store_MS.Controllers
             else
             {
                 user.Email = model.Email;
-                user.UserName = model.FullName;
+                user.FullName = model.FullName;
                 user.PhoneNumber = model.PhoneNumber;
                 user.StreetAdress = model.StreetAdress;
                 user.store_id = model.store_id;
@@ -514,11 +669,7 @@ namespace Mobile_Store_MS.Controllers
 
                     user.isactive = false;
                     var result1 = await Usermanager.UpdateAsync(user);
-                    if (user.store_id != null)
-                    {
-                        string StoreName = util.GetAllStores().FirstOrDefault(x => x.store_id == user.store_id).StoreName;
-                        await hubContext.Groups.RemoveFromGroupAsync(user.Id, StoreName + user.store_id);
-                    }
+
                     if (result1.Succeeded)
                     {
                         return RedirectToAction("ListUsers");
@@ -592,9 +743,11 @@ namespace Mobile_Store_MS.Controllers
         [HttpGet]
 
         [Authorize(Policy = "EditUserRole")]
+        [Authorize(Roles = "Admin,Super Admin")]
         public async Task<IActionResult> ManageRoles(string userId)
         {
             ViewBag.userId = userId;
+            string loggedInAdminId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
             var user = await Usermanager.FindByIdAsync(userId);
 
@@ -608,22 +761,26 @@ namespace Mobile_Store_MS.Controllers
 
             foreach (var role in Rolemanager.Roles)
             {
-                var Eachuserviewmodel = new UserRoles
+                if (User.IsInRole("Super Admin") || User.IsInRole("Admin") && role.Name != "Admin" && role.Name != "Super Admin")
                 {
-                    RoleId = role.Id,
-                    RoleName = role.Name
-                };
+                    var Eachuserviewmodel = new UserRoles
+                    {
+                        RoleId = role.Id,
+                        RoleName = role.Name
+                    };
 
-                if (await Usermanager.IsInRoleAsync(user, role.Name))
-                {
-                    Eachuserviewmodel.isSelected = true;
-                }
-                else
-                {
-                    Eachuserviewmodel.isSelected = false;
+                    if (await Usermanager.IsInRoleAsync(user, role.Name))
+                    {
+                        Eachuserviewmodel.isSelected = true;
+                    }
+                    else
+                    {
+                        Eachuserviewmodel.isSelected = false;
+                    }
+
+                    model.Add(Eachuserviewmodel);
                 }
 
-                model.Add(Eachuserviewmodel);
             }
 
             return View(model);
@@ -663,6 +820,7 @@ namespace Mobile_Store_MS.Controllers
         }
 
 
+        [Authorize(Roles = "Admin,Super Admin")]
         [Authorize(Policy = "EditUserRole")]
         public async Task<IActionResult> ManageClaims(string userId)
         {

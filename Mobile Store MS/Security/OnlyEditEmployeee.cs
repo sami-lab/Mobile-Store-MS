@@ -28,12 +28,16 @@ namespace Mobile_Store_MS.Security
             }
             else
             {
-                string[] a = authFilterContext.HttpContext.Request.Path.Value.Split('/');
-                string roleIdBeingEdited = a[a.Length - 1];                
+          
+                string roleIdBeingEdited = authFilterContext.HttpContext.Request.Query["roleId"];
                 var role = await roleManager.FindByIdAsync(roleIdBeingEdited);
                 if(role.Name=="Super Admin" || role.Name=="Admin")
                 {
                     context.Fail();
+                }
+                else
+                {
+                    context.Succeed(requirement);
                 }
             }
             await Task.CompletedTask;

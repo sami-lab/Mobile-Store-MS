@@ -190,7 +190,7 @@ namespace Mobile_Store_MS.Data.Repositeries
             return model.Id;
         }
 
-        public List<MessageViewModel> messages(string userID, string personId, string userEmail, string Email)
+        public  List<MessageViewModel> messages(string userID, string personId, string userEmail, string Email)
         {
             //|| x.UserName == userEmail || x.UserId == personId
             var messages = context.Messages.Where(x => x.UserId == userID && x.UserName == Email || x.UserName == userEmail && x.UserId == personId).Select(x => new MessageViewModel()
@@ -200,11 +200,15 @@ namespace Mobile_Store_MS.Data.Repositeries
                 Text = x.Text,
                 When = x.When,
                 read = x.read,
-            }).OrderByDescending(x => x.When).Take(100).ToList();
+            }).OrderByDescending(x => x.When).Take(100).ToList();         
             return messages;
         }
+        public int UserTotalNotification(string userID)
+        {
+            return context.Notification.Where(x => x.UserId == userID).Count();
+        }
 
-        public List<NotificationsViewModel> Notifications(string userID, int? skip, int? limit)
+        public async  Task<List<NotificationsViewModel>> Notifications(string userID, int? skip, int? limit)
         {
             if (skip == null) skip = 0;
             var notifications = context.Notification.Where(x => x.UserId == userID).Select(x => new NotificationsViewModel()
@@ -217,21 +221,21 @@ namespace Mobile_Store_MS.Data.Repositeries
                 UserId = x.UserId,
                 When = x.When
             }).OrderByDescending(x => x.When).Skip((int)skip).TakeIfNotNull(limit).ToList();
-
+            bool update = await UpdateNotificationRead(userID);
             return notifications;
         }
 
-        public bool UpdateMessagesRead(string userID, string Email)
+        public async Task<bool> UpdateMessagesRead(string Email, string PersonId)
         {
             try
             {
-                var messages = context.Messages.Where(x => (x.UserId == userID && x.UserName == Email)  && x.read == false);
+                var messages = context.Messages.Where(x => (x.UserId == PersonId && x.UserName == Email)  && x.read == false);
                 foreach (var m in messages)
                 {
                     m.read = true;
                     context.Messages.Update(m);
                 }
-                context.SaveChanges();
+                await context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
@@ -241,7 +245,7 @@ namespace Mobile_Store_MS.Data.Repositeries
             }
         }
 
-        public bool UpdateNotificationRead(string userID)
+        public async Task<bool> UpdateNotificationRead(string userID)
         {
             try
             {
@@ -251,7 +255,7 @@ namespace Mobile_Store_MS.Data.Repositeries
                     m.read = true;
                     context.Notification.Update(m);
                 }
-                context.SaveChanges();
+                await context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
@@ -266,21 +270,21 @@ namespace Mobile_Store_MS.Data.Repositeries
             int notifications = context.Notification.Where(x => x.UserId == userID && x.read == false).Count();
             return notifications;
         }
-        public int countUnreadMessages(string userID)
+        public int countUnreadMessages(string userEmail)
         {
-            int Messages = context.Messages.Where(x => x.UserId == userID  && x.read == false).Count();
+            int Messages = context.Messages.Where(x => x.UserName == userEmail  && x.read == false).Count();
             return Messages;
         }
 
-        public async Task<List<UnreadMessages>> countUserUnreadMessages(string userID)
+        public async Task<List<UnreadMessages>> countUserUnreadMessages(string UserEmail)
         {
           
             List<UnreadMessages> messages = new List<UnreadMessages>();
-            foreach (var u in userManager.Users.Where(x => x.Id != userID))
+            foreach (var u in userManager.Users.Where(x => x.Id != UserEmail))
             {
                 if ((u.store_id != null || await userManager.IsInRoleAsync(u, "Super Admin")) && u.isactive == true)
                 {
-                    int count = context.Messages.Where(x => (x.UserId == userID && x.UserName == u.Email) && x.read == false).Count();
+                    int count = context.Messages.Where(x => (x.UserId == u.Id && x.UserName == UserEmail) && x.read == false).Count();
                     messages.Add(new UnreadMessages() { userID = u.Id, count = count });
                 }
             }

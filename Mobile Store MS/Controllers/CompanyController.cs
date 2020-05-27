@@ -42,8 +42,6 @@ namespace Mobile_Store_MS.Controllers
         }
 
         // GET: Company/Create
-        //[Authorize(Roles ="Super Admin")]
-        [AllowAnonymous]
         public ActionResult Create()
         {
             return View();
@@ -51,9 +49,7 @@ namespace Mobile_Store_MS.Controllers
 
         // POST: Company/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        //[Authorize(Roles = "Super Admin")]
-        [AllowAnonymous]
+        [ValidateAntiForgeryToken]    
         public ActionResult Create(CompanyViewModel model)
         {
             try
@@ -73,7 +69,6 @@ namespace Mobile_Store_MS.Controllers
         }
 
         // GET: Company/Edit/5
-        [Authorize(Roles = "Super Admin")]
         public ActionResult Edit(int id)
         {
             var data = icompanyRepositories.GetDetail(id);
@@ -94,7 +89,6 @@ namespace Mobile_Store_MS.Controllers
 
         // POST: Company/Edit/5
         [HttpPost]
-        [Authorize(Roles = "Super Admin")]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, EditCompanyViewModel model)
         {
@@ -124,7 +118,6 @@ namespace Mobile_Store_MS.Controllers
         // POST: Company/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Super Admin")]
         public ActionResult Delete(int id, IFormCollection collection)
         {
             try

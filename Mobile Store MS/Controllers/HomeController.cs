@@ -33,11 +33,11 @@ namespace Mobile_Store_MS.Controllers
             Usermanager = usermanager;
             util = new utilities(myApp, hostingEnvironment);
             this._hubContext = _hubContext;
-           
+
         }
 
 
-        public  IActionResult Index()
+        public IActionResult Index()
         {
             //util.getCities();             
             var data = iModelRepositery.GetDetails().GroupBy(x => x.CompanyName)
@@ -164,7 +164,7 @@ namespace Mobile_Store_MS.Controllers
         public async Task<JsonResult> UserMessages(string userID, string Email)
         {
             var user = await Usermanager.GetUserAsync(User);
-            var Messages = homeRepoitery.messages(user.Id, userID, user.Email, Email);
+            var Messages =  homeRepoitery.messages(user.Id, userID, user.Email, Email);
             return Json(Messages);
         }
 
@@ -175,10 +175,8 @@ namespace Mobile_Store_MS.Controllers
             if (limit == null) limit = 10;
             int skip = (int)((pageNo - 1) * limit);
             var user = await Usermanager.GetUserAsync(User);
-            int totalNotification = homeRepoitery.Notifications(user.Id, null, null).Count();
-            ViewBag.TotalNotifications = totalNotification;
-            ViewBag.CurrentPage = pageNo;
-            var Notifications = homeRepoitery.Notifications(user.Id, skip, (int)limit);
+            int totalNotification = homeRepoitery.UserTotalNotification(user.Id);
+            var Notifications = await homeRepoitery.Notifications(user.Id, skip, (int)limit);
             return Json(new { Notifications, totalNotification, pageNo });
         }
 
@@ -186,7 +184,7 @@ namespace Mobile_Store_MS.Controllers
         public async Task<JsonResult> GetUserUnreadMessagesCount()
         {
             var user = await Usermanager.GetUserAsync(User);
-            var Messages = homeRepoitery.countUserUnreadMessages(user.Id);
+            var Messages = await homeRepoitery.countUserUnreadMessages(user.Email);
             return Json(Messages);
         }
 
@@ -195,7 +193,7 @@ namespace Mobile_Store_MS.Controllers
         public async Task<JsonResult> GetUnreadMessagesCount()
         {
             var user = await Usermanager.GetUserAsync(User);
-            int Messages = homeRepoitery.countUnreadMessages(user.Id);
+            int Messages = homeRepoitery.countUnreadMessages(user.Email);
             return Json(Messages);
         }
         //Count Total Unread Notifications
@@ -206,12 +204,10 @@ namespace Mobile_Store_MS.Controllers
             return Json(Messages);
         }
 
-
-        //Updating Particular User Unread Messages
-        public JsonResult UpdateMessagesRead(string Email)
+        public async Task<JsonResult> UpdateUserMessages(string personID)
         {
-            string userID = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-            bool result = homeRepoitery.UpdateMessagesRead(userID, Email);
+            var user = await Usermanager.GetUserAsync(User);
+            bool result = await homeRepoitery.UpdateMessagesRead(user.Email,personID);
             return Json(result);
         }
     }

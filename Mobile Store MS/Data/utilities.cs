@@ -62,7 +62,7 @@ namespace Mobile_Store_MS.Data
             Configuration = configuration;
         }
 
-    
+       //For Uploading Image
         public string ProcessPhotoproperty(IFormFile Photo)
         {
             string uniqueFileName = null;
@@ -80,6 +80,7 @@ namespace Mobile_Store_MS.Data
             return uniqueFileName;
         }
 
+        //To Check Available Stock
         public bool checkingquantity(int id, int StoreId, int quantitySelected)
         {
             var result = context.Stock.Select(x => new { x.modelId, x.Quantity, x.store_id }).FirstOrDefault(x => x.modelId == id && x.store_id == StoreId);
@@ -92,6 +93,7 @@ namespace Mobile_Store_MS.Data
             return false;
         }
 
+        //Updating Stock after Successfull Order or Purchase
         public bool updatequan(int id, int StoreId, int quantitySelected, string operation)
         {
             try
@@ -134,6 +136,7 @@ namespace Mobile_Store_MS.Data
             }
         }
 
+        //Get List of Companies
         public List<CompanyViewModel> GetAllCompany()
         {
             var result = context.CompanyModel.Where(x => x.isActive == true).Select(x => new CompanyViewModel()
@@ -146,6 +149,7 @@ namespace Mobile_Store_MS.Data
             return result;
         }
 
+        //Get List of all Store
         public List<StoreList> GetAllStores()
         {
             var result = context.Stores.Select(x => new StoreList()
@@ -155,6 +159,8 @@ namespace Mobile_Store_MS.Data
             }).ToList();
             return result;
         }
+
+        //Get List of Model of Company
         public List<modelList> getModelList(int PhoneId)
         {
             var list = context.BrandModel.Where(x => x.PhoneId == PhoneId).Select(x => new modelList()
@@ -165,6 +171,7 @@ namespace Mobile_Store_MS.Data
             return list;
         }
 
+        //Get All Cities List
         public List<cities> getCities()
         {
             string file_path = Path.Combine(hostingEnvironment.WebRootPath, "data", "cities.json");
@@ -187,6 +194,8 @@ namespace Mobile_Store_MS.Data
                 return null;
             }
         }
+
+        //To Generate Unique Cus Ref Number
         public int GenerateCusRef()
         {
             int RefNo = 1;
@@ -198,6 +207,7 @@ namespace Mobile_Store_MS.Data
             return RefNo;
         }
 
+        //To Generate Unique  Store Ref Number
         public int GenerateStoreRef(int City)
         {
             int RefNo = 1;
@@ -209,6 +219,7 @@ namespace Mobile_Store_MS.Data
             return RefNo;
         }
 
+        //Calculate Price Based On Quantity
         public int Price(int modelId, int Quantity)
         {
             if (modelId == 0)
@@ -219,6 +230,7 @@ namespace Mobile_Store_MS.Data
             return result.Price * Quantity;
         }
 
+        //Get List of Vendors
         public List<VendorList> GetAllVendors(int PhoneId)
         {
             var list = context.Vendor.Where(x => x.PhoneId == PhoneId).Select(x => new VendorList()
@@ -229,6 +241,7 @@ namespace Mobile_Store_MS.Data
             return list;
         }
 
+        //To Remove Old images of Brands
         public bool RemoveImage(int imageId)
         {
             var exist = context.Images.FirstOrDefault(x => x.imageId == imageId);
@@ -254,6 +267,7 @@ namespace Mobile_Store_MS.Data
 
         }
 
+        //Get Nearby StoreId 
         public int getStoreId(double lat1, double lng1)
         {
             double minDistance = double.MaxValue;
@@ -271,6 +285,7 @@ namespace Mobile_Store_MS.Data
             return storeid;
         }
 
+        //Get Nearby StoreId  by user's city id
         public int getStoreId(int cityId)
         {
             double minDistance = double.MaxValue;
@@ -290,6 +305,7 @@ namespace Mobile_Store_MS.Data
 
         }
 
+        //Send Mail through Smtp
         public void sendemail(string email, string subject, string body)
         {
 
@@ -311,6 +327,8 @@ namespace Mobile_Store_MS.Data
             smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
             smtp.Send(message);
         }
+
+        //Calculate Distqnces between two places
         public double Calc(double Lat1,
                   double Long1, double Lat2, double Long2)
         {
@@ -358,6 +376,7 @@ namespace Mobile_Store_MS.Data
             return dDistance;
         }
 
+        //Add Notification to DB
         public async Task<bool> AddNotification(NotificationsViewModel model) 
         {
             try

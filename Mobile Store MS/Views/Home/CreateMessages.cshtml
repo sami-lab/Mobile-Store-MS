@@ -6,7 +6,7 @@
 
 <input type="text" id="CurrentUser" hidden value="@ViewBag.Email" />
 <input type="text" id="userImg" hidden value="@ViewBag.MyImage" />
-<div class="container-fluid h-100" >
+<div class="container-fluid h-100">
     <div class="row justify-content-center w-100 h-100 ">
 
         <div class="col-md-8 col-lg-8 col-xl-6 chat border">
@@ -19,7 +19,7 @@
                         </div>
                         <div class="user_info">
                             <span>Chat with <span class="name"></span></span>
-                            <p><span></span> Messages</p>
+                            <p><span class="count"></span> Messages</p>
                         </div>
 
                     </div>
@@ -76,8 +76,9 @@
                                             <span class=""></span>
                                         </div>
                                         <div class="user_info">
-                                            <span>@user.FullName</span>
-                                            <p>@user.Email  <span class="badge badge-pill badge-danger notification"></span></p> 
+                                            <span>@user.FullName </span>
+                                            <p>   <span style="font-size: smaller;" class="badge badge-pill  badge-danger notification"></span>@user.Email</p>
+
                                         </div>
                                     </div>
                                 </a>
@@ -97,9 +98,7 @@
     <link href="~/css/Chat.css" rel="stylesheet" />
     @*<script src="~/js/signalr/dist/browser/signalr.js"></script>*@
     @*<script src="~/js/signalr/dist/browser/signalr.min.js"></script>*@
-    <script src="~/lib/jquery/dist/jquery.unobtrusive-ajax.min.js"></script>
-    <script src="~/js/message.js"></script>
-    <script src="~/js/SignalRMethods.js"></script>
+  
 
     <script>
         $(document).ready(function () {
@@ -119,121 +118,106 @@
                     .forEach((item) => item.style.display = 'block');
             });
 
-            $('#userList li a').click(LoadChat($(this)));
+            $('#userList li a').click(async function () {
+                var x = $(this).parent();
+
+                $('#chatbody').css("visibility", "visible")
+                $('#chatbody').parent().removeClass('border');
+                var id = x.attr('data-id');
+                var Fullname = x.attr('data-FullName');
+                var img = x.attr('data-img');
+                var email = x.attr('data-email');
+                document.getElementById('Text').value = "";
+                var userImg = $('#userImg').val();
+                $('#chatWith img').attr('src', '/image/' + img);
+                $('.name').text(Fullname);
+                $('#UserName').val(email);
+                $('.action_menu ul:first-child a').attr('href', '/Administration/GetUserById/' + id);
+                $('#chat').html('');
+                x.find('.user_info span.notification').text(0);
+
+                await $.get('/home/UserMessages', { userID: id, Email: email }, async function (data) {
+                    $('.user_info p span.count').text(data.length >= 100 ? '100+' : data.length);
+                    let chats = '', line=1;
+                    data = data.reverse();
+  
+                    data.forEach(d => {
+                        const date = new Date(d.when);
+                        const when =
+                            (date.getMonth() + 1) + "/"
+                            + date.getDate() + "/"
+                            + date.getFullYear() + " "
+                            + date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
+                        if (d.userName === email) {
+                           
+                            chats += ` <div class="d-flex justify-content-start mb-4">
+                                                                                        <div class="img_cont_msg">
+                                                                                            <img src="${userImg}" asp-append-version="true" class="rounded-circle user_img_msg">
+                                                                                        </div>
+                                                                                        <div class="msg_cotainer text-break ">
+                                                                                           ${d.text}
+                                                                                            <span class="msg_time text-nowrap">${when}</span>
+                                                                                        </div>
+                                                                                   </div>`;
+                        } else {
+                            if (d.read === false && line === 1) {
+                                chats += '<hr style="color:white; background-color:white;" />';
+                                line++;
+                            }  
+                            chats += `<div class="d-flex justify-content-end mb-4">
+                                                                                        <div class="msg_cotainer_send">
+                                                                                             ${d.text}
+                                                                                            <span class="msg_time_send text-nowrap ">${when}</span>
+                                                                                        </div>
+                                                                                        <div class="img_cont_msg">
+                                                                                               <img src="/image/${img}" asp-append-version="true" class="rounded-circle user_img_msg">
+                                                                                        </div>
+                                                                                  </div>`
+                        }
+                        $('#chat').html(chats);
+
+                    });
+                   
+                    var childrenCount = document.getElementById("chat").childNodes.length;
+                    if (childrenCount > 5)
+                        document.getElementById("chat").childNodes[childrenCount - 1].scrollIntoView();
+                    await updateMessage(id);
+                });
+
+            });
             $('#action_menu_btn').click(function () {
                 $('.action_menu').toggle();
             });
 
-            
 
+            window.onload = async function () {
+                //For Getting All Users Unread Count
+                await $.get('/Home/GetUserUnreadMessagesCount', null, function (data) {
+                    $('#userList li').each(function (index) {
+                        var id = $(this).attr('data-id');
+                        data.forEach(x => {
+                            if (id == x.userID) {
+                                $(this).find('.user_info span.notification').text(x.count);
+                            }
+                        })
 
-
-          
-        });
-        $(window).load(async function () {
-            //For Getting All Users Unread Count 
-            await $.get('/home/GetUserUnreadMessagesCount', null, function (data) {
-                $('#userList li').each(function (index) {
-                    var id = $(this).attr('data-id');
-                    if (id == data.userID) {
-                        $(this).find('span.notification').text(data.count);
-                    }
+                    });
                 });
-            });
 
-            //For Directly Loading Messages throught Notifications
-            var userId = getUrlParameter(userId);
-            if (userId != null) {
-                $('#userList li').each(async function (index){
-                    var id = $(this).attr('data-id');
-                    if (id == userId) {
-                       await LoadChat($(this).children("a"));
-                    }
+
+            };
+
+            async function updateMessage(personID) {
+                await $.get('/home/UpdateUserMessages', { personID: personID },  function (data) {
+                    if (!data) console.log("Update Unsuccess");
                 });
             }
+
         });
 
-        async function LoadChat(e) {
-            var x = e.parent();
 
-            $('#chatbody').css("visibility", "visible")
-            $('#chatbody').parent().removeClass('border');
-            var id = x.attr('data-id');
-            var Fullname = x.attr('data-FullName');
-            var img = x.attr('data-img');
-            var email = x.attr('data-email');
-            document.getElementById('Text').value = "";
-            var userImg = $('#userImg').val();
-            $('#chatWith img').attr('src', '/image/' + img);
-            $('.name').text(Fullname);
-            $('#UserName').val(email);
-            $('.action_menu ul:first-child a').attr('href', '/Administration/GetUserById/' + id);
-            $('#chat').html('');
-            await $.get('/home/UserMessages', { userID: id, Email: email }, function (data) {
-                $('.user_info p span').text(data.length >= 100 ? '100+' : data.length);
-                let chats = '';
-                data = data.reverse();
-                data.forEach(d => {
-                    const date = new Date(d.when);
-                    const when =
-                        (date.getMonth() + 1) + "/"
-                        + date.getDate() + "/"
-                        + date.getFullYear() + " "
-                        + date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
-                    if (d.userName === email) {
-                        chats += ` <div class="d-flex justify-content-start mb-4">
-                                                                                    <div class="img_cont_msg">
-                                                                                        <img src="${userImg}" asp-append-version="true" class="rounded-circle user_img_msg">
-                                                                                    </div>
-                                                                                    <div class="msg_cotainer text-break">
-                                                                                       ${d.text}
-                                                                                        <span class="msg_time text-nowrap">${when}</span>
-                                                                                    </div>
-                                                                               </div>`;
-                    } else {
 
-                        chats += `<div class="d-flex justify-content-end mb-4">
-                                                                                    <div class="msg_cotainer_send">
-                                                                                         ${d.text}
-                                                                                        <span class="msg_time_send text-nowrap">${when}</span>
-                                                                                    </div>
-                                                                                    <div class="img_cont_msg">
-                                                                                           <img src="/image/${img}" asp-append-version="true" class="rounded-circle user_img_msg">
-                                                                                    </div>
-                                                                              </div>`
-                    }
-                    $('#chat').html(chats);
 
-                });
-
-                var childrenCount = document.getElementById("chat").childNodes.length;
-                if (childrenCount > 5)
-                    document.getElementById("chat").childNodes[childrenCount - 1].scrollIntoView();
-                await UpdateMessagesRead(email);
-            });
-
-        }
-
-        var getUrlParameter = function getUrlParameter(sParam) {
-            var sPageURL = window.location.search.substring(1),
-                sURLVariables = sPageURL.split('&'),
-                sParameterName,
-                i;
-
-            for (i = 0; i < sURLVariables.length; i++) {
-                sParameterName = sURLVariables[i].split('=');
-
-                if (sParameterName[0] === sParam) {
-                    return sParameterName[1] === undefined ? null : decodeURIComponent(sParameterName[1]);
-                }
-            }
-        };
-
-        var UpdateMessagesRead = async function UpdateMessagesRead(email) {
-            await $.get('/home/UpdateMessagesRead/', { Email: email }, function (data) {
-                if (!data) console.log("Could not Update Read Status");
-            });
-        };
     </script>
 
 }

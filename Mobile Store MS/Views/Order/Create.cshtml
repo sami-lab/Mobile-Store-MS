@@ -16,7 +16,7 @@
     <div class="bg-light m-3 p-5">
         <h1 class="text-center mt-3 text-info">Order</h1>
         <div class="row d-flex justify-content-around">
-            <div class="col-md-5 col-lg-5 col-sm-12">
+            <div class="col-md-4 col-lg-4 col-sm-12">
                 <div class="form-group">
                     <label asp-for="cus_name" class="control-label"></label>
                     <input asp-for="cus_name" class="form-control" />
@@ -83,7 +83,7 @@
 
 
             </div>
-            <div class="col-md-5 col-lg-5 col-sm-12">
+            <div class="col-md-4 col-lg-4 col-sm-12">
                 <div class="form-group row">
                     <label asp-for="com_Name" class="control-label col-6"></label>
                     <div class="col-12">
@@ -97,13 +97,17 @@
                 <div class="form-group row">
                     <label asp-for="model_name" class="control-label col-6"></label>
                     <div class="col-12">
-                        <select id="modelId" asp-for="modelId" class="custom-select mr-sm-2"
+                        <select id="modelId" asp-for="modelId" multiple class="custom-select mr-sm-2"
                                 asp-items="@(new SelectList(string.Empty,"modelId","model_name","--Select--"))">
                             <option value="">Please Select</option>
                         </select>
                     </div>
                     <span asp-validation-for="modelId" class="text-danger"></span>
                 </div>
+                <div>
+                    <input type="button" id="saveBtn" value="Save" />
+                </div>
+
                 <div class="form-group">
                     <label asp-for="Date" class="control-label"></label>
                     <input asp-for="Date" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly class="form-control" />
@@ -121,9 +125,14 @@
                 </div>
             </div>
 
+            <div class="col-md-2 col-lg-2 border" id="orderItems">
+               
+                    <h5>Selected Products</h5>
+                    <div id="products"></div>
+               
+            </div>
 
-
-        </div> 
+        </div>
         <div class="form-group row ml-3">
 
             <label class="col-12 col-form-label">@Html.DisplayNameFor(x => x.Method)</label>
@@ -210,6 +219,7 @@ else
     </script>
     <script>
         $(document).ready(function () {
+            const modelsdata = [];
             $("#CompanyId").change(async function () {
                 $("#price").val(0);
                 $("#Quantity").val(0);
@@ -227,7 +237,15 @@ else
                 $('#CustRef').removeAttr('readonly')
             })
 
-
+            $('#saveBtn').click(function () {
+                $.ajax({
+                    url: '/Order/GetProduct?Phoneid=' + $("#CompanyId").val() + "&modelId=" + $('#modelId').val(),
+                    type: 'Post',
+                    success: function (data) {
+                        $('#products').append(data);
+                    }
+                })
+            })
             window.onload = async function () {
                 var CompanyId = $("#CompanyId").val();
                 if (CompanyId != '') {
@@ -265,5 +283,6 @@ else
                 });
             });
         }
+
     </script>
 }

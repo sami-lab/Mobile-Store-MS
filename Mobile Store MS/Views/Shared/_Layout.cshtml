@@ -1,5 +1,6 @@
 ﻿@using Mobile_Store_MS.Data
 @inject SignInManager<ApplicationUser> SignInManager
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,10 +14,13 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
-    <script src="~/js/signalr/dist/browser/signalr.js"></script>
-    <script src="~/js/Notifications.js"></script>
     <link href="~/css/admin.css" rel="stylesheet" />
     <script src="~/js/script.js"></script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/Notifications.js"></script>
+    <script src="~/lib/jquery/dist/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/js/message.js"></script>
+    <script src="~/js/SignalRMethods.js"></script>
 </head>
 <body>
     @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin") || User.IsInRole("Super Admin") || User.IsInRole("Employee"))
@@ -35,7 +39,7 @@
                     </div>
                     <div class="sidebar-header row">
                         <div class="user-pic" id="userpic">
-                            <img class="img-responsive img-rounded" src="~/Image/emp.jpg" alt="User picture">
+                            <img class="img-responsive img-rounded" src="~/Image/emp.jpg" asp-append-version="true" alt="User picture">
                         </div>
                         <div class="user-info">
                             <span class="user-name" style="font-size:smaller">
@@ -141,9 +145,13 @@
                                                 Details
                                             </a>
                                         </li>
-                                        <li>
-                                            <a asp-controller="Purchasing" asp-action="Create">Create Purchasing</a>
-                                        </li>
+                                        @if (User.HasClaim(claim => claim.Type == "Allow Purchasing" && claim.Value == "true"))
+                                        {
+                                            <li>
+                                                <a asp-controller="Purchasing" asp-action="Create">Create Purchasing</a>
+                                            </li>
+                                        }
+
                                     </ul>
                                 </div>
                             </li>
@@ -251,7 +259,7 @@
                                 <div class="sidebar-search">
                                     <div>
                                         <form id="search-form1" class="input-group" method="get" asp-controller="Administration" asp-action="GetUserById">
-                                            <input type="text" name="id" required min="1" class="form-control search-menu" placeholder="Search User">
+                                            <input type="text" name="id" required  autocomplete="off" class="form-control search-menu" placeholder="Search User">
                                             <div class="input-group-append">
                                                 <button class="input-group-text" type="submit">
                                                     <i class="fa fa-search" aria-hidden="true"></i>
@@ -276,7 +284,7 @@
                                 </a>
                                 <div class="sidebar-submenu">
                                     <ul>
-                                        @if (User.IsInRole("Super Admin"))
+                                        @if (User.IsInRole("Super Admin") || User.IsInRole("Admin") && User.HasClaim(claim => claim.Type == "Create User" && claim.Value == "true"))
                                         {
                                             <li>
                                                 <a asp-controller="Administration" asp-action="AddEmployee">Add Employee</a>
@@ -285,7 +293,7 @@
                                                 <a asp-controller="Administration" asp-action="GetAllRoles">All Roles</a>
                                             </li>
                                         }
-                                        else if (User.IsInRole("Admin") || User.IsInRole("Employee"))
+                                        else if (User.IsInRole("Employee") && User.HasClaim(claim => claim.Type == "Create User" && claim.Value == "true"))
                                         {
                                             <li>
                                                 <a asp-controller="Account" asp-action="Register">Add Member</a>
@@ -327,7 +335,7 @@
 
 
                             <li class="shadow" style="border-bottom:1px solid rgba(0,0,0,.1);  padding:8px 0;" id="load">
-                                <a href="#" class="btn btn-outline-dark text-primary w-100" >
+                                <a href="#" class="btn btn-outline-dark text-primary w-100">
                                     Load More
                                 </a>
                             </li>
@@ -338,7 +346,10 @@
 
                     <a asp-controller="Home" asp-action="CreateMessages">
                         <i class="fa fa-envelope "></i>
-                        <span class="badge badge-pill badge-warning notification" id="messagesCount">0</span>
+                        @{
+                            var Email = User.Identity.Name;
+                        }
+                        <span class="badge badge-pill badge-warning notification" id="messagesCount" data-Email="@Email">0</span>
                     </a>
                     @if (SignInManager.IsSignedIn(User))
                     {
@@ -385,9 +396,9 @@
     }
 
     <script>
-        let page = 1,count=1; 
+        let page = 1, count = 1;
         const dataArray = [];
-        const loadButton = document.getElementById('load');
+
         window.onload = async function () {
             //Profile
             const req1 = await fetch('/Home/GetProfile');
@@ -415,48 +426,54 @@
             if (NotificationsCountData != null) {
                 document.querySelector('#NotificationsCount').textContent = NotificationsCountData;
             }
-            else {
-                document.querySelector('#NotificationsCount').textContent = 0;
+
+        }
+
+
+        function LoadButton(page) {
+            if (page > 1) {
+                let loadreq = fetch('/Home/UserNotifications?pageNo=' + page).then(d => d.json()).then(data2 => {
+                    dataArray.push(...data2.notifications);
+                    console.log("Data2 " + data2.pageNo);
+                    AddNotification(dataArray, data2.pageNo, data2.totalNotification);
+                });
+                //const load = await fetch('/Home/UserNotifications/pageNo?'+page );
+                //const loadData = await load.json();
+                //dataArray.push(...loadData.notifications);
+                //AddNotification(dataArray, loadData.pageNo, loadData.totalNotification);
+                //AddNotification(loadData);
             }
         }
 
 
-        loadButton.addEventListener('click', async function () {
-           
-            if (page > 1) {
-                const load = await fetch('/Home/UserNotifications/pageNo?'+page );
-                const loadData = await load.json();
-                dataArray.push(...loadData.notifications);
-                AddNotification(dataArray, loadData.pageNo, loadData.totalNotification);
-                //AddNotification(loadData);
-            }
-        });
-
-
-        document.getElementById('loadNotification').addEventListener('click', async function () {
-            if(count > 1) return
+        document.getElementById('loadNotification').addEventListener('click', function () {
+            if (count > 1) return
             count++;
-            let req2 = await fetch('/Home/UserNotifications').then(d => d.json()).then(data2 => {
+            let req2 = fetch('/Home/UserNotifications').then(d => d.json()).then(data2 => {
                 dataArray.push(...data2.notifications);
                 AddNotification(dataArray, data2.pageNo, data2.totalNotification);
             });
-            //const data2 = await req2.json();
-            //console.log(data2.notifications);
-            //AddNotification(data2);
+
 
         });
 
         function AddNotification(data, pageNo, totalNotification) {
             page = pageNo + 1;
+
+            data = data.sort(function (a, b) {
+
+                return new Date(a.when) - new Date(b.when);
+            });
+
             //page = data.pageNo+1;
             const ul = document.getElementById('notification_dropdown');
             ul.innerHTML = ` <li class="shadow" style="border-bottom:1px solid rgba(0,0,0,.1);  padding:8px 0;" id="load">
-                                <a href="#" class="btn btn-outline-dark text-primary w-100" >
-                                    Load More
-                                </a>
-                            </li>`;
+                                        <a href="#" onclick="LoadButton(${page})" class="btn btn-outline-dark text-primary w-100" >
+                                            Load More
+                                        </a>
+                                    </li>`;
             if (data != null) {
-                data.reverse();
+                //data.reverse();
                 data.forEach(x => {
                     let read = '';
                     const date = new Date(x.when);
@@ -466,26 +483,25 @@
                     if (when >= 24) dateString = Math.floor(Math.abs(when / 24)) + "d ago";
                     else if (when == 0) dateString = Math.floor(Math.abs(time * 60)) + "m ago";
                     if (x.read == false) read = "bg_dark";
-                     const li = `<li class="icon m-1 list-unstyled d-flex ${read}" style="border-bottom:1px solid rgba(0,0,0,.1);  padding:1px 0;">
-                           <a href="${x.url}">
-                               <p class="text">  <span class="font-weight-bolder">${x.heading} </span> ${x.text} </br> <span class="not_time">${dateString}</span ></p>
-                            </a>
-                         </li >`;
+                    const li = `<li class="icon m-1 list-unstyled d-flex ${read}" style="border-bottom:1px solid rgba(0,0,0,.1);  padding:1px 0;">
+                                   <a href="${x.url}">
+                                       <p class="text">  <span class="font-weight-bolder">${x.heading} </span> ${x.text} </br> <span class="not_time">${dateString}</span ></p>
+                                    </a>
+                                 </li >`;
                     ul.innerHTML += li;
                 });
 
                 var totalNotifications = parseInt(totalNotification);
-                var countNotifications = document.getElementById("notification_dropdown").childNodes.length -1;
+                var countNotifications = document.getElementById("notification_dropdown").childNodes.length - 1;
                 document.getElementById("notification_dropdown").childNodes[countNotifications - 1].scrollIntoView();
-                if ( parseInt(countNotifications) >= totalNotifications)
-                {
+                if (parseInt(countNotifications) >= totalNotifications) {
                     document.getElementById('load').style.display = "none"
                 }
 
             }
             else {
                 document.getElementById('load').style.display = "none"
-               
+
             }
 
         }

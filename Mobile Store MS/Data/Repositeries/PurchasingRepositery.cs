@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Mobile_Store_MS.Data.Interfaces;
 using Mobile_Store_MS.Data.Model;
+using Mobile_Store_MS.Hubs;
+using Mobile_Store_MS.ViewModel.MessagesViewModel;
 using Mobile_Store_MS.ViewModel.PurchasingViewModel;
 using System;
 using System.Collections.Generic;
@@ -16,13 +20,15 @@ namespace Mobile_Store_MS.Data.Repositeries
         //private readonly IHostingEnvironment hostingEnvironment;
         utilities util;
         UserManager<ApplicationUser> UserManager;
-        public PurchasingRepositery(ApplicationDbContext _context, IHostingEnvironment hostingEnvironment,UserManager<ApplicationUser> userManager)
+        private IHubContext<NotificationHub> _hubContext;
+        public PurchasingRepositery(ApplicationDbContext _context, IHostingEnvironment hostingEnvironment,UserManager<ApplicationUser> userManager, IHubContext<NotificationHub> hubContext)
         {
             context = _context;
             util = new utilities(context, hostingEnvironment);
             UserManager = userManager;
+            _hubContext = hubContext;
         }
-        public int addPurchasing(PurchasingViewModel c)
+        public async Task<int> addPurchasing(PurchasingViewModel c, IUrlHelper Url)
         {
             bool res = false;
             // var price = context.BrandModel.Select(x => new { x.Price, x.modelId }).FirstOrDefault(x => x.modelId == c.modelId);
@@ -40,6 +46,22 @@ namespace Mobile_Store_MS.Data.Repositeries
             context.SaveChanges();
             res = util.updatequan(c.modelId, c.store_id, c.Quantity, "Add");
             if (res == false) return 0;
+            string StoreName = util.GetAllStores().FirstOrDefault(x => x.store_id == c.store_id).StoreName;
+            var users = UserManager.Users.Where(x => x.store_id == c.store_id).ToList();
+
+            NotificationsViewModel n = new NotificationsViewModel();
+            n.heading = "Purchasing #" + model.purchase_id;
+            n.Text = "Items Purchased By " +c.takenBy;
+            n.Url = Url.Action("Details", "Purchasing", new { id = model.purchase_id });
+            n.read = false;
+            n.When = DateTime.Now;
+            await _hubContext.Clients.Groups(StoreName).SendAsync("RecieveNotification", n);
+
+            foreach (var em in users)
+            {
+                n.UserId = em.Id;
+                await util.AddNotification(n);
+            }
             return model.purchase_id;
         }
 

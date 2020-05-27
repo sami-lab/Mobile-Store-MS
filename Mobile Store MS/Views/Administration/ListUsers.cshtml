@@ -12,6 +12,47 @@
 
     @if (Model.Any())
     {
+        <div class="row">
+            <form class="col-6" id="searchForm" asp-controller="Administration" asp-action="Search" method="get">
+                <p>
+                    <label class="custom-control">Find By: </label>
+                    <select name="searchList" id="searchList" class="form-control mb-1" style="border:1px solid #cccccc">
+                        <option value="">--Select--</option>
+                        <option value="FullName">Name</option>
+                        <option value="Email">Email</option>
+                        <option value="Id">ID</option>
+                        <option value="City">City</option>
+                        <option value="PhoneNumber">PhoneNumber</option>
+                    </select>
+                    <input type="text" class="form-control search" autocomplete="off" style="display: none;" id="FullName" placeholder="Search By Name" name="FullName">
+                    <input type="text" class="form-control search" autocomplete="off" style="display: none;" id="Email" placeholder="Search By Email" name="Email">
+                    <input type="text" class="form-control search" autocomplete="off" style="display: none;" id="Id" placeholder="Search By Id" name="Id">
+                    <input type="text" class="form-control search" autocomplete="off" style="display: none;" id="PhoneNumber" placeholder="Search By Phone Number" name="PhoneNumber">
+
+                    <select name="City" style="display: none;" class="search custom-select mr-sm-2" id="City"
+                            asp-items="@(new SelectList( @ViewBag.cities,"id","city"))">
+                        <option value="">Please Select</option>
+                    </select>
+                    <input id="submit" class="btn btn-primary mt-1" disabled type="submit" value="Filter" />
+                </p>
+            </form>
+            <form class="col-6" id="sortForm" asp-controller="Administration" asp-action="Sort" method="get">
+                <p>
+                    <label>Sort By: </label>
+                    <select name="sortBy" class="form-control mb-1" style="border:1px solid #cccccc">
+                        <option value="Email">Email</option>
+                        <option value="FullName">Full Name</option>
+                        <option value="City">City</option>
+                    </select>
+                    <select name="order" class="form-control mb-1" style="border:1px solid #cccccc">
+                        <option value="Asc" selected>Ascending Order</option>
+                        <option value="Des">Descending Order</option>
+                    </select>
+                    <input class="btn btn-primary" type="submit" value="Filter" />
+                </p>
+            </form>
+        </div>
+
         if (User.IsInRole("Super Admin"))
         {
             <a asp-action="AddEmployee" asp-controller="Administration"
@@ -36,7 +77,7 @@
                         <button class="btn btn-default btn-xs btn-filter"><i class="fas fa-filter"></i> Filter</button>
                     </div>
                 </div>
-                <table class="table">
+                <table class="table table-responsive">
                     <thead>
                         <tr class="filters">
                             <th><input type="text" class="form-control" placeholder=" @Html.DisplayNameFor(model => model.Id)" disabled></th>
@@ -106,7 +147,7 @@
 
 
                         <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                            <a class="page-link" asp-controller="Administration" asp-action="ListUsers" asp-route-pageNo="@i" >@i</a>
+                            <a class="page-link" asp-controller="Administration" asp-action="ListUsers" asp-route-pageNo="@i">@i</a>
                         </li>
                     }
 
@@ -144,6 +185,45 @@
     }
 </div>
 @section Scripts{
+    <script>
+        $(document).ready(function () {
+            var selectedVal;
+            $('#searchForm').on('submit', function (event) {
+                var searchVal = $("#searchList").find("option:selected").val();
+                if (searchVal != null) {
+                    if ($('#' + searchVal) == null) {
+                        event.preventDefault();
+                        alert('Input Field Could not be null');
+                    }
+                }
+                else {
+                    event.preventDefault();
+                    alert('please select Value to search');
+                }
+            });
+            $("#searchList").change(function () {
+                $('#submit').attr("disabled", "false");
+                selectedVal = $(this).find("option:selected").val();
+                if (selectedVal == null) {
+                    $('#submit').attr("disabled", "true");
+                    return;
+                }
+                $("#searchForm :input.search").each(function () {
+                    $(this).val("");
+                    $(this).hide();
+                });
+                $('#' + selectedVal).show();
+                $("#searchForm :input.search").filter('#searchForm :input[id="' + selectedVal + '"]').on('change keyup keydown', function () {
+                    if ($(this).val().length > 0) {
+                        $('#submit').attr("disabled", false);
+                    }
+                    else $('#submit').attr("disabled", true);
+                })
+            })
+
+
+        });
+    </script>
     <script src="~/js/CustomScript.js"></script>
     <link href="~/css/StyleSheet.css" rel="stylesheet" />
     <script src="~/js/Filter.js"></script>

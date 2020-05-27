@@ -13,6 +13,10 @@ namespace Mobile_Store_MS.ViewModel.Orders
 {
     public class OrderViewModel
      {
+        public OrderViewModel()
+        {
+            Products = new List<Products>();
+        }
         [Display(Name ="Order ID")]
         public int order_id { get; set; }
         [Required]
@@ -22,6 +26,7 @@ namespace Mobile_Store_MS.ViewModel.Orders
         [Remote(action:"quantityCheck",controller:"Order")]
         public int Quantity { get; set; }
 
+        public List<Products> Products { get; set; }
         [Required]
         public int Amount { get; set; }
 
@@ -80,6 +85,22 @@ namespace Mobile_Store_MS.ViewModel.Orders
         public Address Address { get; set; }
        // public ModelViewModel model { get; set; }      
         //public CustomerViewModel.CustomerViewModel Cus_model { get; set; }
+    }
+    public class Products
+    {
+        public int id { get; set; }
+        public int modelId { get; set; }
+        [Display(Name = "Model Name")]
+        public string model_name { get; set; }
+        public int Phoneid { get; set; }
+        [Display(Name = "Company Name")]
+        public string com_Name { get; set; }
+        public int Quantity { get; set; }
+        [Display(Name = "Price")]
+        public double price { get; set; }
+        [Display(Name = "Select")]
+        public bool isSelected { get; set; }
+        public int order_id { get; set; }
     }
     public enum PaymentMethods
     {

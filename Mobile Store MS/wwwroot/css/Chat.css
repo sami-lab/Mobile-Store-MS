@@ -244,7 +244,9 @@
     right: 15px;
     display: none;
 }
-
+.unread {
+    background-color: #ff9191;
+}
     .action_menu ul {
         list-style: none;
         padding: 0;

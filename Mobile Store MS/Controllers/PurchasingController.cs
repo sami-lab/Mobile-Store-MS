@@ -109,8 +109,8 @@ namespace Mobile_Store_MS.Controllers
                 if(ModelState.IsValid)
                 {
                     var user = await userManager.GetUserAsync(User);
-                    model.takenBy = user.Id;
-                    int id = iPurchasingRepositery.addPurchasing(model);
+                    model.takenBy = user.Email ;
+                    int id = await iPurchasingRepositery.addPurchasing(model,Url);
                     if (id == 0) return View("Error");
                     return RedirectToAction("Details", new { id = id });
                 }

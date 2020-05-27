@@ -1,136 +1,148 @@
 ﻿@model IEnumerable<Mobile_Store_MS.ViewModel.Store.StoreViewModel>
+@using Newtonsoft.Json;
+    @{
+        ViewData["Title"] = "Index";
 
-@{
-    ViewData["Title"] = "Index";
-
-}
-
-<h1>Store Details</h1>
-
-@if (Model.Any())
-{
-    <p>
-        <a class="btn btn-primary mb-3" style="width:auto" asp-action="Create"
-           asp-controller="Store">Create new Store</a>
-    </p>
-    <div class="row">
-        <div class="panel panel-primary filterable">
-            <div class="panel-heading rounded">
-                <h3 class="panel-title font-weight-bold">Stores</h3>
-                <div class="pull-right">
-                    <button class="btn btn-default btn-xs btn-filter"><i class="fas fa-filter"></i> Filter</button>
-                </div>
-            </div>
-            <table class="table">
-                <thead>
-                    <tr class="filters">
-                        <th><input type="text" class="form-control" placeholder="@Html.DisplayNameFor(model => model.store_id)" disabled></th>
-                        <th><input type="text" class="form-control" placeholder="@Html.DisplayNameFor(model => model.StoreName)" disabled></th>
-                        <th><input type="text" class="form-control" placeholder="@Html.DisplayNameFor(model => model.CityName)" disabled></th>
-                        <th><input type="text" class="form-control" placeholder=" @Html.DisplayNameFor(model => model.SupportNo)" disabled></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.store_id)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.StoreName)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.CityName)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.SupportNo)
-                            </td>
-                            <td>
-
-                                @if (User.IsInRole("Super Admin"))
-                                {
-                                    <a asp-action="Edit" asp-route-id="@item.store_id"><i class="far fa-edit" title="Edit"></i></a><span>|</span>
-                                    @await Html.PartialAsync("~/Views/Shared/Modal.cshtml", item.store_id)<span>|</span>
-                                    @Html.ActionLink("Add Employee", "AddEmployee", "Administration", new { store_id = item.store_id })<span>|</span>
-                                }
-                                else if (User.IsInRole("Admin"))
-                                {
-                                    @Html.ActionLink("Add Employee", "Register", "Account", new { store_id = item.store_id })
-                                }
-                                <a asp-action="Details" asp-route-id="@item.store_id"><i class="fas fa-info-circle" title="Details"></i></a><span>|</span>
-                                @Html.ActionLink("Stock Details", "StoreStock", "Quantity", new { id = item.store_id }) |
-                                @Html.ActionLink("Store Employees", "GetEmployees", "Store", new { store_id = item.store_id }) |
-                                @Html.ActionLink("Store Purchasing", "StorePurchasing", "Purchasing", new { store_id = item.store_id }) |
-                                @Html.ActionLink("Store Orders", "StoreOrders", "Order", new { store_id = item.store_id }) |
-
-
-
-
-                            </td>
-
-                        </tr>
-
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div id="map" style="width:100%; height:500px;"></div>
-  
-    foreach (var item in Model)
-    {
-    <div>
-        <script type="text/javascript">
-
-                function displaygooglemap() {
-                     var map;
-                    map = new google.maps.map(document.getelementbyid('map'), {
-                        center: { lat: 30.3753, lng: 69.3451 },
-                        zoom: 15,
-                        minzoom: 15,
-                        maptypeid: google.maps.maptypeid.roadmap
-                    });
-                    //set marker on the map
-                    var marker = new google.maps.marker({
-                        position: { lat: @item.Lat, lng: @item.Lng },
-                         map: map,
-                        animation: google.maps.animation.bounce,
-                     });
-                 }
-
-           
-
-        </script>
-    </div>
     }
 
-}
-else
-{
-    <div class="card">
-        <div class="card-header">
-            No Store Added yet
-        </div>
-        <div class="card-body">
-            <h5 class="card-title">
-                Use the button below to Add new Store
-            </h5>
+    <h1>Store Details</h1>
+
+    @if (Model.Any())
+    {
+        <p>
             <a class="btn btn-primary mb-3" style="width:auto" asp-action="Create"
                asp-controller="Store">Create new Store</a>
+        </p>
+        <div class="row">
+            <div class="panel panel-primary filterable">
+                <div class="panel-heading rounded">
+                    <h3 class="panel-title font-weight-bold">Stores</h3>
+                    <div class="pull-right">
+                        <button class="btn btn-default btn-xs btn-filter"><i class="fas fa-filter"></i> Filter</button>
+                    </div>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr class="filters">
+                            <th><input type="text" class="form-control" placeholder="@Html.DisplayNameFor(model => model.store_id)" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="@Html.DisplayNameFor(model => model.StoreName)" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="@Html.DisplayNameFor(model => model.CityName)" disabled></th>
+                            <th><input type="text" class="form-control" placeholder=" @Html.DisplayNameFor(model => model.SupportNo)" disabled></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.store_id)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.StoreName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CityName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.SupportNo)
+                                </td>
+                                <td>
+
+                                    @if (User.IsInRole("Super Admin"))
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@item.store_id"><i class="far fa-edit" title="Edit"></i></a><span>|</span>
+                                        @await Html.PartialAsync("~/Views/Shared/Modal.cshtml", item.store_id)<span>|</span>
+                                        @Html.ActionLink("Add Employee", "AddEmployee", "Administration", new { store_id = item.store_id })<span>|</span>
+                                    }
+                                    else if (User.IsInRole("Admin"))
+                                    {
+                                        @Html.ActionLink("Add Employee", "Register", "Account", new { store_id = item.store_id })
+                                    }
+                                    <a asp-action="Details" asp-route-id="@item.store_id"><i class="fas fa-info-circle" title="Details"></i></a><span>|</span>
+                                    @Html.ActionLink("Stock Details", "StoreStock", "Quantity", new { id = item.store_id }) |
+                                    @Html.ActionLink("Store Employees", "GetEmployees", "Store", new { store_id = item.store_id }) |
+                                    @Html.ActionLink("Store Purchasing", "StorePurchasing", "Purchasing", new { store_id = item.store_id }) |
+                                    @Html.ActionLink("Store Orders", "StoreOrders", "Order", new { store_id = item.store_id }) |
+
+
+
+
+                                </td>
+
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-}
+        <div id="map" style="width:100%; height:500px;"></div>
 
-@section Scripts{
 
-    <link href="~/css/StyleSheet.css" rel="stylesheet" />
-    <script src="~/js/CustomScript.js"></script>
-    <script src="~/js/Filter.js"></script>
-  
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJOZd-P3bAJXBAYtfryQT_GTv61uRehMs&callback=DisplayGoogleMap"
-                async defer></script>
+        <script>
 
-        @*AIzaSyDPsMCu_pOqkc6brvRGiNIAek8xsDGNL3w*@
-}
+       
+            @*var latlng = [];
+            var obj = { Lat : @item.Lat,Lng :@item.Lng,Name:@item.StoreName}
+            latlng.push(obj);*@
+
+        </script>
+
+        <div>
+            <script>
+                var data = @Html.Raw(Json.Serialize(Model))
+                    console.log("Map Loaded")
+                var map = new L.Map("map", {
+                    center: new L.LatLng(30.3753, 69.3451),
+                    zoom: 6,
+                    layers: new L.TileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png")
+                });
+                var marker; var circle;
+                data.forEach(x => {
+                    marker = new L.Marker(new L.LatLng(x.lat, x.lng));
+                    marker.bindPopup(`<b>${x.storeName}</b><br>${x.completeAddress}.<br>${x.supportNo}`);
+                    map.addLayer(marker);
+
+                    circle = L.circle([x.lat, x.lng], {
+                        color: 'red',
+                        fillColor: '#f03',
+                        fillOpacity: 0.5,
+                        radius: 500
+                    }).addTo(map);
+                })
+              
+            </script>
+
+        
+        </div>
+
+
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-header">
+                No Store Added yet
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">
+                    Use the button below to Add new Store
+                </h5>
+                <a class="btn btn-primary mb-3" style="width:auto" asp-action="Create"
+                   asp-controller="Store">Create new Store</a>
+            </div>
+        </div>
+    }
+
+    @section Scripts{
+
+
+        <link href="~/css/StyleSheet.css" rel="stylesheet" />
+        <script src="~/js/CustomScript.js"></script>
+        <script src="~/js/Filter.js"></script>
+        <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+
+       
+    }

@@ -43,6 +43,7 @@ namespace Mobile_Store_MS.Controllers
                 return View(storeRepositery.GetDetails().Where(x=> x.store_id== user.store_id));
             }
             var data = storeRepositery.GetDetails();
+            ViewBag.data = data;
             return View(data);
         }
         [AllowAnonymous]

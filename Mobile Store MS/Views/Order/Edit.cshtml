@@ -1,20 +1,21 @@
-﻿@model Mobile_Store_MS.ViewModel.OrdersViewModel.EditOrderViewModel
-
+﻿@model Mobile_Store_MS.ViewModel.Orders.OrderViewModel
+@using Mobile_Store_MS.Data
+@using Mobile_Store_MS.ViewModel.Orders
 @{
     ViewData["Title"] = "Edit";
+    //double Total = ViewBag.TotalPrice;
+  
 }
 <hr />
 <form method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input name="TotalAmount"  value="@ViewBag.TotalPrice" hidden/>
+   <input asp-for="Method" hidden/>
 
-    <input asp-for="ExistingQuantity" hidden />
-    <input asp-for="Existing_store_id" hidden />
-    <input asp-for="cus_id" hidden />
-    <input asp-for="order_id" hidden />
     <div class="bg-light m-3 p-5">
         <h1 class="text-center mt-3 text-info">Edit Order</h1>
-        <div class="row d-flex justify-content-around">
-            <div class="col-md-5 col-lg-5 col-sm-12">
+        <div class="row">
+            <div class="col-md-4">
                 <div class="form-group">
                     <label asp-for="cus_name" class="control-label"></label>
                     <input asp-for="cus_name" class="form-control" />
@@ -28,7 +29,6 @@
 
                 @if (User.IsInRole("Admin") || User.IsInRole("Super Admin") || User.IsInRole("Employee"))
                 {
-                    <label class="border font-weight-bolder font-italic text-center mt-4 text-danger" style="font-family:'Times New Roman', Times, serif">If Customer already Purchase from Shop Just Write their RefNo# Otherwise Leave it Empty</label>
                     <div class="form-group row">
                         <label asp-for="store_id" class="control-label col-6"></label>
                         <div class="col-12">
@@ -40,9 +40,9 @@
                         <span asp-validation-for="store_id" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="CustRef" class="control-label"></label>
-                        <input asp-for="CustRef" readonly min="1" class="form-control" />
-                        <span id="CusRef1" class="btn-link">Enable Field</span>
+
+                        <input hidden asp-for="CustRef" readonly min="1" class="form-control" />
+
                         <span asp-validation-for="CustRef" class="text-danger"></span>
                     </div>
                 }
@@ -74,51 +74,103 @@
                         <span asp-validation-for="store_id" class="text-danger"></span>
                     </div>
 
-
                     <input asp-for="CustRef" readonly min="1" hidden class="form-control disabled" />
-
                 }
-
+                <div class="row">
+                    <div class="form-group col-6">
+                        <label class="control-label"> Paid Amount </label>
+                        <input  id="TotalPrice" class="form-control" value="@ViewBag.TotalPrice" disabled />
+                    </div>
+                    <div class="form-group col-6">
+                        <label class="control-label text-nowrap"> Current Total </label>
+                        <input id="CurrentPrice" class="form-control" value="0" disabled />
+                    </div>
+                </div>
 
             </div>
-            <div class="col-md-5 col-lg-5 col-sm-12">
+            <div class="col-md-8" id="orderItems">
+                <div class="form-group">
+                    <label asp-for="Date" class="control-label"></label>
+                    <input asp-for="Date" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly class="form-control" />
+                    <span asp-validation-for="Date" class="text-danger"></span>
+                </div>
                 <div class="form-group row">
-                    <label asp-for="com_Name" class="control-label col-6"></label>
+                    <label asp-for="Products.First().com_Name" class="control-label col-6"></label>
                     <div class="col-12">
-                        <select id="CompanyId" asp-for="Phoneid" class="custom-select mr-sm-2"
+                        <select id="CompanyId" class="custom-select mr-sm-2"
                                 asp-items="@(new SelectList( @ViewBag.Companies,"Phoneid","Com_name"))">
                             <option value="">Please Select</option>
                         </select>
                     </div>
-                    <span asp-validation-for="com_Name" class="text-danger"></span>
+                    <span asp-validation-for="Products.First().com_Name" class="text-danger"></span>
                 </div>
                 <div class="form-group row">
-                    <label asp-for="model_name" class="control-label col-6"></label>
+                    <label asp-for="Products.First().modelId" class="control-label col-6"></label>
                     <div class="col-12">
-                        <select id="modelId" asp-for="modelId" class="custom-select mr-sm-2"
+                        <select id="modelId" multiple class="custom-select mr-sm-2"
                                 asp-items="@(new SelectList(string.Empty,"modelId","model_name","--Select--"))">
                             <option value="">Please Select</option>
                         </select>
                     </div>
-                    <span asp-validation-for="modelId" class="text-danger"></span>
+                    <span asp-validation-for="Products.First().modelId" class="text-danger"></span>
                 </div>
-                <div class="form-group">
-                    <label asp-for="Date" class="control-label"></label>
-                    <input asp-for="Date" readonly class="form-control" />
-                    <span asp-validation-for="Date" class="text-danger"></span>
+                <div>
+                    <input class="btn btn-success btn-block" type="button" id="saveBtn" value="Save" />
                 </div>
-                <div class="form-group">
-                    <label asp-for="Quantity" class="control-label"></label>
-                    <input asp-for="Quantity" min="1" class="form-control" />
-                    <span asp-validation-for="Quantity" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Amount" class="control-label"></label>
-                    <input id="price" asp-for="Amount" readonly class="form-control" />
-                    <span asp-validation-for="Amount" class="text-danger"></span>
-                </div>
+                <label id="CurrentAmount" class="d-none border font-weight-bolder font-italic text-center mt-4 text-danger" style="font-family:'Times New Roman', Times, serif"> </label>
+                <input asp-for="orders" hidden />
+
+            </div>
+        </div>
+        <div class="">
+            <h5 class="text-center">Selected Products</h5>
+            <div class="d-md-flex d-lg-flex" id="products">
+                @for (int i = 0; i < Model.Products.Count; i++)
+                {
+                    var initailPrice = Model.Products[i].price / Model.Products[i].Quantity;
+                    <div id="model_@Model.Products[i].modelId" class="justify-content-center border bg-light m-1 item">
+
+
+                        <div class="form-group p-1">
+                            <input hidden asp-for="@Model.Products[i].Phoneid" />  <input hidden asp-for="@Model.Products[i].modelId" />
+                            <input hidden asp-for="@Model.Products[i].com_Name" />  <input hidden asp-for="@Model.Products[i].model_name" />
+                            @Html.DisplayFor(modelItem => Model.Products[i].com_Name)   @Html.DisplayFor(modelItem => Model.Products[i].model_name)
+                            <button type="button" class="close" onclick="Delete(this)">&times;</button>
+                        </div>
+                        <div class="form-group p-1">
+                            <label asp-for="@Model.Products[i].Quantity" class="control-label"></label>
+                            <input asp-for="@Model.Products[i].Quantity" id="Quantity_@Model.Products[i].modelId" require min="1" class="form-control qty" />
+                            <input value="@Model.Products[i].Quantity" id="Qty_@Model.Products[i].modelId" hidden />
+                            <span asp-validation-for="@Model.Products[i].Quantity" class="text-danger"></span>
+                        </div>
+                        <div class="form-group p-1">
+                            <label asp-for="@Model.Products[i].price" class="control-label"></label>
+                            <input value="@initailPrice" hidden id="Price_@Model.Products[i].modelId" require readonly class="form-control" />
+                            <input asp-for="@Model.Products[i].price" id="price_@Model.Products[i].modelId" require readonly class="form-control" />
+                            <span asp-validation-for="@Model.Products[i].price" class="text-danger"></span>
+                        </div>
+
+
+                    </div>
+
+                }
             </div>
 
+        </div>
+        <div id="myModal_@Model.CustRef" class="modal" role="dialog">
+            <div class="modal-dialog" style="position:absolute; left:10%;">
+                <!-- Modal content-->
+                <div class="modal-content" style="width:80vw;">
+                    <div class="modal-header ">
+                        <h4 class="modal-title"><i class="fas fa-shopping-cart"></i> Order Summary</h4>
+                        <button type="button" class="close" data-dismiss="modal">Back</button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="partial">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div>
             <div class="form-group d-flex m-auto justify-content-end flex-row ">
@@ -130,7 +182,11 @@
                 {
                     <a asp-action="MyOrders" style="border-radius: 1.5rem;  margin-top: 1%; margin-right:2%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600;  cursor: pointer; width:20%; text-align:center;">Cancel</a>
                 }
-                <input type="submit" value="Update" style="border-radius: 1.5rem;  margin-right:8%; margin-top: 1%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600; width:20%; cursor: pointer;" />
+                <a href="#" id="Submit" data-toggle="modal" data-target="#myModal_@Model.CustRef"
+                   style="border-radius: 1.5rem;  margin-right:8%; margin-top: 1%; border: none; padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600; width:20%; cursor: pointer; text-align:center; font-weight:bolder;">
+                    Summary
+                </a>
+                @*<input type="submit" value="Update" style="border-radius: 1.5rem;  margin-right:8%; margin-top: 1%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600; width:20%; cursor: pointer;" />*@
             </div>
         </div>
     </div>
@@ -156,50 +212,206 @@ else
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
-        $(document).ready(function () {
+        const models = [];
+        $(document).ready(async function () {
+        
             $("#CompanyId").change(async function () {
-                $("#price").val(0);
                 await data();
-                await CalPrice();
             })
-            $('#modelId').change(async function () {
-                $("#price").val(0);
-                await CalPrice();
+         
+
+            const modelsdata = [];
+            $("#Submit").click(function () {
+                event.preventDefault();
+
+                const pro = $('#products');
+                pro.find('div.item').each(function (i, row) {
+                    const childrens = $(this).children();
+                    const obj = {};
+                    childrens.each(function (i, row1) {
+
+                        if (i == 0) {
+                            const Phoneid = $(this).children().filter("[id*='Phoneid']").val();
+                            const modelId = $(this).children().filter(":nth-child(2)").val();
+                            const com_Name = $(this).children().filter(":nth-child(3)").val();
+                            const model_name = $(this).children().filter(":nth-child(4)").val();
+                            obj['Phoneid'] = Phoneid;
+                            obj['modelId'] = modelId;
+                            obj['com_Name'] = com_Name;
+                            obj['model_name'] = model_name
+                        }
+                        else if (i == 1) {
+                            const Quantity = $(this).children().filter("[id*='Quantity']").val();
+                            obj['Quantity'] = Quantity;
+                        }
+                        else if (i == 2) {
+                            price = $(this).children().filter("[id*='price']").val();
+                            obj['price'] = price;
+                        }
+                    })
+
+
+
+                    if (!modelsdata.some(x => x.modelId == obj.modelId)) {
+                        modelsdata.push(obj);
+                    }
+
+
+                })
+
+                $('#orders').val(JSON.stringify(modelsdata))
+
+                $("div .modal").attr("id", "myModal_" + $("#CustRef").val());
+                $("Submit").attr("data-target", "#myModal_" + $("#CustRef").val());
+                $.ajax({
+                    type: "POST",
+                    url: "/Order/ShowParitalView",
+                    data: $("form").serialize(),
+                    success: function (data) {
+                        $('#partial').html(data);
+                        $("#myModal_" + $("#CustRef").val()).modal('show');
+                    },
+                    failure: function (response) {
+                        console.log(response.responseText);
+                    },
+                    error: function (response) {
+                        console.log(response.responseText);
+                    }
+                })
+            })
+
+            $("[id^='myModal_']").on('hidden.bs.modal', function () {
+                modelsdata.length = 0;
             });
-            $('#Quantity').change(async function () {
-                await CalPrice();
-            });
+
+            $('#saveBtn').click(function () {
+                $.ajax({
+                    url: '/Order/GetProduct?Phoneid=' + $("#CompanyId").val() + "&modelId=" + $('#modelId').val() + "&models=" + models,
+                    type: 'Post',
+                    success: function (data) {
+                        $('#products').append(data);
+                        LoadModels();
+                    },
+
+                })
+
+            })
             $('#CityId').change(async function () {
-                console.log($('#CityId').val());
                 await GetStoreId();
             })
 
-           
-        });
-        window.onload = async function () {
-            await data();
-        }
-        async function data() {
-            await $.getJSON("/Order/GetAllModels", { PhoneId: $("#CompanyId").val() }, function (data) {
-                $("#modelId").empty();
-                $.each(data, function (index, row) {
-                    $("#modelId").append("<option value='" + row.modelId + "'>" + row.model_name + '</option>')
-                });
-            });
-        }
+            $("#products").on('change'," :input[id^='Quantity']", function () {
+                const qty = parseInt($(this).val());//Current Quantity
+                const modelID = this.getAttribute('id').split('_')[1];
+                const priceInput = parseFloat($('#Price_' + modelID).val());//IntialPrice
+                const PreviousQ = $('#Qty_' + modelID);//Previous Quantity
+                const PreviousQty = parseInt(PreviousQ.val());
 
-        async function CalPrice() {
-            const modelId = $('#modelId').val();
-            if (modelId.toString() != null) {
-                await $.getJSON("/Order/Price", { modelId: $("#modelId").val(), Quantity: $("#Quantity").val() }, function (data) {
-                    $("#price").val(data);
+                const Current = $('#CurrentPrice');
+                const CurrentTotal = parseFloat(Current.val());
+                if (qty - PreviousQty > 0) {
+                    const priceDifference = (qty - PreviousQty) * priceInput;
+                    Current.val(CurrentTotal + priceDifference);
+                }
+                else if (qty - PreviousQty < 0) {
+                    const priceDifference = (PreviousQty - qty) * priceInput;
+                    Current.val(CurrentTotal - priceDifference);
+                }
+                ChangeAmountText();
+                let price = priceInput * qty;
+                PreviousQ.val(qty);
+                $('#price_' + modelID).val(price)
+
+            });
+
+            LoadModels();
+            await data();
+            
+        });
+       
+        async function data() {
+            if ($("#CompanyId").val().length > 0) {
+
+                await $.getJSON("/Order/GetAllModels", { PhoneId: $("#CompanyId").val() }, function (data) {
+                    $("#modelId").empty();
+                    $.each(data, function (index, row) {
+                        $("#modelId").append("<option value='" + row.modelId + "'>" + row.model_name + '</option>')
+                    });
                 });
             }
+        }
+        function Delete(ele) {
+            const parent = ele.parentElement.parentElement;
+            const id = parent.getAttribute("id").split('_')[1];
+            const index = models.indexOf(id);
+
+            if (index > -1) {
+                models.splice(index, 1);
+            }
+            const priceInput = parseFloat($('#Price_' + id).val());
+            const Quantity = parseInt($('#Quantity_' + id).val());
+            const total = priceInput * Quantity;
+            const Previous = $('#CurrentPrice');
+            const PreviousPrice = Previous.val();
+            Previous.val(parseFloat(PreviousPrice) - total);
+            ChangeAmountText();
+
+           
+           
+            parent.remove()
         }
         async function GetStoreId() {
             await $.getJSON("/Order/GetStoreByCityId", { cityId: $('#CityId').val() }, function (data) {
                 $('store_id').val(data);
             });
+        }
+        function LoadModels() {
+            const pro = $('#products');
+            pro.find('div.item').each(function (i, row) {
+                let modelId = 0;
+                const mode = $(this).find('div:nth-child(1) :input:nth-child(2)');
+                modelId = mode.val();
+
+                if (!models.includes(modelId)) {
+                    const priceInput = parseFloat($('#Price_' + modelId).val());//IntialPrice
+                    const PreviousQty = parseInt($('#Qty_' + modelId).val());//Previous Quantity
+
+                    const amt = priceInput * PreviousQty;
+                    console.log(priceInput, PreviousQty, amt)
+                    const Current = $('#CurrentPrice');
+                    const CurrentTotal = parseFloat(Current.val());
+                    Current.val(CurrentTotal + amt);
+                    models.push(modelId);
+                    ChangeAmountText();
+                }
+
+            })
+           
+        }
+        function ChangeAmountText() {
+            if (models.length > 0) {
+                const InitialTotal = parseFloat($('#TotalPrice').val());
+                const CurrentTotal = parseFloat($('#CurrentPrice').val());
+                const label = $('#CurrentAmount');
+                if (InitialTotal > CurrentTotal) {
+                    label.removeClass('d-none');
+                    label.text(`Remaining Amount : ${InitialTotal-CurrentTotal}`)
+
+                }
+                else if (InitialTotal < CurrentTotal) {
+                    label.removeClass('d-none');
+                    label.text(`Pay More : ${CurrentTotal-InitialTotal}`)
+
+                }
+                else {
+                    label.addClass('d-none');
+                }
+            }
+            else {
+                const label = $('#CurrentAmount');
+                label.removeClass('d-none');
+                label.text('The Products cannot be null')
+            }
         }
     </script>
 }

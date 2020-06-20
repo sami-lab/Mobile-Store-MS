@@ -16,10 +16,12 @@ namespace Mobile_Store_MS.Controllers
     {
         public readonly IStockRepositery stockRepositery;
         UserManager<ApplicationUser> Usermanager;
-        public QuantityController(IStockRepositery _stockRepositery,UserManager<ApplicationUser> userManager )
+        utilities util;
+        public QuantityController(IStockRepositery _stockRepositery,UserManager<ApplicationUser> userManager, ApplicationDbContext _context)
         {
             stockRepositery = _stockRepositery;
             Usermanager = userManager;
+            util = new utilities(_context);
         }
         public IActionResult Index()
         {
@@ -52,6 +54,29 @@ namespace Mobile_Store_MS.Controllers
             var data = stockRepositery.GetDetails().Where(x=> x.store_id==id).GroupBy(x => new { x.store_id, x.StoreName, x.RefNo })
                                   .Select(x => new GroupByStock() { store_id = x.Key.store_id, StoreName = x.Key.StoreName, RefNo = x.Key.RefNo, Models = x });
             return View(data);
+        }
+        [Authorize(Roles ="Super Admin")]
+        public IActionResult AddStockManually()
+        {
+            ViewBag.Companies = util.GetAllCompany();
+            ViewBag.Stores = util.GetAllStores();
+            return View();
+        }
+        [HttpPost]
+        [Authorize(Roles = "Super Admin")]
+        public IActionResult AddStockManually(StockViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                bool res = stockRepositery.AddStockManually(model);
+                if (!res)
+                {
+                    ModelState.AddModelError("", "The Action Can't be Perform! Something went Wrong");
+                    return View(model);
+                }
+                return View("Index");
+            }
+            return View(model);
         }
     }
 }

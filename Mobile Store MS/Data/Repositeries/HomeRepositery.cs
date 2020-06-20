@@ -28,11 +28,11 @@ namespace Mobile_Store_MS.Data.Repositeries
         {
             dashboard d = new dashboard();
             //Purchase and Sale
-            d.LastMonthSales = context.Order.OrderBy(x => x.Date).Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Amount);
+            d.LastMonthSales = context.Order.OrderBy(x => x.Date).Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Products.Select(t=> t.price).Sum());
             d.LastMonthPurchasing = context.Purchasings.OrderBy(x => x.Date).Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Amount);
             d.TotalSalesCount = context.Order.Count();
             d.TotalPurchasingCount = context.Purchasings.Count();
-            d.TotalSales = context.Order.Sum(x => x.Amount);
+            d.TotalSales = context.Order.Sum(x => x.Products.Select(p=> p.price).Sum());
             d.TotalPurchasing = context.Purchasings.Sum(x => x.Amount);
             d.MonthlyProfit = d.LastMonthSales - d.LastMonthPurchasing;
             d.TotalProfit = d.TotalSales - d.TotalPurchasing;
@@ -40,32 +40,34 @@ namespace Mobile_Store_MS.Data.Repositeries
             //Recent Orders
             var result = (from v in context.Order
                           join
-                           b in context.BrandModel
-                           on v.modelId equals b.modelId
-                          join
                           c in context.Customer
                           on v.cus_id equals c.cus_id
                           join
-                          e in context.CompanyModel
-                          on b.PhoneId equals e.Phoneid
-                          join
                           s in context.Stores
                           on v.store_id equals s.store_id
+
                           select new OrderViewModel()
                           {
                               order_id = v.order_id,
                               Date = v.Date,
-                              Quantity = v.Quantity,
-                              Amount = v.Amount,
-                              modelId = v.modelId,
-                              model_name = b.model_name,
                               StoreName = s.StoreName + s.Ref_No,
-                              com_Name = e.Com_name,
                               cus_id = v.cus_id,
                               cus_name = c.cus_name,
                               orderStatus = v.status,
                               TakenBy = v.TakenBy,
                               CustRef = c.CustRef,
+                              Products = (from p in context.Products
+                                          where p.order_id == v.order_id
+                                          select new Products()
+                                          {
+                                              id = p.id,
+                                              modelId = p.modelId,
+                                              model_name = p.BrandModel.model_name,
+                                              Phoneid = p.BrandModel.PhoneId,
+                                              com_Name = p.BrandModel.model.Com_name,
+                                              price = p.price,
+                                              Quantity = p.Quantity
+                                          }).ToList()
                           }).OrderBy(x => x.Date).Take(10).ToList();
             d.Orders = result;
 
@@ -102,12 +104,12 @@ namespace Mobile_Store_MS.Data.Repositeries
             #endregion
 
             //Graphs
-            var DailyGraphSale = context.Order.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).ToList()
-                   .GroupBy(x => x.Date.ToString("yyyy/MM/dd"))
+            var DailyGraphSale = context.Order.Select(x=> new { x.Date,x.Products}).Where(x => (x.Date - DateTime.Now).TotalDays <= 30).ToList()
+             .GroupBy(x => x.Date.ToString("yyyy/MM/dd"))
                    .Select(pr => new Graph()
                    {
                        Day = pr.Key.ToString(),
-                       Amount = pr.Sum(x => x.Amount)
+                       Amount = pr.Select(x=> x.Products.Select(t=> t.price).Sum()).Sum()
                    });
             var json = JsonConvert.SerializeObject(DailyGraphSale);
             //d.Sales = json;
@@ -130,7 +132,7 @@ namespace Mobile_Store_MS.Data.Repositeries
                                  ComapanyName = pr.Select(x => new { x.PhoneId, x.model.Com_name }).FirstOrDefault(r => r.PhoneId == pr.Key).Com_name,
                                  BrandsTotal = pr.Where(x => x.PhoneId == pr.Key).Count()
                              }).ToList();
-            //context.BrandModel.Where(x=> x.)
+           
             //Users
             d.User = userManager.Users.Take(5).ToList();
             d.TotalUsers = userManager.Users.Count();
@@ -153,14 +155,14 @@ namespace Mobile_Store_MS.Data.Repositeries
                 RefNo = s.Ref_No,
                 MonthPurchasing = s.Purchasing != null ? s.Purchasing.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Amount) : 0,
                 MonthPurchasingCount = s.Purchasing != null ? s.Purchasing.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Count() : 0,
-                AverageMonthlyPurchasing = s.Purchasing != null ? s.Purchasing.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Amount) / 30 : 0,
-                MonthSales = s.Order != null ? s.Order.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Amount) : 0,
+                AverageMonthlyPurchasing = s.Purchasing != null ?  Math.Round((double)s.Purchasing.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Amount) / 30,2) : 0,
+                MonthSales = s.Order != null ? s.Order.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Products.Select(t=> t.price).Sum()) : 0,
                 MonthSalesCount = s.Purchasing != null ? s.Purchasing.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Count() : 0,
-                AverageMonthlySale = s.Order != null ? s.Order.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Amount) / 30 : 0,
-                MonthlyProfit = (s.Purchasing != null ? s.Purchasing.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Amount) : 0) - (s.Order != null ? s.Order.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Amount) : 0),
+                AverageMonthlySale = s.Order != null ? Math.Round(s.Order.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Products.Select(t => t.price).Sum()) / 30,2 ): 0,
+                MonthlyProfit = (s.Purchasing != null ? s.Purchasing.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Amount) : 0) - (s.Order != null ? s.Order.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Products.Select(t => t.price).Sum()) : 0),
                 AnnualPurchasing = s.Purchasing != null ? s.Purchasing.Where(x => (x.Date - DateTime.Now).TotalDays <= 360).Sum(x => x.Amount) : 0,
-                AnnualSales = s.Order != null ? s.Order.Where(x => (x.Date - DateTime.Now).TotalDays <= 360).Sum(x => x.Amount) : 0,
-                AnnualProfit = (s.Purchasing != null ? s.Purchasing.Where(x => (x.Date - DateTime.Now).TotalDays <= 360).Sum(x => x.Amount) : 0) - (s.Order != null ? s.Order.Where(x => (x.Date - DateTime.Now).TotalDays <= 360).Sum(x => x.Amount) : 0),
+                AnnualSales = s.Order != null ? s.Order.Where(x => (x.Date - DateTime.Now).TotalDays <= 360).Sum(x => x.Products.Select(t => t.price).Sum()) : 0,
+                AnnualProfit = (s.Purchasing != null ? s.Purchasing.Where(x => (x.Date - DateTime.Now).TotalDays <= 360).Sum(x => x.Amount) : 0) - (s.Order != null ? s.Order.Where(x => (x.Date - DateTime.Now).TotalDays <= 360).Sum(x => x.Products.Select(t => t.price).Sum()) : 0),
                 CompletedOrders = s.Order != null ? s.Order.Where(x => x.status == Model.Order.Status.Completed).Count() : 0,
                 ProcessOrders = s.Order != null ? s.Order.Where(x => x.status == Model.Order.Status.Processing).Count() : 0,
                 PendingOrders = s.Order != null ? s.Order.Where(x => x.status == Model.Order.Status.Pending).Count() : 0,

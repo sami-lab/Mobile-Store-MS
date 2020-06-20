@@ -1,4 +1,5 @@
 ﻿using Mobile_Store_MS.Data.Model.Company;
+using Mobile_Store_MS.Data.Model.Order;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -51,11 +52,9 @@ namespace Mobile_Store_MS.Data.Model
 
         [ForeignKey("PhoneId")]
         public CompanyModel model { get; set; }
-        //images table should map
+      
         public ICollection<ModelImages> Images { get; set; }
-
-
-        public ICollection<Order.Order> Orders { get; set; }
+        public ICollection<Product> Orders { get; set; }
         public ICollection<Purchasing> Purchasing { get; set; }
         public ICollection<Stock.Stock> Stock { get; set; }
     }

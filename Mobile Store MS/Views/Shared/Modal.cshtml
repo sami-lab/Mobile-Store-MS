@@ -1,4 +1,4 @@
-﻿@model int
+﻿@model dynamic
 
 
 <span>
@@ -17,7 +17,7 @@
             <div class="modal-body">
                 <form asp-action="Delete" asp-route-id="@Model" method="post">
                     <span>
-                        <span><b>Are you sure you want to delete? @Model?</b></span>
+                        <span><b>Are you sure you want to delete??</b></span>
                         <button type="submit" class="btn btn-danger">Yes</button>
                         <a href="#/" class="btn btn-primary" data-dismiss="modal">No</a>
                     </span>

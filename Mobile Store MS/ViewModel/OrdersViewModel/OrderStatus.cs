@@ -10,7 +10,7 @@ namespace Mobile_Store_MS.ViewModel.OrdersViewModel
     public class OrderStatus
     {
         [Display(Name = "Order ID")]
-        public int order_id { get; set; }
+        public string order_id { get; set; }
         [Display(Name = "Order Status")]
         public Status? orderStatus { get; set; }
 

@@ -44,7 +44,7 @@ namespace Mobile_Store_MS.Data.Repositeries
             };
             context.Purchasings.Add(model);
             context.SaveChanges();
-            res = util.updatequan(c.modelId, c.store_id, c.Quantity, "Add");
+            res = util.updateSingleQuantity(c.modelId, c.Quantity, c.store_id, "Add");
             if (res == false) return 0;
             string StoreName = util.GetAllStores().FirstOrDefault(x => x.store_id == c.store_id).StoreName;
             var users = UserManager.Users.Where(x => x.store_id == c.store_id).ToList();
@@ -62,6 +62,7 @@ namespace Mobile_Store_MS.Data.Repositeries
                 n.UserId = em.Id;
                 await util.AddNotification(n);
             }
+            context.SaveChanges();
             return model.purchase_id;
         }
 
@@ -69,6 +70,12 @@ namespace Mobile_Store_MS.Data.Repositeries
         {
             try
             {
+                var Purchasing= context.Purchasings.Find(id);
+
+                bool quantityCheck = util.checkingQuantitySingleProduct(Purchasing.modelId, Purchasing.Quantity, Purchasing.store_id);
+                if (quantityCheck == false) return false;
+                bool res= util.updateSingleQuantity(Purchasing.modelId, Purchasing.Quantity, Purchasing.store_id, "Subtract");
+                if (res == false) return false;
                 Purchasing c = new Purchasing()
                 {
                     purchase_id = id
@@ -172,11 +179,11 @@ namespace Mobile_Store_MS.Data.Repositeries
                 if (model.store_id != model.Existing_store_id)
                 {
 
-                    bool quantityCheck = util.checkingquantity(model.modelId, model.Existing_store_id, model.Quantity);
+                    bool quantityCheck = util.checkingQuantitySingleProduct(model.modelId, model.Quantity, model.Existing_store_id);
                     if (quantityCheck == false) return -1;
-                    res = util.updatequan(model.modelId, model.Existing_store_id, model.Quantity, "Subtract");
+                    res = util.updateSingleQuantity(model.modelId, model.Quantity, model.Existing_store_id, "Subtract");
                     if (res == false) return 0;
-                    res = util.updatequan(model.modelId, model.store_id, model.ExistingQuantity, "Add");
+                    res = util.updateSingleQuantity(model.modelId, model.ExistingQuantity, model.store_id, "Add");
                     if (res == false) return 0;
                 }
                 else
@@ -185,13 +192,15 @@ namespace Mobile_Store_MS.Data.Repositeries
                     {
                         if (model.Quantity > model.ExistingQuantity)
                         {
-                            res = util.updatequan(model.modelId, model.store_id, (model.Quantity - model.ExistingQuantity), "Add");
+                            res = util.updateSingleQuantity(model.modelId, (model.Quantity - model.ExistingQuantity), model.store_id, "Add");
                         }
                         else if (model.Quantity < model.ExistingQuantity)
                         {
-                            bool quantityCheck = util.checkingquantity(model.modelId, model.store_id, (model.ExistingQuantity - model.Quantity));
+
+                            bool quantityCheck = util.checkingQuantitySingleProduct(model.modelId, (model.ExistingQuantity - model.Quantity), model.store_id);
                             if (quantityCheck == false) return -1;
-                            res = util.updatequan(model.modelId, model.store_id, (model.ExistingQuantity - model.Quantity), "Subtract");
+         
+                            res = util.updateSingleQuantity(model.modelId, (model.ExistingQuantity - model.Quantity), model.store_id, "Subtract");
                         }
                         if (res == false) return 0;
                     }

@@ -5,139 +5,162 @@
 @inject SignInManager<ApplicationUser> signInManager
 @{
     ViewData["Title"] = "Order Summary";
+    double TotalPrice = 0;
 }
 
 <div class="rounded border bg-white">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="bg-light m-2 p-2">
         <h1 class="text-center mt-1 text-info">Summary</h1>
-        <div class="row d-flex justify-content-around">
-            <div class="col-md-5 col-lg-5 col-sm-12">
-                <div class="form-group">
-                    <label asp-for="cus_name" class="control-label"></label>
-                    <input asp-for="cus_name" disabled class="form-control" />
-                    <span asp-validation-for="cus_name" class="text-danger"></span>
+        <div class="row">
+            <div class="col-12">
+                <div class="row">
+                    <div class="form-group col-6">
+                        <label asp-for="cus_name" class="control-label"></label>
+                        <input asp-for="cus_name" disabled class="form-control" />
+                        <span asp-validation-for="cus_name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-6">
+                        <label asp-for="cus_phone" class="control-label"></label>
+                        <input asp-for="cus_phone" disabled class="form-control" />
+                        <span asp-validation-for="cus_phone" class="text-danger"></span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label asp-for="cus_phone" class="control-label"></label>
-                    <input asp-for="cus_phone" disabled class="form-control" />
-                    <span asp-validation-for="cus_phone" class="text-danger"></span>
-                </div>
-
                 @if (signInManager.IsSignedIn(User) && User.IsInRole("Admin") || User.IsInRole("Super Admin") || User.IsInRole("Employee"))
                 {
                     <label class="border font-weight-bolder font-italic text-center mt-4 text-danger" style="font-family:'Times New Roman', Times, serif">If Customer already Purchase from Shop Just Write their RefNo# Otherwise Leave it Empty</label>
-                    <div class="form-group">
-                        <label asp-for="store_id" class="control-label col-6"></label>
-                        <input asp-for="StoreName" disabled class="form-control" />
-                        <span asp-validation-for="store_id" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="CustRef" class="control-label"></label>
-                        <input asp-for="CustRef" disabled readonly min="1" class="form-control" />
-                        <span asp-validation-for="CustRef" class="text-danger"></span>
+                    <div class="row">
+                        <div class="form-group col-4">
+                            <label asp-for="store_id" class="control-label col-6"></label>
+                            <input asp-for="StoreName" disabled class="form-control" />
+                            <span asp-validation-for="store_id" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-4">
+                            <label asp-for="CustRef" class="control-label"></label>
+                            <input asp-for="CustRef" disabled readonly min="1" class="form-control" />
+                            <span asp-validation-for="CustRef" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4 col-sm-12">
+                            <label asp-for="Date" class="control-label"></label>
+                            <input asp-for="Date" disabled value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly class="form-control" />
+                            <span asp-validation-for="Date" class="text-danger"></span>
+                        </div>
                     </div>
                 }
                 else
                 {
-                    <div class="form-group">
-                        <label asp-for="CityName" class="control-label ml-3"></label>
-                        <input asp-for="CityName" disabled readonly class="form-control" />
-                        <span asp-validation-for="CityId" class="text-danger"></span>
+                    <div class="row">
+                        <div class="form-group col-6">
+                            <label asp-for="CityName" class="control-label ml-3"></label>
+                            <input asp-for="CityName" disabled readonly class="form-control" />
+                            <span asp-validation-for="CityId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-6">
+                            <label asp-for="store_id" class="control-label col-12"></label>
+                            <input asp-for="StoreName" disabled class="form-control" />
+                            <span asp-validation-for="store_id" class="text-danger"></span>
+                        </div>
                     </div>
                     <div class="form-group row col-12">
-                        <label asp-for="Address.StreetAddress" class="control-label"></label>
-                        <textarea asp-for="Address.StreetAddress" disabled cols="4" rows="2" required placeholder="Street Adress" class="form-control w-100"></textarea>
-                        <span asp-validation-for="Address.StreetAddress" class="text-danger"></span>
+                        <div class="form-group row col-12">
+                            <label asp-for="Address.StreetAddress" class="control-label"></label>
+                            <textarea asp-for="Address.StreetAddress" disabled cols="4" rows="2" required placeholder="Street Adress" class="form-control w-100"></textarea>
+                            <span asp-validation-for="Address.StreetAddress" class="text-danger"></span>
+                        </div>
+
+                        <input asp-for="CustRef" readonly min="1" hidden class="form-control disabled" />
                     </div>
-                    <div class="form-group">
-                        <label asp-for="store_id" class="control-label col-12"></label>
-                        <input asp-for="StoreName" disabled class="form-control" />
-                        <span asp-validation-for="store_id" class="text-danger"></span>
-                    </div>
-
-
-                    <input asp-for="CustRef" readonly min="1" hidden class="form-control disabled" />
-
                 }
 
+                <div class="container-fluid py-2">
+                    <div style="overflow-x:scroll">
+                        <div class=" d-flex  flex-row flex-nowrap mb-2 ">
+                            @for (int i = 0; i < Model.Products.Count; i++)
+                            {
+                                TotalPrice += Model.Products[i].price;
+                                <div class="card shadow col-lg-3 col-md-3 col-sm-6 col-12 m-3">
+                                    <div class="card-header font-weight-bolder text-center text-capitalize">
+                                        <input asp-for="Products[i].modelId" hidden />    <input asp-for="Products[i].Phoneid" hidden />
+                                        <input asp-for="Products[i].com_Name" hidden />     <input asp-for="Products[i].model_name" hidden />
+                                        @Model.Products[i].com_Name @Model.Products[i].model_name
+                                        <span asp-validation-for="Products[i].modelId" class="text-danger"></span>
+                                        <span asp-validation-for="Products[i].Phoneid" class="text-danger"></span>
+                                    </div>
+                                    <div class="card-body">
+                                        <input asp-for="Products[i].Quantity" hidden />    <input asp-for="Products[i].price" hidden />
+                                        <p class="card-text text-center text-dark">Price:    @Model.Products[i].price </p>
+                                        <p class="card-text text-center text-dark">Quantity  @Model.Products[i].Quantity</p>
+                                        <span asp-validation-for="Products[i].Quantity" class="text-danger"></span>
+                                        <span asp-validation-for="Products[i].price" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <h5 class="text-center mt-1 text-info">Total Price:  @ViewBag.TotalPrices</h5>
+                </div>
 
+                @if (Model.Method == Mobile_Store_MS.ViewModel.Orders.PaymentMethods.Stripe)
+                {
+                    <div>
+                        @{
+                            var OrderTotal = ViewBag.TotalPrices * 0.63;
+                        }
+
+                        <script>
+                            $(document).ready(function () {
+                                $(':input[type="submit"]').attr("disabled", true)
+                            })
+                        </script>
+                        <script  src="https://checkout.stripe.com/checkout.js" class="stripe-button" style="display:none"
+                                data-key="@Stripe.Value.PublicKey"
+                                data-amount="@OrderTotal"
+                                data-name="Mobile Shop"
+                                data-label="PLACE ORDER"
+                                data-description="Be Smart with Smart Choice"
+                                data-allow-remember-me="false"
+                                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                                data-locale="auto">
+
+                        </script>
+                        
+                        <div class="form-group d-flex m-auto justify-content-end flex-row ">
+                            <button type="button" style="border-radius: 1.5rem;  margin-top: 1%; margin-right:2%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600;  cursor: pointer; width:20%; text-align:center;" data-dismiss="modal">Back</button>
+                            <input type="submit" value="Checkout" style="border-radius: 1.5rem;  margin-right:8%; margin-top: 1%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600; width:20%; cursor: pointer;" />
+                        </div>
+                    </div>
+                    
+                }
+                else if (Model.Method == Mobile_Store_MS.ViewModel.Orders.PaymentMethods.CashOnDelievery)
+                {
+                    <div class="form-group d-flex m-auto justify-content-end flex-row ">
+                        <button type="button" style="border-radius: 1.5rem;  margin-top: 1%; margin-right:2%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600;  cursor: pointer; width:20%; text-align:center;" data-dismiss="modal">Back</button>
+                        <input type="submit" value="Checkout" style="border-radius: 1.5rem;  margin-right:8%; margin-top: 1%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600; width:40%; cursor: pointer;" />
+                    </div>
+                }
+                else
+                {
+                    <script>
+                        $(':input[ type="submit"]').attr("disabled", true)
+                    </script>
+
+                }
             </div>
-            <div class="col-md-5 col-lg-5 col-sm-12">
-                <div class="form-group ">
-                    <label asp-for="com_Name" class="control-label col-6"></label>
-                    <input asp-for="com_Name" disabled class="form-control" />
-                    <span asp-validation-for="com_Name" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="model_name" class="control-label col-6"></label>
-                    <input asp-for="model_name" disabled class="form-control" />
-                    <span asp-validation-for="modelId" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Date" class="control-label"></label>
-                    <input asp-for="Date" disabled value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly class="form-control" />
-                    <span asp-validation-for="Date" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Quantity" class="control-label"></label>
-                    <input asp-for="Quantity" disabled min="1" class="form-control" />
-                    <span asp-validation-for="Quantity" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Amount" class="control-label"></label>
-                    <input id="price" asp-for="Amount" disabled readonly class="form-control" />
-                    <span asp-validation-for="Amount" class="text-danger"></span>
-                </div>
-            </div>
+
         </div>
-
-        @if (Model.Method == Mobile_Store_MS.ViewModel.Orders.PaymentMethods.Stripe)
-        {
-        <div>
-            @{
-                var OrderTotal = Model.Amount * 0.63;
-            }
-
-
-            <script  src="https://checkout.stripe.com/checkout.js" class="stripe-button" style="display:none"
-                    data-key="@Stripe.Value.PublicKey"
-                    data-amount="@OrderTotal"
-                    data-name="Mobile Shop"
-                    data-label="PLACE ORDER"
-                    data-description="Be Smart with Smart Choice"
-                    data-allow-remember-me="false"
-                    data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
-                    data-locale="auto">
-
-            </script>
-            <script type="text/javascript">
-                //$('.stripe-button-el').addClass('d-none');
-                $(document).ready(function () {
-                    document.querySelector(".stripe-button-el")[0].style.display = "none";
-                });               
-            </script>
-            <div class="form-group d-flex m-auto justify-content-end flex-row ">
-                <button type="button" style="border-radius: 1.5rem;  margin-top: 1%; margin-right:2%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600;  cursor: pointer; width:20%; text-align:center;" data-dismiss="modal">Back</button>
-                <input type="submit" value="Proceed To Checkout" style="border-radius: 1.5rem;  margin-right:8%; margin-top: 1%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600; width:20%; cursor: pointer;" />
-            </div>
-        </div>
-        }
-        else if (Model.Method == Mobile_Store_MS.ViewModel.Orders.PaymentMethods.CashOnDelievery)
-        {
-            <div class="form-group d-flex m-auto justify-content-end flex-row ">
-                <button type="button" style="border-radius: 1.5rem;  margin-top: 1%; margin-right:2%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600;  cursor: pointer; width:20%; text-align:center;" data-dismiss="modal">Back</button>
-                <input type="submit" value="Proceed To Checkout" style="border-radius: 1.5rem;  margin-right:8%; margin-top: 1%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600; width:40%; cursor: pointer;" />
-            </div>
-        }
-        else
-        {
-            <script>
-                $(':input[ type="submit"]').attr("disabled", true)
-            </script>
-
-        }
     </div>
-   
 </div>
+<script type="text/javascript">
+    //$('.stripe-button-el').addClass('d-none');
 
+    $(document).ready(function () {
+       
+        console.log("Calling");
+        $(':input[type="submit"]').attr("disabled", false)
+        const ele = document.querySelector(".stripe-button-el")[0];
+        console.log(ele);
+        ele.style.visibility = false;
+    });
+    
+  
+</script>

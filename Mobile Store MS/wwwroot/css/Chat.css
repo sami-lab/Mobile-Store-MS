@@ -273,3 +273,24 @@
         margin-bottom: 15px !important;
     }
 }
+@media(min-width: 760px) {
+    #chatButton {
+        display: none;
+    }
+}
+    @media(max-width: 760px) {
+        #chatButton {
+            display: block;
+            background-color: lightgray;
+            color: black;
+            text-align: center;
+            padding: 10px;
+            position: absolute;
+            right: 0;
+            bottom: 0;
+        }
+
+        #side {
+            display: none;
+        }
+    }

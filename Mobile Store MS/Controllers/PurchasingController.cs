@@ -109,7 +109,7 @@ namespace Mobile_Store_MS.Controllers
                 if(ModelState.IsValid)
                 {
                     var user = await userManager.GetUserAsync(User);
-                    model.takenBy = user.Email ;
+                    model.takenBy = user.Id ;
                     int id = await iPurchasingRepositery.addPurchasing(model,Url);
                     if (id == 0) return View("Error");
                     return RedirectToAction("Details", new { id = id });
@@ -215,6 +215,8 @@ namespace Mobile_Store_MS.Controllers
                     return RedirectToAction("Index");
                 }
                 //something Went Wrong
+                ViewBag.ErrorTitle = "Error on Deleting Purchase";
+                ViewBag.ErrorMessage = "Out of Stock";
                 return View("Error");
             }
             catch

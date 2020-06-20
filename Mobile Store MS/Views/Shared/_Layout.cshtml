@@ -259,7 +259,7 @@
                                 <div class="sidebar-search">
                                     <div>
                                         <form id="search-form1" class="input-group" method="get" asp-controller="Administration" asp-action="GetUserById">
-                                            <input type="text" name="id" required  autocomplete="off" class="form-control search-menu" placeholder="Search User">
+                                            <input type="text" name="id" required autocomplete="off" class="form-control search-menu" placeholder="Search User">
                                             <div class="input-group-append">
                                                 <button class="input-group-text" type="submit">
                                                     <i class="fa fa-search" aria-hidden="true"></i>
@@ -377,7 +377,8 @@
             </nav>
             <!-- sidebar-wrapper  -->
             <main class="page-content">
-                <div class="container-fluid">
+
+                <div class="w-100 ">
                     @if (IsSectionDefined("Scripts"))
                     {
                         @RenderSection("Scripts")
@@ -391,6 +392,12 @@
     }
     else
     {
+        @if (IsSectionDefined("Scripts"))
+        {
+            @RenderSection("Scripts")
+        }
+
+        @RenderBody()
         <h4>Please Login To Continue</h4>
         <a class="btn btn-primary " asp-controller="Account" asp-action="Login">Login</a>
     }
@@ -468,10 +475,10 @@
             //page = data.pageNo+1;
             const ul = document.getElementById('notification_dropdown');
             ul.innerHTML = ` <li class="shadow" style="border-bottom:1px solid rgba(0,0,0,.1);  padding:8px 0;" id="load">
-                                        <a href="#" onclick="LoadButton(${page})" class="btn btn-outline-dark text-primary w-100" >
-                                            Load More
-                                        </a>
-                                    </li>`;
+                                            <a href="#" onclick="LoadButton(${page})" class="btn btn-outline-dark text-primary w-100" >
+                                                Load More
+                                            </a>
+                                        </li>`;
             if (data != null) {
                 //data.reverse();
                 data.forEach(x => {
@@ -484,10 +491,10 @@
                     else if (when == 0) dateString = Math.floor(Math.abs(time * 60)) + "m ago";
                     if (x.read == false) read = "bg_dark";
                     const li = `<li class="icon m-1 list-unstyled d-flex ${read}" style="border-bottom:1px solid rgba(0,0,0,.1);  padding:1px 0;">
-                                   <a href="${x.url}">
-                                       <p class="text">  <span class="font-weight-bolder">${x.heading} </span> ${x.text} </br> <span class="not_time">${dateString}</span ></p>
-                                    </a>
-                                 </li >`;
+                                       <a href="${x.url}">
+                                           <p class="text">  <span class="font-weight-bolder">${x.heading} </span> ${x.text} </br> <span class="not_time">${dateString}</span ></p>
+                                        </a>
+                                     </li >`;
                     ul.innerHTML += li;
                 });
 

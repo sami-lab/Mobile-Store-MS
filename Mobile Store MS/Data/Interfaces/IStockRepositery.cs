@@ -13,5 +13,6 @@ namespace Mobile_Store_MS.Data.Interfaces
          List<StockViewModel> BrandStock(int model_id);
 
         StockViewModel StoreBrandStock(int store_id, int model_id);
+        bool AddStockManually(StockViewModel model);
     }
 }

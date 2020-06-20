@@ -105,3 +105,5 @@ C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp
 C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Template\OrderConfirmation.g.cshtml.cs
 C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Administration\AccessDenied.g.cshtml.cs
 C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Order\_DisplayOrder.g.cshtml.cs
+C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\obj\Debug\netcoreapp2.2\Razor\Views\Quantity\AddStockManually.g.cshtml.cs
+C:\Users\smsam\source\repos\Mobile Store MS\Mobile Store MS\bin\Debug\netcoreapp2.2\nlog.config

@@ -1,26 +1,34 @@
 ﻿
-@model IEnumerable<Mobile_Store_MS.ViewModel.Orders.Products>
-<table class="table">
-    
-    <tbody>
-        @foreach (var item in Model)
-        {
-        <tr class="card d-flex">
-            <td>
-                <input asp-for="@item.isSelected" />
-            </td>
-            <td>
-                <input hidden asp-for="@item.Phoneid" />  <input hidden asp-for="@item.modelId" />
-                @Html.DisplayFor(modelItem => item.com_Name)   @Html.DisplayFor(modelItem => item.model_name)
-            </td>
-            <td>
-                <input asp-for="@item.Quantity" />
-            </td>
-            <td>
-                <input class="disabled" readonly asp-for="@item.price" />
-            </td>
-        </tr>
-            
-        }
-    </tbody>
-</table>
+@model List<Mobile_Store_MS.ViewModel.Orders.Products>
+
+
+@for(int i =0; i < Model.Count; i++)
+{
+    var initailPrice = Model[i].price / Model[i].Quantity;
+    <div id="model_@Model[i].modelId" class="justify-content-center border bg-light m-1 item">
+
+
+        <div class="form-group p-1">
+            <input hidden asp-for="@Model[i].Phoneid" />  <input hidden asp-for="@Model[i].modelId" />
+            <input hidden asp-for="@Model[i].com_Name" />  <input hidden asp-for="@Model[i].model_name" />
+            @Html.DisplayFor(modelItem => Model[i].com_Name)   @Html.DisplayFor(modelItem => Model[i].model_name)
+            <button type="button" class="close" onclick="Delete(this)">&times;</button>
+        </div>
+        <div class="form-group p-1">
+            <label asp-for="@Model[i].Quantity" class="control-label"></label>
+            <input asp-for="@Model[i].Quantity" id="Quantity_@Model[i].modelId" require min="1" class="form-control qty" />
+            <input value="@Model[i].Quantity" id="Qty_@Model[i].modelId" hidden />
+            <span asp-validation-for="@Model[i].Quantity" class="text-danger"></span>
+        </div>
+        <div class="form-group p-1">
+            <label asp-for="@Model[i].price" class="control-label"></label>
+            <input value="@initailPrice" hidden id="Price_@Model[i].modelId" require readonly class="form-control" />
+            <input asp-for="@Model[i].price" id="price_@Model[i].modelId" require readonly class="form-control" />
+            <span asp-validation-for="@Model[i].price" class="text-danger"></span>
+        </div>
+
+
+    </div>
+
+}
+

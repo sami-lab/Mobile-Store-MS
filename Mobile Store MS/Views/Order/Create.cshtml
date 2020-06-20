@@ -13,10 +13,13 @@
 
 <form asp-action="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input name="TotalAmount" hidden value="0" disabled />
     <div class="bg-light m-3 p-5">
         <h1 class="text-center mt-3 text-info">Order</h1>
-        <div class="row d-flex justify-content-around">
-            <div class="col-md-4 col-lg-4 col-sm-12">
+        <div class="row">
+
+            <div class="col-md-4">
+
                 <div class="form-group">
                     <label asp-for="cus_name" class="control-label"></label>
                     <input asp-for="cus_name" class="form-control" />
@@ -31,6 +34,7 @@
                 @if (signInManager.IsSignedIn(User) && User.IsInRole("Admin") || User.IsInRole("Super Admin") || User.IsInRole("Employee"))
                 {
                     <label class="border font-weight-bolder font-italic text-center mt-4 text-danger" style="font-family:'Times New Roman', Times, serif">If Customer already Purchase from Shop Just Write their RefNo# Otherwise Leave it Empty</label>
+
                     <div class="form-group row">
                         <label asp-for="store_id" class="control-label col-6"></label>
                         <div class="col-12">
@@ -47,9 +51,21 @@
                         <span id="CusRef1" class="btn-link">Enable Field</span>
                         <span asp-validation-for="CustRef" class="text-danger"></span>
                     </div>
+
                 }
                 else
                 {
+
+                    <div class="form-group row">
+                        <label asp-for="store_id" class="control-label col-12"></label>
+                        <div class="col-12">
+                            <select asp-for="store_id" class="custom-select mr-sm-2"
+                                    asp-items="@(new SelectList( @ViewBag.Stores,"store_id","StoreName"))">
+                                <option value="">Please Select</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="store_id" class="text-danger"></span>
+                    </div>
                     <div class="form-group row">
                         <label asp-for="CityName" class="control-label ml-3"></label>
                         <div class="col-12">
@@ -65,84 +81,64 @@
                         <textarea asp-for="Address.StreetAddress" cols="4" rows="2" required placeholder="Street Adress" class="form-control w-100"></textarea>
                         <span asp-validation-for="Address.StreetAddress" class="text-danger"></span>
                     </div>
-                    <div class="form-group row">
-                        <label asp-for="store_id" class="control-label col-12"></label>
-                        <div class="col-12">
-                            <select asp-for="store_id" class="custom-select mr-sm-2"
-                                    asp-items="@(new SelectList( @ViewBag.Stores,"store_id","StoreName"))">
-                                <option value="">Please Select</option>
-                            </select>
-                        </div>
-                        <span asp-validation-for="store_id" class="text-danger"></span>
-                    </div>
 
 
                     <input asp-for="CustRef" readonly min="1" hidden class="form-control disabled" />
 
                 }
 
-
             </div>
-            <div class="col-md-4 col-lg-4 col-sm-12">
-                <div class="form-group row">
-                    <label asp-for="com_Name" class="control-label col-6"></label>
-                    <div class="col-12">
-                        <select id="CompanyId" asp-for="Phoneid" class="custom-select mr-sm-2"
-                                asp-items="@(new SelectList( @ViewBag.Companies,"Phoneid","Com_name"))">
-                            <option value="">Please Select</option>
-                        </select>
-                    </div>
-                    <span asp-validation-for="com_Name" class="text-danger"></span>
-                </div>
-                <div class="form-group row">
-                    <label asp-for="model_name" class="control-label col-6"></label>
-                    <div class="col-12">
-                        <select id="modelId" asp-for="modelId" multiple class="custom-select mr-sm-2"
-                                asp-items="@(new SelectList(string.Empty,"modelId","model_name","--Select--"))">
-                            <option value="">Please Select</option>
-                        </select>
-                    </div>
-                    <span asp-validation-for="modelId" class="text-danger"></span>
-                </div>
-                <div>
-                    <input type="button" id="saveBtn" value="Save" />
-                </div>
 
+
+            <div class="col-md-8" id="orderItems">
                 <div class="form-group">
                     <label asp-for="Date" class="control-label"></label>
                     <input asp-for="Date" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly class="form-control" />
                     <span asp-validation-for="Date" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Quantity" class="control-label"></label>
-                    <input asp-for="Quantity" min="1" class="form-control" />
-                    <span asp-validation-for="Quantity" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Amount" class="control-label"></label>
-                    <input id="price" asp-for="Amount" readonly class="form-control" />
-                    <span asp-validation-for="Amount" class="text-danger"></span>
-                </div>
-            </div>
 
-            <div class="col-md-2 col-lg-2 border" id="orderItems">
-               
-                    <h5>Selected Products</h5>
-                    <div id="products"></div>
-               
+                    <label class="control-label">@Html.DisplayNameFor(x => x.Method)</label>
+                    <div class="">
+                        <select asp-for="Method" required class="custom-select mr-sm-2"
+                                asp-items="Html.GetEnumSelectList<PaymentMethods>()">
+                            <option value="">Please Select</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="Method" class="text-danger"></span>
+                </div>
+                <div class="form-group row">
+                    <label asp-for="Products.First().com_Name" class="control-label col-6"></label>
+                    <div class="col-12">
+                        <select id="CompanyId" class="custom-select mr-sm-2"
+                                asp-items="@(new SelectList( @ViewBag.Companies,"Phoneid","Com_name"))">
+                            <option value="">Please Select</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="Products.First().com_Name" class="text-danger"></span>
+                </div>
+                <div class="form-group row">
+                    <label asp-for="Products.First().modelId" class="control-label col-6"></label>
+                    <div class="col-12">
+                        <select id="modelId" multiple class="custom-select mr-sm-2"
+                                asp-items="@(new SelectList(string.Empty,"modelId","model_name","--Select--"))">
+                            <option value="">Please Select</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="Products.First().modelId" class="text-danger"></span>
+                </div>
+                <div>
+                    <input class="btn btn-success btn-block" type="button" id="saveBtn" value="Save" />
+                </div>
+                <input asp-for="orders" id="orders" hidden />
+
             </div>
 
         </div>
-        <div class="form-group row ml-3">
+        <div class="">
+            <h5 class="text-center">Selected Products</h5>
+            <div class="d-md-flex d-lg-flex" id="products"></div>
 
-            <label class="col-12 col-form-label">@Html.DisplayNameFor(x => x.Method)</label>
-            <div class="col-12">
-                <select asp-for="Method" required class="custom-select mr-sm-2"
-                        asp-items="Html.GetEnumSelectList<PaymentMethods>()">
-                    <option value="">Please Select</option>
-                </select>
-            </div>
-            <span asp-validation-for="Method" class="text-danger col-12"></span>
         </div>
         <div>
             <div class="form-group d-flex m-auto justify-content-end flex-row ">
@@ -154,12 +150,10 @@
                 {
                     <a asp-action="MyOrders" style="border-radius: 1.5rem;  margin-top: 1%; margin-right:2%; border: none;  padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600;  cursor: pointer; width:20%; text-align:center;">Cancel</a>
                 }
-                @*<partial name="~/Views/Order/OrderSummary.cshtml" model="Model" />*@
-                @*@await Html.PartialAsync("~/Views/Order/OrderSummary.cshtml", new OrderViewModel() { cus_name = Model.cus_name, cus_phone = Model.cus_phone, CustRef = Model.CustRef, Phoneid = Model.Phoneid, modelId = Model.modelId, Quantity = Model.Quantity, Address = Model.Address, CityId = Model.CityId, Date = Model.Date, store_id = Model.store_id })*@
 
                 <a href="#" id="Submit" data-toggle="modal" data-target="#myModal_@Model.CustRef"
                    style="border-radius: 1.5rem;  margin-right:8%; margin-top: 1%; border: none; padding:10px 2%; background: #0062cc; color: #fff; font-weight: 600; width:20%; cursor: pointer; text-align:center; font-weight:bolder;">
-                    Submit
+                    Summary
                 </a>
                 <div id="myModal_@Model.CustRef" class="modal" role="dialog">
                     <div class="modal-dialog" style="position:absolute; left:10%;">
@@ -193,10 +187,52 @@ else
 
 @section Scripts {
 
+  
     <script>
-        $(function () {
+         const models = [];
+        $(document).ready(function () {
+            const modelsdata = [];
             $("#Submit").click(function () {
                 event.preventDefault();
+              
+                const pro = $('#products');
+                pro.find('div.item').each(function (i, row) {
+                    const childrens = $(this).children();
+                    const obj = {};
+                    childrens.each(function (i, row1) {
+                       
+                        if (i == 0) {
+                            const Phoneid = $(this).children().filter("[id*='Phoneid']").val();
+                            const modelId = $(this).children().filter(":nth-child(2)").val();
+                            const com_Name = $(this).children().filter(":nth-child(3)").val();
+                            const model_name = $(this).children().filter(":nth-child(4)").val();
+                            obj['Phoneid'] = Phoneid;
+                            obj['modelId'] = modelId;
+                            obj['com_Name'] = com_Name;
+                            obj['model_name'] = model_name
+                        }
+                        else if (i == 1) {
+                            const Quantity = $(this).children().filter("[id*='Quantity']").val();
+                            obj['Quantity'] = Quantity;
+                        }
+                        else if (i == 2) {
+                            price = $(this).children().filter("[id*='price']").val();
+                            obj['price'] = price;
+                        }
+                    })
+
+                   
+
+                      if (!modelsdata.some(x => x.modelId == obj.modelId))
+                      {
+                        modelsdata.push(obj);
+                      }
+                   
+
+                })
+
+                $('#orders').val(JSON.stringify(modelsdata))
+
                 $("div .modal").attr("id", "myModal_" + $("#CustRef").val());
                 $("Submit").attr("data-target", "#myModal_" + $("#CustRef").val());
                 $.ajax({
@@ -215,37 +251,53 @@ else
                     }
                 })
             })
-        });
-    </script>
-    <script>
-        $(document).ready(function () {
-            const modelsdata = [];
+
+            $("[id^='myModal_']").on('hidden.bs.modal', function () {
+                modelsdata.length = 0;
+            });
+
             $("#CompanyId").change(async function () {
-                $("#price").val(0);
-                $("#Quantity").val(0);
                 await data();
             })
-            $('#Quantity').change(function () {
-                const modelId = $('#modelId').val();
-                if (modelId.toString() != null) {
-                    $.getJSON("/Order/Price", { modelId: $("#modelId").val(), Quantity: $("#Quantity").val() }, function (data) {
-                        $("#price").val(data);
-                    });
-                }
-            });
+           
             $('#CusRef1').click(function () {
                 $('#CustRef').removeAttr('readonly')
             })
 
             $('#saveBtn').click(function () {
                 $.ajax({
-                    url: '/Order/GetProduct?Phoneid=' + $("#CompanyId").val() + "&modelId=" + $('#modelId').val(),
+                    url: '/Order/GetProduct?Phoneid=' + $("#CompanyId").val() + "&modelId=" + $('#modelId').val() + "&models=" + models,
                     type: 'Post',
                     success: function (data) {
                         $('#products').append(data);
-                    }
+                        const pro = $('#products');
+
+                        pro.find('div.item').each(function (i, row) {
+                            let modelId = 0;
+                            const mode = $(this).find('div:nth-child(1) :input:nth-child(2)');
+                            modelId = mode.val();
+                                 
+                            if (!models.includes(modelId)) {
+                                models.push(modelId);
+                            }
+
+                         })
+
+                        $("#products :input[id^='Quantity']").change(function () {
+                          
+                            const qty = $(this).val();
+                            const modelID = this.getAttribute('id').split('_')[1];
+                            const priceInput = $('#Price_' + modelID).val();
+                            let price = priceInput * qty;
+                            $('#price_' + modelID).val(price)
+
+                        });
+                    },
+
                 })
+            
             })
+
             window.onload = async function () {
                 var CompanyId = $("#CompanyId").val();
                 if (CompanyId != '') {
@@ -266,7 +318,7 @@ else
             };
         });
 
-
+       
         async function GetStoreId() {
             if ($('#CityId').val() != null) {
                 await $.getJSON("/Order/GetStoreByCityId", { cityId: $('#CityId').val() }, function (data) {
@@ -283,6 +335,15 @@ else
                 });
             });
         }
-
+        function Delete(ele) {
+            const parent = ele.parentElement.parentElement;
+            const id = parent.getAttribute("id").split('_')[1];
+            const index = models.indexOf(id);
+            if (index > -1) {
+                models.splice(index, 1);
+            }
+            parent.remove()
+        }
+        
     </script>
 }

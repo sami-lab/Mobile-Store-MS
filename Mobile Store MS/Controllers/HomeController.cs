@@ -17,7 +17,7 @@ using Mobile_Store_MS.ViewModel.Administrator;
 namespace Mobile_Store_MS.Controllers
 {
 
-    [AllowAnonymous]
+  
     public class HomeController : Controller
     {
         public readonly IModelRepositery iModelRepositery;
@@ -36,7 +36,7 @@ namespace Mobile_Store_MS.Controllers
 
         }
 
-
+        [AllowAnonymous]
         public IActionResult Index()
         {
             //util.getCities();             
@@ -44,14 +44,15 @@ namespace Mobile_Store_MS.Controllers
                                 .Select(x => new GroupBYCompany() { CompanyName = x.Key, Models = x });
             return View(data);
         }
-        [Authorize]
+
+        [Authorize(Roles ="Admin,Super Admin")]
         public IActionResult Admin()
         {
             var data = homeRepoitery.Admin();
             return View(data);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin, Super Admin,Employee")]
         public async Task<IActionResult> CreateMessages()
         {
             var user = await Usermanager.GetUserAsync(User);
@@ -69,7 +70,7 @@ namespace Mobile_Store_MS.Controllers
             }
             return View(users);
         }
-        [Authorize]
+        [Authorize(Roles = "Admin, Super Admin,Employee")]
         public async Task<IActionResult> Create(MessageViewModel model)
         {
             if (ModelState.IsValid)
@@ -82,12 +83,14 @@ namespace Mobile_Store_MS.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         public IActionResult Models(int id)
         {
             var data = iModelRepositery.GetDetails().Where(x => x.PhoneId == id).GroupBy(x => x.CompanyName)
                                 .Select(x => new GroupBYCompany() { CompanyName = x.Key, Models = x });
             return View(data);
         }
+
         [Authorize]
         public async Task<IActionResult> Profile()
         {
@@ -161,6 +164,7 @@ namespace Mobile_Store_MS.Controllers
         }
 
         //Total User's Messages
+        [Authorize(Roles = "Admin, Super Admin,Employee")]
         public async Task<JsonResult> UserMessages(string userID, string Email)
         {
             var user = await Usermanager.GetUserAsync(User);
@@ -169,6 +173,7 @@ namespace Mobile_Store_MS.Controllers
         }
 
         //Total User's Notifications 
+        [Authorize(Roles = "Admin, Super Admin,Employee")]
         public async Task<JsonResult> UserNotifications(int? pageNo, int? limit)
         {
             if (pageNo == null) pageNo = 1;
@@ -181,6 +186,7 @@ namespace Mobile_Store_MS.Controllers
         }
 
         //Count User Unread Messages
+        [Authorize(Roles = "Admin, Super Admin,Employee")]
         public async Task<JsonResult> GetUserUnreadMessagesCount()
         {
             var user = await Usermanager.GetUserAsync(User);
@@ -190,6 +196,7 @@ namespace Mobile_Store_MS.Controllers
 
 
         //Count Total Users Unread Messages 
+        [Authorize(Roles = "Admin, Super Admin,Employee")]
         public async Task<JsonResult> GetUnreadMessagesCount()
         {
             var user = await Usermanager.GetUserAsync(User);
@@ -197,6 +204,7 @@ namespace Mobile_Store_MS.Controllers
             return Json(Messages);
         }
         //Count Total Unread Notifications
+        [Authorize(Roles = "Admin, Super Admin,Employee")]
         public async Task<JsonResult> GetUnreadNotificationsCount()
         {
             var user = await Usermanager.GetUserAsync(User);
@@ -204,6 +212,7 @@ namespace Mobile_Store_MS.Controllers
             return Json(Messages);
         }
 
+        [Authorize(Roles = "Admin, Super Admin,Employee")]
         public async Task<JsonResult> UpdateUserMessages(string personID)
         {
             var user = await Usermanager.GetUserAsync(User);

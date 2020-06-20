@@ -13,11 +13,12 @@ namespace Mobile_Store_MS.Data.Interfaces
     {
         List<OrderViewModel> GetDetails(int? skip, int? limit);
         List<OrderViewModel> StoreOrders(int store_id, int? skip, int? limit);
-        OrderViewModel GetDetail(int id);
-        bool UpdateStatus(int order_id,Status status,string LoginUserId);
-        Task<int> addOrder(OrderViewModel c, IUrlHelper Url);
-        int Update(EditOrderViewModel model);
-        bool delete(int id,bool info);
-       
+        List<OrderViewModel> UserOrders(int Cus_ref);
+        OrderViewModel GetDetail(string id);
+        bool UpdateStatus(string order_id,Status status,string LoginUserId);
+        Task<List<Tuple<int, bool>>> addOrder(OrderViewModel c, IUrlHelper Url);
+        List<Tuple<int, bool>> Update(OrderViewModel model);
+        bool delete(string id,bool info);
+        int CountTotalOrders(int? store_id);
     }
 }

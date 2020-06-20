@@ -2,6 +2,10 @@
 
 @{
     ViewData["Title"] = "Details";
+    string products = "";
+    string prices = "";
+    double TotalPrice = 0;
+    string Quantities = "";
 }
 
 <div style="margin: 0 !important; padding: 0 !important; background-color: #eeeeee;" bgcolor="#eeeeee">
@@ -65,8 +69,15 @@
                                                 <td width="25%" align="left" bgcolor="#eeeeee" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px;"> @Model.order_id </td>
                                             </tr>
                                             <tr>
-                                                <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;"> Product </td>
-                                                <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;"> @Model.com_Name @Model.model_name </td>
+                                                <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;"> Products </td>
+                                                @foreach (var product in Model.Products)
+                                                {
+                                                    TotalPrice += product.price;
+                                                    prices += product.price + "\n";
+                                                    products += product.com_Name + " " + product.model_name + "\n";
+                                                    Quantities += product.Quantity + ",";
+                                                }
+                                                <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">@products </td>
                                             </tr>
                                             <tr>
                                                 <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;"> Shipping From </td>
@@ -74,11 +85,11 @@
                                             </tr>
                                             <tr>
                                                 <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;"> Quantity </td>
-                                                <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;"> @Model.Quantity </td>
+                                                <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;"> @Quantities </td>
                                             </tr>
                                             <tr>
                                                 <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;"> Amount </td>
-                                                <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;"> @Model.Amount </td>
+                                                <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;"> @prices </td>
                                             </tr>
                                         </table>
                                     </td>
@@ -88,7 +99,7 @@
                                         <table cellspacing="0" cellpadding="0" border="0" style="width:100%; ">
                                             <tr>
                                                 <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;"> TOTAL </td>
-                                                <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;"> @Model.Amount </td>
+                                                <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;"> @TotalPrice </td>
                                             </tr>
                                         </table>
                                     </td>
@@ -186,16 +197,15 @@
 <div>
     @if (Model.orderStatus == Mobile_Store_MS.Data.Model.Order.Status.Completed)
     {
-        <a asp-action="Invoice" asp-route-id="@Model.order_id">Get Invoice</a>
+        <a asp-action="Invoice" asp-route-id="@Model.Encryptedorder_id">Get Invoice</a>
     }
     else if (Model.orderStatus == Mobile_Store_MS.Data.Model.Order.Status.Pending)
     {
-        @Html.ActionLink("Edit", "Edit", new { id = Model.order_id }) <span>||</span>
-        @await Html.PartialAsync("~/Views/Shared/Modal.cshtml", Model.modelId)
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Encryptedorder_id }) <span>||</span>
+        @await Html.PartialAsync("~/Views/Shared/Modal.cshtml", Model.Encryptedorder_id)
     }
 
     @Html.ActionLink("Customer Details", "Details", "Customer", new { id = Model.cus_id }) ||
-    @Html.ActionLink("Model Details", "Details", "CompanyModel", new { id = Model.modelId }) ||
     @if (User.IsInRole("Super Admin") || User.IsInRole("Admin") || User.IsInRole("Employee"))
     {
         <a asp-action="Index">Back to Orders</a>

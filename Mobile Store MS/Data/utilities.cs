@@ -30,7 +30,7 @@ namespace Mobile_Store_MS.Data
         public ApplicationDbContext context;
         private readonly IHostingEnvironment hostingEnvironment;
         public readonly IConfiguration Configuration;
-       // public UserManager<ApplicationUser> UserManager;
+        // public UserManager<ApplicationUser> UserManager;
         //public utilities(ApplicationDbContext _context,UserManager<ApplicationUser> userManager)
         //{
         //    context = _context;
@@ -40,7 +40,7 @@ namespace Mobile_Store_MS.Data
         {
 
         }
-      
+
         public utilities(ApplicationDbContext _context)
         {
             context = _context;
@@ -49,7 +49,7 @@ namespace Mobile_Store_MS.Data
         {
             this.hostingEnvironment = hostingEnvironment;
         }
-       
+
         public utilities(ApplicationDbContext _context, IHostingEnvironment hostingEnvironment)
         {
             context = _context;
@@ -62,7 +62,7 @@ namespace Mobile_Store_MS.Data
             Configuration = configuration;
         }
 
-       //For Uploading Image
+        //For Uploading Image
         public string ProcessPhotoproperty(IFormFile Photo)
         {
             string uniqueFileName = null;
@@ -80,26 +80,51 @@ namespace Mobile_Store_MS.Data
             return uniqueFileName;
         }
 
-        //To Check Available Stock
-        public bool checkingquantity(int id, int StoreId, int quantitySelected)
+        //To Check Available Stock of Single Product
+        public bool checkingQuantitySingleProduct(int modelId, int quantitySelected, int StoreId)
         {
-            var result = context.Stock.Select(x => new { x.modelId, x.Quantity, x.store_id }).FirstOrDefault(x => x.modelId == id && x.store_id == StoreId);
-            if (result == null) return false;
-            int quan = result.Quantity;
-            if (quan - quantitySelected >= 0)
+            var result = context.Stock.Select(x=> new { x.modelId,x.Quantity,x.store_id}).FirstOrDefault(x => x.modelId == modelId && x.store_id == StoreId);
+            if(result != null)
             {
-                return true;
+                if(result.Quantity - quantitySelected >= 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             return false;
         }
+        //To Check Available Stock
+        public List<Tuple<int, bool>> checkingquantity(List<Products> Items, int StoreId)
+        {
+            List<Tuple<int, bool>> qty = new List<Tuple<int, bool>>();
+            var result = context.Stock.Select(x => new { x.modelId, x.Quantity, x.store_id }).Where(x => Items.Select(p => p.modelId).Contains(x.modelId) && x.store_id == StoreId).ToList();
+            if (result == null) throw new Exception();
+            foreach (var item in result)
+            {
+                int quan = item.Quantity;
+                int quantitySelected = Items.FirstOrDefault(x => x.modelId == item.modelId).Quantity;
+                if (quan - quantitySelected >= 0)
+                {
+                    qty.Add(new Tuple<int, bool>(item.modelId, true));
+                }
+                else
+                {
+                    qty.Add(new Tuple<int, bool>(item.modelId, false));
+                }
+            }
+            return qty;
+        }
 
-        //Updating Stock after Successfull Order or Purchase
-        public bool updatequan(int id, int StoreId, int quantitySelected, string operation)
+        public bool updateSingleQuantity(int modelId,int quantitySelected, int StoreId, string operation)
         {
             try
             {
-                var result = context.Stock.FirstOrDefault(u => u.modelId == id && u.store_id == StoreId);
-                if (result != null)
+                var result = context.Stock.FirstOrDefault(x => x.modelId == modelId && x.store_id == StoreId);
+                if(result != null)
                 {
                     if (operation == "Add")
                     {
@@ -109,28 +134,57 @@ namespace Mobile_Store_MS.Data
                     {
                         result.Quantity -= quantitySelected;
                     }
-                    else
-                    {
-                        return false;
-                    }
+                    context.Stock.Attach(result);
                     context.Entry(result).Property("Quantity").IsModified = true;
                     context.SaveChanges();
                     return true;
                 }
-                else
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        //Updating Stock after Successfull Order
+        //Note : This Method just Update Quantity and never check whether that stock is exist or not
+        public bool updatequan(List<Products> Items, int StoreId, string operation)
+        {
+            try
+            {
+
+                var result = context.Stock.Select(x => new Stock()
                 {
-                    Stock s = new Stock()
+                    id= x.id,
+                    modelId = x.modelId,
+                    Quantity = x.Quantity,
+                    store_id = x.store_id
+                }).Where(x=> Items.Select(p => p.modelId).Contains(x.modelId) && x.store_id==StoreId).ToList();
+
+                //Debugging Require For this Line
+                if (result.Count != Items.Count) throw new Exception();
+                if (result != null)
+                {
+                    foreach (var item in result)
                     {
-                        store_id = StoreId,
-                        modelId = id,
-                        Quantity = quantitySelected
-                    };
-                    context.Stock.Add(s);
+                        if (operation == "Add")
+                        {
+                            item.Quantity += Items.FirstOrDefault(x => x.modelId == item.modelId).Quantity;
+                        }
+                        else if (operation == "Subtract")
+                        {
+                            item.Quantity -= Items.FirstOrDefault(x => x.modelId == item.modelId).Quantity;
+                        }
+                    }
+
+                    context.Stock.UpdateRange(result);
                     context.SaveChanges();
                     return true;
                 }
+
+                return false;
             }
-            catch
+            catch(Exception e)
             {
                 return false;
             }
@@ -220,14 +274,10 @@ namespace Mobile_Store_MS.Data
         }
 
         //Calculate Price Based On Quantity
-        public int Price(int modelId, int Quantity)
+        public List<Tuple<int, int>> Price(int[] modelIds)
         {
-            if (modelId == 0)
-            {
-                return 0;
-            }
-            var result = context.BrandModel.Select(x => new { x.modelId, x.Price }).FirstOrDefault(x => x.modelId == modelId);
-            return result.Price * Quantity;
+            var result = context.BrandModel.Select(x => new { x.modelId, x.Price }).Where(x => modelIds.Contains(x.modelId)).Select(c => new Tuple<int, int>(c.modelId, c.Price)).ToList();
+            return result;
         }
 
         //Get List of Vendors
@@ -377,7 +427,7 @@ namespace Mobile_Store_MS.Data
         }
 
         //Add Notification to DB
-        public async Task<bool> AddNotification(NotificationsViewModel model) 
+        public async Task<bool> AddNotification(NotificationsViewModel model)
         {
             try
             {
@@ -388,20 +438,20 @@ namespace Mobile_Store_MS.Data
                     Url = model.Url,
                     UserId = model.UserId,
                     When = DateTime.Now,
-                    read= false,
+                    read = false,
                 };
                 await context.Notification.AddAsync(n);
-                await context.SaveChangesAsync();
+                //await context.SaveChangesAsync();
                 return true;
             }
             catch (Exception e)
             {
-                
+
                 return false;
             }
         }
-      
-      
+
+
     }
     public struct modelList
     {

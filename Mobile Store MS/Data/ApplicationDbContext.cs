@@ -20,6 +20,7 @@ namespace Mobile_Store_MS.Data
             : base(options)
         {
         }
+      
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -28,35 +29,45 @@ namespace Mobile_Store_MS.Data
              .HasMany(a => a.Brand)
              .WithOne(b => b.model)
              .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CompanyModel>()
+             .HasMany(a => a.Vendor)
+             .WithOne(b => b.model)
+             .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<CompanyModel>()
+            //  .HasMany(a => a.Orders)
+            //  .WithOne(b => b.CompanyModel)
+            //  .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<BrandModel>()
+              .HasMany(a => a.Orders)
+              .WithOne(b => b.BrandModel)
+              .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<BrandModel>()
               .HasMany(a => a.Images)
               .WithOne(b => b.model)
               .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Customer>()
-             .HasMany(a => a.Order)
-             .WithOne(b => b.Cus_model)
-             .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<BrandModel>()
-            .HasMany(a => a.Orders)
-            .WithOne(b => b.model)
-            .OnDelete(DeleteBehavior.Cascade);
+          
             modelBuilder.Entity<BrandModel>()
             .HasMany(a => a.Purchasing)
             .WithOne(b => b.Brand_model)
             .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<BrandModel>()
+             .HasMany(a => a.Stock)
+             .WithOne(b => b.Model)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Customer>()
+             .HasMany(a => a.Order)
+             .WithOne(b => b.Cus_model)
+             .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Vendor>()
             .HasMany(a => a.Purchasing)
             .WithOne(b => b.Vendor_Model)
             .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<CompanyModel>()
-            .HasMany(a => a.Vendor)
-            .WithOne(b => b.model)
-            .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<BrandModel>()
-           .HasMany(a => a.Stock)
-           .WithOne(b => b.Model)
-           .OnDelete(DeleteBehavior.Cascade);
+          
 
             modelBuilder.Entity<Store>()
            .HasMany(a => a.Purchasing)
@@ -88,6 +99,17 @@ namespace Mobile_Store_MS.Data
            .WithMany(b => b.Order_Model)
            .OnDelete(DeleteBehavior.Restrict);
 
+       
+            modelBuilder.Entity<Order>()
+            .HasMany(a => a.Products)
+            .WithOne(b => b.Order)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Order>()
+          .HasMany(a => a.Charges)
+          .WithOne(b => b.Order)
+          .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<message>()
              .HasOne(a => a.Sender)
              .WithMany(b => b.Messages)
@@ -106,6 +128,10 @@ namespace Mobile_Store_MS.Data
             {
                 entity.HasIndex(e => e.CustRef).IsUnique();
             });
+            modelBuilder.Entity<OrderCharges>(entity =>
+            {
+                entity.HasIndex(e => new { e.priority,e.order_id}).IsUnique();
+            }); 
         }
 
         public DbSet<CompanyModel> CompanyModel { get; set; }
@@ -114,6 +140,8 @@ namespace Mobile_Store_MS.Data
         public DbSet<Customer> Customer { get; set; }
         public DbSet<Vendor> Vendor { get; set; }
         public DbSet<Order> Order { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<OrderCharges> OrderCharges { get; set; }
         public DbSet<Store> Stores { get; set; }
         public DbSet<Purchasing> Purchasings { get; set; }
         public DbSet<Stock> Stock { get; set; }

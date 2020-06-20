@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mobile_Store_MS.Data.Model.Order;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -19,5 +20,6 @@ namespace Mobile_Store_MS.Data.Model
 
         public ICollection<BrandModel> Brand { get; set; }
         public ICollection<Vendor.Vendor> Vendor { get; set; }
+        //public ICollection<Product> Orders { get; set; }
     }
 }

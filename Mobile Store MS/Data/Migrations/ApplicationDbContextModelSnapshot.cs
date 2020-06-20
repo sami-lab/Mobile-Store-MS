@@ -397,22 +397,14 @@ namespace Mobile_Store_MS.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("Amount");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("Date");
 
                     b.Property<int>("PaymentMethod");
 
-                    b.Property<int>("Quantity");
-
                     b.Property<string>("TakenBy");
 
-                    b.Property<string>("TransactionId");
-
                     b.Property<int>("cus_id");
-
-                    b.Property<int>("modelId");
 
                     b.Property<int>("status");
 
@@ -424,11 +416,54 @@ namespace Mobile_Store_MS.Data.Migrations
 
                     b.HasIndex("cus_id");
 
-                    b.HasIndex("modelId");
-
                     b.HasIndex("store_id");
 
                     b.ToTable("Order");
+                });
+
+            modelBuilder.Entity("Mobile_Store_MS.Data.Model.Order.OrderCharges", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ChargeId");
+
+                    b.Property<int>("order_id");
+
+                    b.Property<int>("priority");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("order_id");
+
+                    b.HasIndex("priority", "order_id")
+                        .IsUnique();
+
+                    b.ToTable("OrderCharges");
+                });
+
+            modelBuilder.Entity("Mobile_Store_MS.Data.Model.Order.Product", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("Quantity");
+
+                    b.Property<int>("modelId");
+
+                    b.Property<int>("order_id");
+
+                    b.Property<double>("price");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("modelId");
+
+                    b.HasIndex("order_id");
+
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Mobile_Store_MS.Data.Model.Purchasing", b =>
@@ -642,14 +677,30 @@ namespace Mobile_Store_MS.Data.Migrations
                         .HasForeignKey("cus_id")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Mobile_Store_MS.Data.Model.BrandModel", "model")
+                    b.HasOne("Mobile_Store_MS.Data.Model.Store.Store", "Store_Model")
+                        .WithMany("Order")
+                        .HasForeignKey("store_id")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Mobile_Store_MS.Data.Model.Order.OrderCharges", b =>
+                {
+                    b.HasOne("Mobile_Store_MS.Data.Model.Order.Order", "Order")
+                        .WithMany("Charges")
+                        .HasForeignKey("order_id")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Mobile_Store_MS.Data.Model.Order.Product", b =>
+                {
+                    b.HasOne("Mobile_Store_MS.Data.Model.BrandModel", "BrandModel")
                         .WithMany("Orders")
                         .HasForeignKey("modelId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Mobile_Store_MS.Data.Model.Store.Store", "Store_Model")
-                        .WithMany("Order")
-                        .HasForeignKey("store_id")
+                    b.HasOne("Mobile_Store_MS.Data.Model.Order.Order", "Order")
+                        .WithMany("Products")
+                        .HasForeignKey("order_id")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

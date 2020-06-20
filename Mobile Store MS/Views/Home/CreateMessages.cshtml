@@ -8,6 +8,41 @@
 <input type="text" id="userImg" hidden value="@ViewBag.MyImage" />
 <div class="container-fluid h-100">
     <div class="row justify-content-center w-100 h-100 ">
+        <div id="demo" class="collapse">
+            <div class="card-header">
+                <div class="input-group">
+                    <input type="text" id="search" placeholder="Search..." name="" class="form-control search">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body contacts_body">
+
+                <ul class="contacts list-unstyled" id="userList">
+                    @foreach (var user in Model)
+                    {
+                        var photoPath = "~/image/" + (user.Photopath ?? "emp.jpg");
+                        <li data-id="@user.Id" data-FullName="@user.FullName" data-img="@user.Photopath" data-Email="@user.Email">
+                            <a href="#">
+                                <div class="d-flex bd-highlight">
+                                    <div class="img_cont">
+                                        <img src="@photoPath" asp-append-version="true" class="rounded-circle user_img">
+                                        <span class=""></span>
+                                    </div>
+                                    <div class="user_info">
+                                        <span>@user.FullName </span>
+                                        <p>   <span style="font-size: smaller;" class="badge badge-pill  badge-danger notification"></span>@user.Email</p>
+
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="card-footer"></div>
+        </div>
 
         <div class="col-md-8 col-lg-8 col-xl-6 chat border">
             <div class="card" id="chatbody" style="visibility:hidden">
@@ -52,7 +87,10 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 col-lg-4 col-xl-3 chat">
+
+        <button id="chatButton" type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo">Users</button>
+
+        <div id="side" class="col-md-4 col-lg-4 col-xl-3 chat">
             <div class="card mb-sm-3 mb-md-0 contacts_card">
                 <div class="card-header">
                     <div class="input-group">
@@ -90,7 +128,7 @@
             </div>
         </div>
     </div>
-</div>
+    </div>
 
 
 @section Scripts{

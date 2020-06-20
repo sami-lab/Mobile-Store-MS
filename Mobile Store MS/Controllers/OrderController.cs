@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +12,7 @@ using Mobile_Store_MS.Data;
 using Mobile_Store_MS.Data.Interfaces;
 using Mobile_Store_MS.Data.Model.Customer;
 using Mobile_Store_MS.Data.Model.Order;
+using Mobile_Store_MS.Security.TokenSecurity;
 using Mobile_Store_MS.Services;
 using Mobile_Store_MS.ViewModel.CustomerViewModel;
 using Mobile_Store_MS.ViewModel.Orders;
@@ -23,26 +25,36 @@ namespace Mobile_Store_MS.Controllers
     [Authorize(Roles = "Admin, Super Admin,Employee,User")]
     public class OrderController : Controller
     {
+        // It is through IDataProtector interface Protect and Unprotect methods,
+        // we encrypt and decrypt respectively
+        private readonly IDataProtector protector;
         public readonly IorderRepositery iOrderRepositery;
         public utilities util;
         public UserManager<ApplicationUser> userManager;
         private readonly Microsoft.AspNetCore.Identity.UI.Services.IEmailSender _emailSender;
-        public OrderController(IorderRepositery IorderRepository, ApplicationDbContext context, IHostingEnvironment hosting, UserManager<ApplicationUser> _userManager, Microsoft.AspNetCore.Identity.UI.Services.IEmailSender emailSender)
+        // It is the CreateProtector() method of IDataProtectionProvider interface
+        // that creates an instance of IDataProtector. CreateProtector() requires
+        // a purpose string. So both IDataProtectionProvider and the class that
+        // contains our purpose strings are injected using the contructor
+        public OrderController(IorderRepositery IorderRepository, ApplicationDbContext context, IHostingEnvironment hosting, UserManager<ApplicationUser> _userManager, Microsoft.AspNetCore.Identity.UI.Services.IEmailSender emailSender, IDataProtectionProvider dataProtectionProvider, DataProctectionPurposeString dataProtectionPurposeStrings)
         {
             iOrderRepositery = IorderRepository;
             userManager = _userManager;
             util = new utilities(context, hosting);
             _emailSender = emailSender;
+            this.protector = dataProtectionProvider.CreateProtector(
+             dataProtectionPurposeStrings.OrderId);
+
         }
         // GET: Order
         [Authorize(Roles = "Admin, Super Admin,Employee")]
         public ActionResult Index(int? pageNo, int? limit)
         {
             if (pageNo == null) pageNo = 1;
-            if (limit == null) limit = 30;
+            if (limit == null) limit = 20;
 
             int skip = (int)((pageNo - 1) * limit);
-            int totalUser = iOrderRepositery.GetDetails(null, null).Count();
+            int totalUser = iOrderRepositery.CountTotalOrders(null);
             decimal totalpages = (decimal)totalUser / (decimal)limit;
             ViewBag.TotalPages = Math.Ceiling(totalpages);
             ViewBag.CurrentPage = pageNo;
@@ -63,7 +75,7 @@ namespace Mobile_Store_MS.Controllers
         {
 
             TempData.Keep();
-            if (limit == null) limit = 30;
+            if (limit == null) limit = 20;
             if (pageNo == null) pageNo = 1;
             int skip = (int)((pageNo - 1) * limit);
 
@@ -76,19 +88,19 @@ namespace Mobile_Store_MS.Controllers
 
                 case "Name":
                     data = Name != null ? (store_id != null ? (iOrderRepositery.StoreOrders((int)store_id, null, null).Where(x => x.cus_name.ToLower().Contains(Name.ToLower())).ToList()) : (iOrderRepositery.GetDetails(null, null).Where(x => x.cus_name.ToLower().Contains(Name.ToLower())).ToList())) : null;
-                    total = iOrderRepositery.GetDetails(null, null).Where(x => x.cus_name.ToLower().Contains(Name.ToLower())).Count();
+                    total = data.Count;
                     totalpages = (decimal)total / (decimal)limit;
                     ViewBag.TotalPages = Math.Ceiling(totalpages);
                     break;
                 case "Month":
                     data = Month.ToString() != null ? (store_id != null ? (iOrderRepositery.StoreOrders((int)store_id, null, null).Where(x => x.Date.Month == Month).ToList()) : (iOrderRepositery.GetDetails(null, null).Where(x => x.Date.Month == Month).ToList())) : null;
-                    total = iOrderRepositery.GetDetails(null, null).Where(x => x.Date.Month == Month).Count();
+                    total = data.Count();
                     totalpages = (decimal)total / (decimal)limit;
                     ViewBag.TotalPages = Math.Ceiling(totalpages);
                     break;
                 case "Date":
                     data = time != null ? (store_id != null ? (iOrderRepositery.StoreOrders((int)store_id, null, null).Where(x => x.Date == time).ToList()) : (iOrderRepositery.GetDetails(null, null).Where(x => x.Date == time).ToList())) : null;
-                    total = iOrderRepositery.GetDetails(null, null).Where(x => x.Date == time).Count();
+                    total = data.Count();
                     totalpages = (decimal)total / (decimal)limit;
                     ViewBag.TotalPages = Math.Ceiling(totalpages);
                     break;
@@ -96,19 +108,19 @@ namespace Mobile_Store_MS.Controllers
                     int n;
                     bool isNumeric = int.TryParse(RefNo, out n);
                     data = RefNo != null ? isNumeric == true ? (store_id != null ? (iOrderRepositery.StoreOrders((int)store_id, null, null).Where(x => x.CustRef == n).ToList()) : (iOrderRepositery.GetDetails(null, null).Where(x => x.CustRef == n).ToList())) : null : null;
-                    total = iOrderRepositery.GetDetails(null, null).Where(x => x.CustRef == n).Count();
+                    total = data.Count();
                     totalpages = (decimal)total / (decimal)limit;
                     ViewBag.TotalPages = Math.Ceiling(totalpages);
                     break;
                 case "OrderStatus":
                     data = OrderStatus != null ? (store_id != null ? (iOrderRepositery.StoreOrders((int)store_id, null, null).Where(x => x.orderStatus == OrderStatus).ToList()) : (iOrderRepositery.GetDetails(null, null).Where(x => x.orderStatus == OrderStatus).ToList())) : null;
-                    total = iOrderRepositery.GetDetails(null, null).Where(x => x.orderStatus == OrderStatus).Count();
+                    total = data.Count();
                     totalpages = (decimal)total / (decimal)limit;
                     ViewBag.TotalPages = Math.Ceiling(totalpages);
                     break;
                 default:
-                    data = store_id != null ? iOrderRepositery.StoreOrders((int)store_id, null, null).ToList() : iOrderRepositery.GetDetails(null, null).ToList();
-                    total = iOrderRepositery.GetDetails(null, null).Count();
+                    data = store_id != null ? iOrderRepositery.StoreOrders((int)store_id, skip, limit).ToList() : iOrderRepositery.GetDetails(skip, limit).ToList();
+                    total = data.Count;
                     totalpages = (decimal)total / (decimal)limit;
                     ViewBag.TotalPages = Math.Ceiling(totalpages);
                     break;
@@ -120,10 +132,10 @@ namespace Mobile_Store_MS.Controllers
         {
 
             if (pageNo == null) pageNo = int.Parse(TempData["CurrentPage"] != null ? TempData["CurrentPage"].ToString() : "1");
-            if (limit == null) limit = 30;
+            if (limit == null) limit = 20;
             double TotalOrders = 0;
-            if (store_id != null) TotalOrders = iOrderRepositery.StoreOrders((int)store_id, null, null).Count();
-            else TotalOrders = int.Parse(TempData["Total"] != null ? TempData["Total"].ToString() : iOrderRepositery.GetDetails(null, null).Count().ToString());
+            if (store_id != null) TotalOrders = iOrderRepositery.CountTotalOrders(store_id);
+            else TotalOrders = int.Parse(TempData["Total"] != null ? TempData["Total"].ToString() : iOrderRepositery.CountTotalOrders(null).ToString());
             double tot = TotalOrders / (double)limit;
             double totalPages = TempData["TotalPages"] != null ? double.Parse(TempData["TotalPages"].ToString()) : Math.Ceiling(tot);
             TempData.Keep();
@@ -145,14 +157,8 @@ namespace Mobile_Store_MS.Controllers
                 case "RefNo":
                     data = order == "Des" ? data.OrderByDescending(x => x.CustRef).ToList() : data.OrderBy(x => x.CustRef).ToList();
                     break;
-                case "Quantity":
-                    data = order == "Des" ? data.OrderByDescending(x => x.Quantity).ToList() : data.OrderBy(x => x.Quantity).ToList();
-                    break;
                 case "Amount":
-                    data = order == "Des" ? data.OrderByDescending(x => x.Amount).ToList() : data.OrderBy(x => x.Amount).ToList();
-                    break;
-                case "com_Name":
-                    data = order == "Des" ? data.OrderByDescending(x => x.com_Name).ToList() : data.OrderBy(x => x.com_Name).ToList();
+                    data = order == "Des" ? data.OrderByDescending(x => x.Products.Select(t => t.price).Sum()).ToList() : data.OrderBy(x => x.Products.Select(t => t.price).Sum()).ToList();
                     break;
                 case "StoreName":
                     data = order == "Des" ? data.OrderByDescending(x => x.StoreName).ToList() : data.OrderBy(x => x.StoreName).ToList();
@@ -174,13 +180,19 @@ namespace Mobile_Store_MS.Controllers
                 var users = userManager.Users.SingleOrDefault(x => x.CusRef == Cusref);
                 if (users != null)
                 {
-                    var UserData = iOrderRepositery.GetDetails(null, null).Where(x => x.CustRef == Cusref).OrderBy(x => x.Date);
+                    var UserData = iOrderRepositery.UserOrders((int)users.CusRef);
                     return View(UserData);
+                }
+                else
+                {
+                    ViewBag.Name = "User";
+                    return View("ProductNotFound", Cusref);
                 }
             }
             var user = await userManager.GetUserAsync(User);
-            var data = iOrderRepositery.GetDetails(null, null).Where(x => x.CustRef == user.CusRef).OrderBy(x => x.Date);
+            var data = iOrderRepositery.UserOrders((int)user.CusRef);
             return View(data);
+
         }
 
         [Authorize(Roles = "Admin, Super Admin,Employee")]
@@ -196,7 +208,7 @@ namespace Mobile_Store_MS.Controllers
             if (User.IsInRole("Super Admin") && store_id != null)
             {
                 data = iOrderRepositery.StoreOrders((int)store_id, skip, limit).ToList();
-                int totalUser = iOrderRepositery.GetDetails(null, null).Where(x => x.store_id == store_id).Count();
+                int totalUser = iOrderRepositery.CountTotalOrders(store_id);
                 decimal totalpages = (decimal)totalUser / (decimal)limit;
                 ViewBag.TotalPages = Math.Ceiling(totalpages);
                 TempData["TotalPages"] = Math.Ceiling(totalpages);
@@ -208,7 +220,7 @@ namespace Mobile_Store_MS.Controllers
                 }
 
                 ViewBag.store_id = store_id;
-
+                return View(data);
             }
             else if (User.IsInRole("Super Admin") && store_id == null)
             {
@@ -218,24 +230,26 @@ namespace Mobile_Store_MS.Controllers
             if (user.store_id != null)
             {
                 data = iOrderRepositery.StoreOrders((int)user.store_id, skip, limit).ToList();
-                int totalUser = iOrderRepositery.GetDetails(null, null).Where(x => x.store_id == user.store_id).Count();
+                int totalUser = iOrderRepositery.CountTotalOrders(user.store_id);
                 decimal totalpages = (decimal)totalUser / (decimal)limit;
                 ViewBag.TotalPages = Math.Ceiling(totalpages);
                 TempData["TotalPages"] = Math.Ceiling(totalpages);
                 TempData["Total"] = totalUser;
-                //if (skip >= totalUser)
-                //{
-                //    ViewBag.ErrorMessage = "The Page you are Looking For Could not be found";
-                //    return View("NotFound");
-                //}
+                if (skip >= totalUser)
+                {
+                    ViewBag.ErrorMessage = "The Page you are Looking For Could not be found";
+                    return View("NotFound");
+                }
                 ViewBag.store_id = user.store_id;
             }
-            //if (data == null) return View("Error");
+            else return View("Error");
+          
             return View(data);
         }
         // GET: Order/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(string id)
         {
+            // Decrypt the employee id using Unprotect method
             var data = iOrderRepositery.GetDetail(id);
             if (data != null)
             {
@@ -245,7 +259,7 @@ namespace Mobile_Store_MS.Controllers
             return View("ProductNotFound", id);
         }
 
-        public ActionResult Invoice(int id)
+        public ActionResult Invoice(string id)
         {
             var data = iOrderRepositery.GetDetail(id);
             if (data != null)
@@ -299,8 +313,8 @@ namespace Mobile_Store_MS.Controllers
             }
             if (ModelId != null)
             {
-                data.Phoneid = Companies.FirstOrDefault(x => x.Phoneid == Phoneid).Phoneid;
-                data.modelId = (int)ModelId;
+                //data.Phoneid = Companies.FirstOrDefault(x => x.Phoneid == Phoneid).Phoneid;
+                // data.modelId = (int)ModelId;
             }
             ViewBag.Companies = Companies;
             return View(data);
@@ -313,7 +327,22 @@ namespace Mobile_Store_MS.Controllers
         {
             try
             {
-
+                if(c.orders == "[]" || c.Products.Count == 0)
+                {
+                    ViewBag.Companies = util.GetAllCompany();
+                    ViewBag.Stores = util.GetAllStores();
+                    ViewBag.cities = util.getCities();
+                    ModelState.AddModelError("","Products Can't be Null");
+                    return View(c);
+                }
+                if(c.Products.Any(x=> x.Quantity <= 0))
+                {
+                    ViewBag.Companies = util.GetAllCompany();
+                    ViewBag.Stores = util.GetAllStores();
+                    ViewBag.cities = util.getCities();
+                    ModelState.AddModelError("", "Products Can't be Negative");
+                    return View(c);
+                }
                 // TODO: Add insert logic here
                 if (ModelState.IsValid)
                 {
@@ -341,16 +370,32 @@ namespace Mobile_Store_MS.Controllers
                         c.orderStatus = Status.Completed;
                         c.TakenBy = user.Id;
                     }
-                    int id = await iOrderRepositery.addOrder(c, Url);
-                    if (id == -1)
+
+                    List<Tuple<int, bool>> res = await iOrderRepositery.addOrder(c, Url);
+                    if (res.Any(x => x.Item2 == false && x.Item1 > 0))
                     {
                         ViewBag.Companies = util.GetAllCompany();
                         ViewBag.Stores = util.GetAllStores();
                         ViewBag.cities = util.getCities();
-                        ModelState.AddModelError("", "Out of Stock");
+                        var OutOfStock = res.Where(x => x.Item2 == false);
+                        var listOfModels = c.Products.Where(x => OutOfStock.Select(i => i.Item1).Contains(x.modelId)).Select(x => new { x.model_name, x.com_Name });
+                        string str = "";
+                        foreach (var item in listOfModels)
+                        {
+                            str = str + item.com_Name + " " + item.model_name + "\n";
+                        }
+                        ModelState.AddModelError("", "Following Product(s) is Out of Stock /n" + String.Join("/n", listOfModels));
                         return View(c);
                     }
-                    else if (id == -2)
+                    else if(res.Any(x => x.Item2 == false && x.Item1 == -1))
+                    {
+                        ViewBag.Companies = util.GetAllCompany();
+                        ViewBag.Stores = util.GetAllStores();
+                        ViewBag.cities = util.getCities();
+                        ModelState.AddModelError("", "Order Placed! Error in Updating Stock");
+                        return View(c);
+                    }
+                    else if (res.Any(x => x.Item2 == false && x.Item1 == -2))
                     {
                         ViewBag.Companies = util.GetAllCompany();
                         ViewBag.Stores = util.GetAllStores();
@@ -358,13 +403,16 @@ namespace Mobile_Store_MS.Controllers
                         ModelState.AddModelError("", "Error in Payment Gatway");
                         return View(c);
                     }
+
+                    var id = res.Select(x => x.Item1).First();
                     if (!(User.IsInRole("Admin") || User.IsInRole("Super Admin") || User.IsInRole("Employee")))
                     {
                         c.order_id = id;
                         string str = await ViewToStringRenderer.RenderViewToStringAsync(HttpContext.RequestServices, $"~/Views/Template/OrderConfirmation.cshtml", c);
                         await _emailSender.SendEmailAsync(user.Email, "Order Confirmation", str);
                     }
-                    return RedirectToAction("Details", new { id = id });
+                    string ID = protector.Protect(id.ToString());
+                    return RedirectToAction("Details", new { id = ID });
                 }
                 ViewBag.Companies = util.GetAllCompany();
                 ViewBag.Stores = util.GetAllStores();
@@ -381,45 +429,72 @@ namespace Mobile_Store_MS.Controllers
             }
         }
 
-        [HttpPost]
-        public IActionResult GetProduct(int Phoneid, string[] modelId)
+
+        public IActionResult GetProduct(int Phoneid, string[] modelId, string[] models)
         {
             var data = new List<Products>();
-            var ids = modelId[0].Split(',');
-            int[] idslist = Array.ConvertAll(ids, i => int.Parse(i));
-            string CompanyName = util.GetAllCompany().FirstOrDefault(x => x.Phoneid == Phoneid).Com_name;
-            var list = util.getModelList(Phoneid).Where(x => idslist.Contains(x.modelId));
-            //util.getModelList(Phoneid).Join(idslist, up => up.modelId, id => id, (up, id) => up);
-
-            foreach (var pro in list)
+            string[] modelsexist = new string[] { }; int[] modelsExists = new int[] { };
+            if (modelId[0] != null)
             {
-                Products p = new Products()
+                var ids = modelId[0].Split(',');
+                int[] idslist = Array.ConvertAll(ids, i => int.Parse(i));
+                string CompanyName = util.GetAllCompany().FirstOrDefault(x => x.Phoneid == Phoneid).Com_name;
+                var list = util.getModelList(Phoneid).Where(x => idslist.Contains(x.modelId)).ToList();
+                if (!String.IsNullOrEmpty(models[0]))
                 {
-                    modelId = pro.modelId,
-                    model_name=pro.model_name,
-                    Phoneid = Phoneid,
-                    com_Name= CompanyName,
-                    price = 0,
-                    Quantity = 1,
-                    isSelected=true,
-                };
-                data.Add(p);
+                    modelsexist = models[0].Split(',');
+                    modelsExists = Array.ConvertAll(modelsexist, i => int.Parse(i));
+                    ViewData["Index"] = modelsExists.Length;
+                }
+                else
+                    ViewData["Index"] = 0;
+                var Prices = util.Price(idslist);
+                for (int i = 0; i < list.Count(); i++)
+                {
+                    if (modelsExists.Length == 0 || !modelsExists.Contains(list[i].modelId))
+                    {
+                        Products p = new Products()
+                        {
+                            modelId = list[i].modelId,
+                            model_name = list[i].model_name,
+                            Phoneid = Phoneid,
+                            com_Name = CompanyName,
+                            price = Prices.FirstOrDefault(x => x.Item1 == list[i].modelId).Item2,
+                            Quantity = 1,
+                        };
+
+                        data.Add(p);
+                    }
+                }
             }
-          
             return PartialView("_DisplayOrder", data);
         }
         [HttpPost]
         public PartialViewResult ShowParitalView(OrderViewModel orderView)
         {
-            orderView.com_Name = util.GetAllCompany().FirstOrDefault(x => x.Phoneid == orderView.Phoneid).Com_name;
-            orderView.model_name = util.getModelList(orderView.Phoneid).FirstOrDefault(x => x.modelId == orderView.modelId).model_name;
-            orderView.StoreName = util.GetAllStores().FirstOrDefault(x => x.store_id == orderView.store_id).StoreName;
-            if (String.IsNullOrEmpty(Convert.ToString(orderView.CityId)))
+            try
             {
-                orderView.CityName = util.getCities().FirstOrDefault(x => x.id == orderView.CityId).city;
-            }
+                orderView.Products = JsonConvert.DeserializeObject<List<Products>>(orderView.orders);
+                var pricesArray = orderView.Products.Select(x => new { x.modelId, x.Quantity }).ToList();
+                double TotalPrices = 0;
+                var prices = util.Price(pricesArray.Select(x => x.modelId).ToArray()).ToList();
+                pricesArray.ForEach(x => TotalPrices += prices.FirstOrDefault(p => p.Item1 == x.modelId).Item2 * x.Quantity);
 
-            return PartialView("OrderSummary", orderView);
+                ViewBag.TotalPrices = TotalPrices-orderView.TotalAmount;
+                //orderView.Products.com_Name = util.GetAllCompany().FirstOrDefault(x => x.Phoneid == orderView.Phoneid).Com_name;
+                //orderView.model_name = util.getModelList(orderView.Phoneid).FirstOrDefault(x => x.modelId == orderView.modelId).model_name;
+                orderView.StoreName = util.GetAllStores().FirstOrDefault(x => x.store_id == orderView.store_id).StoreName;
+                if (String.IsNullOrEmpty(Convert.ToString(orderView.CityId)))
+                {
+                    orderView.CityName = util.getCities().FirstOrDefault(x => x.id == orderView.CityId).city;
+                }
+
+                return PartialView("OrderSummary", orderView);
+            }
+            catch
+            {
+                return PartialView("OrderSummary", orderView);
+            }
         }
         [HttpPost]
         [Authorize(policy: "UpdatingStatus")]
@@ -428,9 +503,9 @@ namespace Mobile_Store_MS.Controllers
             var user = await userManager.GetUserAsync(User);
             bool result = iOrderRepositery.UpdateStatus(s.order_id, (Status)s.orderStatus, user.Id);
             if (result)
-                return RedirectToAction("Index");
+                return RedirectToAction("StoreOrders");
             ViewBag.ErrorTitle = "Error on Updating Status";
-            ViewBag.ErrorMessage = "Cannot Update Status of Completed Order";
+            ViewBag.ErrorMessage = "Cannot Update Status of Selected Order";
             return View("Error");
 
         }
@@ -449,37 +524,17 @@ namespace Mobile_Store_MS.Controllers
         }
 
         // GET: Order/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(string id)
         {
-            ViewBag.Companies = util.GetAllCompany();
-            ViewBag.Stores = util.GetAllStores();
-            ViewBag.cities = util.getCities();
 
             var data = iOrderRepositery.GetDetail(id);
             if (data != null)
             {
-                EditOrderViewModel e = new EditOrderViewModel()
-                {
-                    order_id = data.order_id,
-                    Amount = data.Amount,
-                    Date = data.Date,
-                    Quantity = data.Quantity,
-                    modelId = data.modelId,
-                    store_id = data.store_id,
-                    com_Name = data.com_Name,
-                    model_name = data.model_name,
-                    cus_id = data.cus_id,
-                    cus_name = data.cus_name,
-                    ExistingQuantity = data.Quantity,
-                    Existing_store_id = data.store_id,
-                    CityId = data.CityId,
-                    cus_phone = data.cus_phone,
-                    Phoneid = data.Phoneid,
-                    orderStatus = data.orderStatus,
-                    StrretAddress = data.StrretAddress,
-                    CustRef = data.CustRef
-                };
-                return View(e);
+                ViewBag.Companies = util.GetAllCompany();
+                ViewBag.Stores = util.GetAllStores();
+                ViewBag.cities = util.getCities();
+                ViewBag.TotalPrice = data.Products.Sum(x => x.price);
+                return View(data);
             }
             ViewBag.Name = "Order";
             return View("ProductNotFound", id);
@@ -489,28 +544,71 @@ namespace Mobile_Store_MS.Controllers
         // POST: Order/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, EditOrderViewModel c)
+        public ActionResult Edit(string id, OrderViewModel c)
         {
+          
+            double prices = 0;
             try
             {
-
                 // TODO: Add update logic here
                 if (ModelState.IsValid)
                 {
+                  
                     var data = iOrderRepositery.GetDetail(id);
                     if (data != null)
                     {
-                        int modelId = iOrderRepositery.Update(c);
-                        if (modelId == -1)
+                        prices = data.Products.Sum(x => x.price);
+                        if (c.orders == "[]" || c.Products.Count == 0)
                         {
                             ViewBag.Companies = util.GetAllCompany();
                             ViewBag.Stores = util.GetAllStores();
                             ViewBag.cities = util.getCities();
-                            ModelState.AddModelError("", "Out of Stock");
-                            return View();
+                            ViewBag.TotalPrice = prices;
+                            ModelState.AddModelError("", "Products Can't be Null");
+                            return View(c);
                         }
-                        if (modelId == 0) return View("Error");
-                        return RedirectToAction("Details", new { id = modelId });
+                        if (c.Products.Any(x => x.Quantity <= 0))
+                        {
+                            ViewBag.Companies = util.GetAllCompany();
+                            ViewBag.Stores = util.GetAllStores();
+                            ViewBag.cities = util.getCities();
+                            ViewBag.TotalPrice = prices;
+                            ModelState.AddModelError("", "Products Can't be Negative");
+                            return View(c);
+                        }
+                        c.order_id = data.order_id;
+                        c.Products =  JsonConvert.DeserializeObject<List<Products>>(c.orders);
+                        List<Tuple<int, bool>> res = iOrderRepositery.Update(c);
+                        if (res.Any(x => x.Item2 == false && x.Item1 > 0))
+                        {
+                            ViewBag.Companies = util.GetAllCompany();
+                            ViewBag.Stores = util.GetAllStores();
+                            ViewBag.cities = util.getCities();
+                            ViewBag.TotalPrice = prices;
+                            var OutOfStock = res.Where(x => x.Item2 == false);
+                            var listOfModels = c.Products.Where(x => OutOfStock.Select(i => i.Item1).Contains(x.modelId)).Select(x => new { x.model_name, x.com_Name });
+                            string str = "";
+                            foreach (var item in listOfModels)
+                            {
+                                str = str + item.com_Name + " " + item.model_name + "\n";
+                            }
+                            ModelState.AddModelError("", "Following Product(s) is Out of Stock \n" + String.Join("/n", listOfModels));
+                            return View(c);
+                        }
+                        if (res.Any(x => x.Item2 == false && x.Item1 == 0)) return View("Error");
+                        if (res.Any(x => x.Item2 == false && x.Item1 == -2))
+                        {
+                            ViewBag.Companies = util.GetAllCompany();
+                            ViewBag.Stores = util.GetAllStores();
+                            ViewBag.cities = util.getCities();
+                            ViewBag.TotalPrice = prices;
+                            ModelState.AddModelError("", "Error in Payment Gatway! Sorry for inconvenience");
+                            return View(c);
+                        }
+                        return RedirectToAction("Details", new
+                        {
+                            id = id
+                        });
                     }
                     ViewBag.Name = "Order";
                     return View("ProductNotFound", id);
@@ -518,13 +616,15 @@ namespace Mobile_Store_MS.Controllers
                 ViewBag.Companies = util.GetAllCompany();
                 ViewBag.Stores = util.GetAllStores();
                 ViewBag.cities = util.getCities();
+                ViewBag.TotalPrice = prices;
                 return View(c);
             }
             catch (Exception e)
-            {
+               {
                 ViewBag.Companies = util.GetAllCompany();
                 ViewBag.Stores = util.GetAllStores();
                 ViewBag.cities = util.getCities();
+                ViewBag.TotalPrice = prices;
                 ModelState.AddModelError("", e.Message);
                 return View(c);
             }
@@ -535,7 +635,7 @@ namespace Mobile_Store_MS.Controllers
         // POST: Order/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id)
+        public ActionResult Delete(string id)
         {
             try
             {
@@ -573,11 +673,7 @@ namespace Mobile_Store_MS.Controllers
             return Json(list);
         }
 
-        public JsonResult Price(int modelId, int Quantity)
-        {
-            int price = util.Price(modelId, Quantity);
-            return Json(price);
-        }
+
         [AcceptVerbs("Get", "Post")]
         public JsonResult quantityCheck(int Quantity)
         {
@@ -590,5 +686,13 @@ namespace Mobile_Store_MS.Controllers
                 return Json("Quantity can't be negative");
             }
         }
+
+        public JsonResult Price(int modelId,int Quantity)
+        {
+            int[] modelID = new int[] { modelId };
+            List<Tuple<int,int>> price = util.Price(modelID);
+            return Json(price.FirstOrDefault(x=> x.Item1 == modelId).Item2*Quantity);
+        }
+
     }
 }

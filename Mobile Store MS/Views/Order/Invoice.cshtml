@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Invoice";
+    double TotalPrice = 0;
 }
 
 <div id="invoice container">
@@ -63,30 +64,35 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td class="no">01</td>
-                            <td class="text-left">
-                                <h3>
-                                    <a asp-controller="CompanyModel" asp-action="Details" asp-route-id="@Model.modelId" target="_blank">
-                                        @Model.com_Name @Model.model_name
-                                    </a>
-                                </h3>
+                        @{ int i = 1;}
+                        @foreach (var item in Model.Products)
+                        {
+                            TotalPrice += item.price;
+                            <tr>
+                                <td class="no">@i</td>
+                                <td class="text-left">
+                                    <h3>
+                                        <a asp-controller="CompanyModel" asp-action="Details" asp-route-id="@item.modelId" target="_blank">
+                                            @item.com_Name @item.model_name
+                                        </a>
+                                    </h3>
 
-                            </td>
-                            @{
-                                var eachPrize = Model.Amount / Model.Quantity;
-                            }
-                            <td class="total">@eachPrize</td>
-                            <td class="unit">@Model.Quantity</td>
-                            <td class="total">@Model.Amount</td>
-                        </tr>
-
+                                </td>
+                                @{
+                                    var eachPrize = item.price / item.Quantity;
+                                }
+                                <td class="total">@eachPrize</td>
+                                <td class="unit">@item.Quantity</td>
+                                <td class="total">@item.price</td>
+                            </tr>
+                                        i = i + 1;
+                         }
                     </tbody>
                     <tfoot>
                         <tr>
                             <td colspan="2"></td>
                             <td colspan="2">SUBTOTAL</td>
-                            <td>@Model.Amount</td>
+                            <td>@TotalPrice</td>
                         </tr>
                         <tr>
                             <td colspan="2"></td>
@@ -96,7 +102,7 @@
                         <tr>
                             <td colspan="2"></td>
                             <td colspan="2">GRAND TOTAL</td>
-                            <td>@Model.Amount</td>
+                            <td>@TotalPrice</td>
                         </tr>
                     </tfoot>
                 </table>

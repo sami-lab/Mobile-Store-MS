@@ -19,36 +19,29 @@ namespace Mobile_Store_MS.ViewModel.Orders
         }
         [Display(Name ="Order ID")]
         public int order_id { get; set; }
+
+        //[NotMapped]
+        public string Encryptedorder_id { get; set; }
         [Required]
         [DataType(DataType.Date)]
         public System.DateTime Date { get; set; }
-        [Required]
-        [Remote(action:"quantityCheck",controller:"Order")]
-        public int Quantity { get; set; }
-
+      
         public List<Products> Products { get; set; }
         [Required]
-        public int Amount { get; set; }
+        public string orders { get; set; }
 
-        [Required(ErrorMessage ="Model Name is Required")]
-        [Display(Name = "Model Name")]
-        public int modelId { get; set; }
+       
+        public int TotalAmount { get; set; }
 
-        [Display(Name = "Model Name")]
-        public string model_name { get; set; }
-
-        [Display(Name = "Company Name")]
-        public string com_Name { get; set; }
-        [Display(Name = "Company Name")]
-        [Required]
-        public int Phoneid { get; set; }
-
+      
         [Required]
         [Display(Name = "Store Name")]
         public int store_id { get; set; }
         [Display(Name = "Store Name")]
         public string StoreName { get; set; }
+        [Display(Name = "Store Adress")]
         public string StoreAdress { get; set; }
+        [Display(Name = "Store Phone")]
         public string StorePhone { get; set; }
 
         //[Required]
@@ -74,8 +67,9 @@ namespace Mobile_Store_MS.ViewModel.Orders
         [Display(Name = "Complete Address")]
         public string StrretAddress { get; set; }
 
-
+        [Display(Name = "Order Status")]
         public Status? orderStatus { get; set; }
+        [Display(Name = "Accepted By")]
         public string TakenBy { get; set; }
 
         [Display(Name = "Payment Method")]
@@ -88,18 +82,25 @@ namespace Mobile_Store_MS.ViewModel.Orders
     }
     public class Products
     {
+
         public int id { get; set; }
+        [Required]
+        [Display(Name = "Models Name")]
         public int modelId { get; set; }
+   
         [Display(Name = "Model Name")]
         public string model_name { get; set; }
+        [Display(Name = "Company Name")]
+        [Required]
         public int Phoneid { get; set; }
         [Display(Name = "Company Name")]
         public string com_Name { get; set; }
+        //[Remote(action: "quantityCheck", controller: "Order")]
+        [Required]
         public int Quantity { get; set; }
         [Display(Name = "Price")]
+        [Required]
         public double price { get; set; }
-        [Display(Name = "Select")]
-        public bool isSelected { get; set; }
         public int order_id { get; set; }
     }
     public enum PaymentMethods

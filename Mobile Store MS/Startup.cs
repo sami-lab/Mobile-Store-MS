@@ -22,6 +22,8 @@ using Mobile_Store_MS.Security;
 using Stripe;
 using Mobile_Store_MS.Hubs;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Mobile_Store_MS.Security.TokenSecurity;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Mobile_Store_MS
 {
@@ -58,23 +60,30 @@ namespace Mobile_Store_MS
                 options.Password.RequiredLength = 7;
                 options.Password.RequiredUniqueChars = 3;
                 options.SignIn.RequireConfirmedEmail = true;
-            }).AddDefaultUI(UIFramework.Bootstrap4)
+                options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
+               
+            })
             .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
-            //services.AddDefaultIdentity<IdentityUser>()
-            //    .AddDefaultUI(UIFramework.Bootstrap4)
-            //    .AddEntityFrameworkStores<ApplicationDbContext>();
-            //Token lifeSpan
+            .AddDefaultTokenProviders()
+            .AddTokenProvider<CustomEmailConfirmationTokenProvider
+            <ApplicationUser>>("CustomEmailConfirmation");
+          
+
+            // Changes token lifespan of all token types
             services.Configure<DataProtectionTokenProviderOptions>(o =>
                o.TokenLifespan = TimeSpan.FromHours(5));
+            // Changes token lifespan of just the Email Confirmation Token type
+            services.Configure<CustomEmailConfirmationTokenProviderOptions>(o =>
+                    o.TokenLifespan = TimeSpan.FromDays(3));
 
             //Setting Up Global Authentication
-           
+
             services.AddMvc(config =>
             {
                 var policy = new AuthorizationPolicyBuilder()
                                   .RequireAuthenticatedUser()
                                   .Build();
+                
                 config.Filters.Add(new AuthorizeFilter(policy));
 
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -85,10 +94,14 @@ namespace Mobile_Store_MS
 
             //Access Denied
             services.ConfigureApplicationCookie(options =>
-            options.AccessDeniedPath = new PathString("/Administration/AccessDenied"));
+            {
+             options.AccessDeniedPath = new PathString("/Administration/AccessDenied");
+                options.LoginPath = new PathString("/Account/Login");
+            });
 
             //External Login
-            services.AddAuthentication()
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                 
             .AddGoogle(options =>
             {
                 options.ClientId = Configuration["GoogleClientId"];
@@ -148,6 +161,10 @@ namespace Mobile_Store_MS
             services.AddScoped<IAuthorizationHandler, OnlyEditEmployeee>();
             services.AddScoped<IAuthorizationHandler, ManageRolePolicy>();
             services.AddSingleton<IAuthorizationHandler, CanEditOnlytheirDetails>();
+
+            //Register purpose string class with DI container
+            services.AddSingleton<DataProctectionPurposeString>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

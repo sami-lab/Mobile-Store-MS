@@ -6,200 +6,217 @@
 @inject IAuthorizationService authorizationservice
 @{
     ViewData["Title"] = "Index";
+ 
 }
 
 
-@if (Model.Any())
-{
-<div class="row">
-    <form class="col-6" id="searchForm" asp-controller="Order" asp-action="Search" method="get">
-        <p>
-            <label class="custom-control">Find By: </label>
-            <select name="searchList" class="form-control mb-1" id="searchList" style="border:1px solid #cccccc">
-                <option value="">--Select--</option>
-                <option value="Name">Name</option>
-                <option value="Date">Date</option>
-                <option value="Month">Month</option>
-                <option value="RefNo">Ref No</option>
-                <option value="OrderStatus">Order Status</option>
-            </select>
-            <input type="text" class="form-control search" autocomplete="off" style="display: none;" id="Name" placeholder="Search By Name" name="Name">
-            <input type="date" class="form-control search" autocomplete="off" style="display: none;" id="Date" name="time">
-            <input type="text" class="form-control search" autocomplete="off" style="display: none;" id="RefNo" placeholder="Search By Ref No" name="RefNo">
-            <select name="Month" style="display: none;" class="search custom-select mr-sm-2" id="Month">
-                <option value="">Please Select</option>
-                <option value="1">January</option>
-                <option value="2">Febraury</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-            </select>
-            <select name="OrderStatus" style="display: none;" class="search custom-select mr-sm-2" id="OrderStatus"
-                    asp-items="Html.GetEnumSelectList<Status>()">
-                <option value="">Please Select</option>
-            </select>
-            <input id="submit" class="btn btn-primary" disabled type="submit" value="Filter" />
-        </p>
-    </form>
-    <form class="col-6" id="sortForm" asp-controller="Order" asp-action="Sort" method="get">
-        <p>
-            <label>Sort By: </label>
-            <select name="sortBy" class="form-control mb-1" style="border:1px solid #cccccc">
-                <option value="RefNo">Ref No</option>
-                <option value="Quantity">Quantity</option>
-                <option value="Amount">Amount</option>
-                <option value="com_Name">Company Name </option>
-                <option value="StoreName">Store Name</option>
-                <option value="Date" selected>Date</option>
-            </select>           
-            <select name="order" class="form-control mb-1" style="border:1px solid #cccccc">               
-                <option value="Asc" selected>Ascending Order</option>
-                <option value="Des">Descending Order</option>
-            </select>
-            <input  class="btn btn-primary"  type="submit" value="Filter" />
-        </p>
-    </form>
-</div>
-   
-    <div class="row">
-        <div class="panel panel-primary filterable">
-            <div class="panel-heading rounded">
-                <h3 class="panel-title font-weight-bold">Orders</h3>
-                <div class="pull-right">
-                    <button class="btn btn-default btn-xs btn-filter"><i class="fas fa-filter"></i> Filter</button>
+<div class="container-fluid">
+    @if (Model.Any())
+    {
+        <div class=" row">
+            <form class="col-6" id="searchForm" asp-controller="Order" asp-action="Search" method="get">
+                <p>
+                    <label class="custom-control">Find By: </label>
+                    <select name="searchList" class="form-control mb-1" id="searchList" style="border:1px solid #cccccc">
+                        <option value="">--Select--</option>
+                        <option value="Name">Name</option>
+                        <option value="Date">Date</option>
+                        <option value="Month">Month</option>
+                        <option value="RefNo">Ref No</option>
+                        <option value="OrderStatus">Order Status</option>
+                    </select>
+                    <input type="text" class="form-control search" autocomplete="off" style="display: none;" id="Name" placeholder="Search By Name" name="Name">
+                    <input type="date" class="form-control search" autocomplete="off" style="display: none;" id="Date" name="time">
+                    <input type="text" class="form-control search" autocomplete="off" style="display: none;" id="RefNo" placeholder="Search By Ref No" name="RefNo">
+                    <select name="Month" style="display: none;" class="search custom-select mr-sm-2" id="Month">
+                        <option value="">Please Select</option>
+                        <option value="1">January</option>
+                        <option value="2">Febraury</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                    <select name="OrderStatus" style="display: none;" class="search custom-select mr-sm-2" id="OrderStatus"
+                            asp-items="Html.GetEnumSelectList<Status>()">
+                        <option value="">Please Select</option>
+                    </select>
+                    <input id="submit" class="btn btn-primary" disabled type="submit" value="Filter" />
+                </p>
+            </form>
+            <form class="col-6" id="sortForm" asp-controller="Order" asp-action="Sort" method="get">
+                <p>
+                    <label>Sort By: </label>
+                    <select name="sortBy" class="form-control mb-1" style="border:1px solid #cccccc">
+                        <option value="RefNo">Ref No</option>
+                        <option value="Amount">Amount</option>
+                        <option value="StoreName">Store Name</option>
+                        <option value="Date" selected>Date</option>
+                    </select>
+                    <select name="order" class="form-control mb-1" style="border:1px solid #cccccc">
+                        <option value="Asc" selected>Ascending Order</option>
+                        <option value="Des">Descending Order</option>
+                    </select>
+                    <input class="btn btn-primary" type="submit" value="Filter" />
+                </p>
+            </form>
+        </div>
+
+        <div class="row">
+            <div class="panel panel-primary filterable">
+                <div class="panel-heading rounded">
+                    <h3 class="panel-title font-weight-bold">Orders</h3>
+                    <div class="pull-right">
+                        <button class="btn btn-default btn-xs btn-filter"><i class="fas fa-filter"></i> Filter</button>
+                    </div>
                 </div>
-            </div>
-            <table class="table table-striped">
-                <thead>
+                <table class="table table-striped table-hover">
+                    <thead>
 
-                    <tr class="filters">
-                        <th><input type="text" class="form-control" placeholder="#" disabled></th>
-                        <th><input type="text" class="form-control" placeholder="Ref No#" disabled></th>
-                        <th><input type="text" class="form-control" placeholder="Name" disabled></th>
-                        <th><input type="text" class="form-control" placeholder="Product" disabled></th>
-                        <th><input type="text" class="form-control" placeholder="Branch" disabled></th>
-                        <th><input type="text" class="form-control" placeholder="Date" disabled></th>
-                        <th><input type="text" class="form-control" placeholder="Amount" disabled></th>
-                        <th><input type="text" class="form-control" placeholder="Status" disabled></th>
-                        <th colspan="2"></th>
-
-                    </tr>
-
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.order_id)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.CustRef)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.cus_name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.com_Name) @Html.DisplayFor(modelItem => item.model_name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.StoreName)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Date)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Amount)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.orderStatus)
-                            </td>
-
-
-                            <td colspan="2" class="d-flex flex-row flex-nowrap justify-content-around">
-
-                                @if (item.orderStatus == Mobile_Store_MS.Data.Model.Order.Status.Pending || User.IsInRole("Super Admin") || User.IsInRole("Admin"))
-                                {
-                                    <a asp-action="Edit" asp-route-id="@item.order_id"><i class="far fa-edit" title="Edit"></i></a><span>|</span>
-                                    @await Html.PartialAsync("~/Views/Shared/Modal.cshtml", item.modelId)<span>|</span>
-
-                                }
-
-                                <a asp-action="Details" asp-route-id="@item.order_id"><i class="fas fa-info-circle" title="Details"></i></a><span>|</span>
-                                @if (User.IsInRole("Super Admin") || (await authorizationservice.AuthorizeAsync(User, "UpdatingStatus")).Succeeded)
-                                {
-                                    @await Html.PartialAsync("~/Views/Order/OrderStatus.cshtml", new OrderStatus() { order_id = item.order_id, orderStatus = item.orderStatus })<span>|</span>
-                                }
-                                @if (item.orderStatus == Mobile_Store_MS.Data.Model.Order.Status.Completed)
-                                {
-                                    <a asp-action="Invoice" asp-route-id="@item.order_id"><i class="fas fa-file-invoice" title="Invoice"></i></a>
-                                }
-                            </td>
+                        <tr class="filters">
+                            <th><input type="text" class="form-control" placeholder="#" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Ref No#" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Name" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Product" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Quantity" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Branch" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Date" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Amount" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Status" disabled></th>
+                            <th colspan="2"></th>
 
                         </tr>
+
+                    </thead>
+                    <tbody>
+                        @{var ind = 0;}
+                        @foreach (var item in Model)
+                        {
+                            string products = "";
+                            double TotalPrice = 0;
+                            string Quantities = "";
+                            ind++;
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => ind)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CustRef)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.cus_name)
+                                </td>
+                                <td>
+                                    @foreach (var product in item.Products)
+                                    {
+                                        TotalPrice += product.price;
+                                        products += product.com_Name + " " + product.model_name + ",";
+                                        Quantities += product.Quantity + ",";
+                                    }
+                                    @Html.DisplayFor(modelItem => products)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => Quantities)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.StoreName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Date)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => TotalPrice)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.orderStatus)
+                                </td>
+
+
+                                <td colspan="2" class="d-flex flex-row flex-nowrap justify-content-around">
+
+                                    @if (item.orderStatus == Mobile_Store_MS.Data.Model.Order.Status.Pending || User.IsInRole("Super Admin") || User.IsInRole("Admin"))
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@item.Encryptedorder_id"><i class="far fa-edit" title="Edit"></i></a><span>|</span>
+                                        @await Html.PartialAsync("~/Views/Shared/Modal.cshtml", item.Encryptedorder_id)<span>|</span>
+
+                                    }
+
+                                    <a asp-action="Details" asp-route-id="@item.Encryptedorder_id"><i class="fas fa-info-circle" title="Details"></i></a><span>|</span>
+                                    @if (User.IsInRole("Super Admin") || (await authorizationservice.AuthorizeAsync(User, "UpdatingStatus")).Succeeded)
+                                    {
+                                        @await Html.PartialAsync("~/Views/Order/OrderStatus.cshtml", new OrderStatus() { order_id = item.Encryptedorder_id, orderStatus = item.orderStatus })<span>|</span>
+
+                                    }
+                                    @if (item.orderStatus == Mobile_Store_MS.Data.Model.Order.Status.Completed)
+                                    {
+                                        <a asp-action="Invoice" asp-route-id="@item.Encryptedorder_id"><i class="fas fa-file-invoice" title="Invoice"></i></a>
+                                    }
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <nav class="table-responsive">
+                <ul class="pagination justify-content-center d-flex flex-wrap">
+                    @if (ViewBag.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-controller="Order" asp-action="Index">First</a>
+                        </li>
+                        <li class="page-item">
+                            @{ var pageNo = ViewBag.CurrentPage - 1; }
+                            <a class="page-link" asp-controller="Order" asp-action="Index" asp-route-pageNo="@pageNo">&laquo;</a>
+                        </li>
                     }
-                </tbody>
-            </table>
+
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+
+
+                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-controller="Order" asp-action="Index" asp-route-pageNo="@i">@i</a>
+                        </li>
+                    }
+
+                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                    {
+                        <li class="page-item">
+                            @{ var pageNo = ViewBag.CurrentPage + 1; }
+                            <a class="page-link" asp-controller="Order" asp-action="Index" asp-route-pageNo="@pageNo">&raquo;</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" asp-controller="Order" asp-action="Index" asp-route-pageNo="@ViewBag.TotalPages">Last</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
         </div>
-        <nav class="table-responsive">
-            <ul class="pagination justify-content-center d-flex flex-wrap">
-                @if (ViewBag.CurrentPage > 1)
-                {
-                    <li class="page-item">
-                        <a class="page-link" asp-controller="Order" asp-action="Index">First</a>
-                    </li>
-                    <li class="page-item">
-                        @{ var pageNo = ViewBag.CurrentPage - 1; }
-                        <a class="page-link" asp-controller="Order" asp-action="Index" asp-route-pageNo="@pageNo">&laquo;</a>
-                    </li>
-                }
 
-                @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                {
-
-
-                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                        <a class="page-link" asp-controller="Order" asp-action="Index" asp-route-pageNo="@i">@i</a>
-                    </li>
-                }
-
-                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-                {
-                    <li class="page-item">
-                        @{ var pageNo = ViewBag.CurrentPage + 1; }
-                        <a class="page-link" asp-controller="Order" asp-action="Index" asp-route-pageNo="@pageNo">&raquo;</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" asp-controller="Order" asp-action="Index" asp-route-pageNo="@ViewBag.TotalPages">Last</a>
-                    </li>
-                }
-            </ul>
-        </nav>
-    </div>
-
-}
-else
-{
-    <div class="card">
-        <div class="card-header">
-            No Orders Added yet
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-header">
+                No Orders Added yet
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">
+                    Use the button below to Add new Order
+                </h5>
+                <a class="btn btn-primary mb-3" style="width:auto" asp-action="Create"
+                   asp-controller="Order">Create new Order</a>
+            </div>
         </div>
-        <div class="card-body">
-            <h5 class="card-title">
-                Use the button below to Add new Order
-            </h5>
-            <a class="btn btn-primary mb-3" style="width:auto" asp-action="Create"
-               asp-controller="Order">Create new Order</a>
-        </div>
-    </div>
-}
+    }
+</div>
 @section Scripts{
     <script>
         $(document).ready(function () {

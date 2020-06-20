@@ -65,7 +65,7 @@ namespace Mobile_Store_MS.Controllers
         // POST: ComapnyModel/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(ModelViewModel m)
+        public async Task<ActionResult> Create(ModelViewModel m)
         {
 
             try
@@ -73,7 +73,7 @@ namespace Mobile_Store_MS.Controllers
                 // TODO: Add insert logic here
                 if (ModelState.IsValid)
                 {
-                    int id = iModelRepositery.addModel(m);
+                    int id = await iModelRepositery.addModel(m);
                     return RedirectToAction("Details", new { id = id });
                 }
                 ViewBag.Companies = util.GetAllCompany();

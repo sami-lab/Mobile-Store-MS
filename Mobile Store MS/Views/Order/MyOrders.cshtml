@@ -5,6 +5,7 @@
 @inject IAuthorizationService authorizationservice
 @{
     ViewData["Title"] = "Index";
+    
 }
 
 <section class="jumbotron text-center text-light" style="background-image:url('/Image/bg.jpg'); margin-left: calc(-50vw + 50% - 8px);  width:100vw;">
@@ -35,6 +36,7 @@
                             <th><input type="text" class="form-control" placeholder="Ref No#" disabled></th>
                             <th><input type="text" class="form-control" placeholder="Name" disabled></th>
                             <th><input type="text" class="form-control" placeholder="Product" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Quantity" disabled></th>
                             <th><input type="text" class="form-control" placeholder="Branch" disabled></th>
                             <th><input type="text" class="form-control" placeholder="Date" disabled></th>
                             <th><input type="text" class="form-control" placeholder="Amount" disabled></th>
@@ -44,11 +46,16 @@
 
                     </thead>
                     <tbody>
+                        @{var ind = 0;}
                         @foreach (var item in Model)
                         {
+                            string products = "";
+                            double TotalPrice = 0;
+                            string Quantities = "";
+                            ind++;
                             <tr>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.order_id)
+                                    @Html.DisplayFor(modelItem => ind)
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.CustRef)
@@ -57,7 +64,16 @@
                                     @Html.DisplayFor(modelItem => item.cus_name)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.com_Name) @Html.DisplayFor(modelItem => item.model_name)
+                                    @foreach (var product in item.Products)
+                                    {
+                                        TotalPrice += product.price;
+                                        products += product.com_Name + " " + product.model_name + ",";
+                                        Quantities += product.Quantity + ",";
+                                    }
+                                    @Html.DisplayFor(modelItem => products)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => Quantities)
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.StoreName)
@@ -66,7 +82,7 @@
                                     @Html.DisplayFor(modelItem => item.Date)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.Amount)
+                                    @Html.DisplayFor(modelItem => TotalPrice)
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.orderStatus)
@@ -76,19 +92,19 @@
                                 <td class="d-flex flex-row flex-nowrap justify-content-around">
                                     @if (User.IsInRole("Super Admin") || (await authorizationservice.AuthorizeAsync(User, "UpdatingStatus")).Succeeded)
                                     {
-                                        @await Html.PartialAsync("~/Views/Order/OrderStatus.cshtml", new OrderStatus() { order_id = item.order_id, orderStatus = item.orderStatus })<span>|</span>
+                                        @await Html.PartialAsync("~/Views/Order/OrderStatus.cshtml", new OrderStatus() { order_id = item.Encryptedorder_id, orderStatus = item.orderStatus })<span>|</span>
                                     }
                                     @if (item.orderStatus == Mobile_Store_MS.Data.Model.Order.Status.Completed)
                                     {
-                                        <a asp-action="Invoice" asp-route-id="@item.order_id"><i class="fas fa-file-invoice" title="Invoice"></i></a><span>|</span>
+                                        <a asp-action="Invoice" asp-route-id="@item.Encryptedorder_id"><i class="fas fa-file-invoice" title="Invoice"></i></a><span>|</span>
                                     }
-                                    @if(item.orderStatus == Mobile_Store_MS.Data.Model.Order.Status.Pending || User.IsInRole("Super Admin") || User.IsInRole("Admin"))
-                                     {
-                                             @await Html.PartialAsync("~/Views/Shared/Modal.cshtml", item.modelId)<span>|</span>
-                                             <a asp-action="Edit" asp-route-id="@item.order_id"><i class="far fa-edit" title="Edit"></i></a><span>|</span>                              
-                                     }
+                                    @if (item.orderStatus == Mobile_Store_MS.Data.Model.Order.Status.Pending || User.IsInRole("Super Admin") || User.IsInRole("Admin"))
+                                    {
+                                        @await Html.PartialAsync("~/Views/Shared/Modal.cshtml", item.Encryptedorder_id)<span>|</span>
+                                        <a asp-action="Edit" asp-route-id="@item.Encryptedorder_id"><i class="far fa-edit" title="Edit"></i></a><span>|</span>
+                                    }
 
-                                    <a asp-action="Details" asp-route-id="@item.order_id"><i class="fas fa-info-circle" title="Details"></i></a>
+                                    <a asp-action="Details" asp-route-id="@item.Encryptedorder_id"><i class="fas fa-info-circle" title="Details"></i></a>
 
 
                                 </td>

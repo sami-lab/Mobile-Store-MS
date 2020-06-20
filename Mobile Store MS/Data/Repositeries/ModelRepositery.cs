@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Mobile_Store_MS.Data.Interfaces;
 using Mobile_Store_MS.Data.Model;
 using Mobile_Store_MS.Data.Model.Company;
+using Mobile_Store_MS.Data.Model.Stock;
 using Mobile_Store_MS.ViewModel.CompanyViewModel;
 using Mobile_Store_MS.ViewModel.ModelsViewModel;
 using System;
@@ -58,7 +59,6 @@ namespace Mobile_Store_MS.Data.Repositeries
                                            where im.modelId == br.modelId
                                            select im.Image_Path).FirstOrDefault()
                           }).ToList();
-
             return result;
         }
 
@@ -107,7 +107,7 @@ namespace Mobile_Store_MS.Data.Repositeries
 
             return result;
         }
-        public int addModel(ModelViewModel model)
+        public async Task<int> addModel(ModelViewModel model)
         {
 
             BrandModel m = new BrandModel()
@@ -152,14 +152,30 @@ namespace Mobile_Store_MS.Data.Repositeries
                         Image_Path =uniqueFileName,
                     };
                     context.Images.Add(i);
-                    context.SaveChanges();
+                   
                   
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                     // Use CopyTo() method provided by IFormFile interface to
                     // copy the file to wwwroot/images folder
                     photo.CopyTo(new FileStream(filePath, FileMode.Create));
                 }
+                context.SaveChanges();
             }
+
+            var Stores = util.GetAllStores();
+            List<Stock> stock = new List<Stock>();
+            foreach(var store in Stores)
+            {
+                Stock s = new Stock()
+                {
+                    modelId = m.modelId,
+                    Quantity = 0,
+                    store_id = store.store_id
+                };
+                stock.Add(s);
+            }
+            await context.Stock.AddRangeAsync(stock);
+            await context.SaveChangesAsync();
             return m.modelId;
 
         }

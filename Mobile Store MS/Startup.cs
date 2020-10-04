@@ -77,7 +77,6 @@ namespace Mobile_Store_MS
                     o.TokenLifespan = TimeSpan.FromDays(3));
 
             //Setting Up Global Authentication
-
             services.AddMvc(config =>
             {
                 var policy = new AuthorizationPolicyBuilder()
@@ -101,7 +100,6 @@ namespace Mobile_Store_MS
 
             //External Login
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                 
             .AddGoogle(options =>
             {
                 options.ClientId = Configuration["GoogleClientId"];
@@ -168,7 +166,8 @@ namespace Mobile_Store_MS
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, UserManager<ApplicationUser> userManager,
+        RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -195,6 +194,9 @@ namespace Mobile_Store_MS
                 config.MapHub<ChatHub>("/messages");
                 config.MapHub<NotificationHub>("/notifications");
             });
+
+            MyIdentityDataInitializer myIdentityDataInitializer = new MyIdentityDataInitializer(Configuration);
+            myIdentityDataInitializer.SeedData(userManager, roleManager);
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

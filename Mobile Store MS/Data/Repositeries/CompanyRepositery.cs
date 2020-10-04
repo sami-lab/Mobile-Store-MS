@@ -59,7 +59,7 @@ namespace Mobile_Store_MS.Data.Repositeries
                 Com_name = x.Com_name,
                 Photopath = x.com_Logo,
                 com_country = x.com_country, 
-            }).FirstOrDefault(x => x.Phoneid == id); ;
+            }).FirstOrDefault(x => x.Phoneid == id); 
             return result;
         }
 

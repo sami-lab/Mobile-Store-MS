@@ -20,6 +20,6 @@ namespace Mobile_Store_MS.Data.Model
 
         public ICollection<BrandModel> Brand { get; set; }
         public ICollection<Vendor.Vendor> Vendor { get; set; }
-        //public ICollection<Product> Orders { get; set; }
+      
     }
 }

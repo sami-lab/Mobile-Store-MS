@@ -34,7 +34,6 @@ namespace Mobile_Store_MS.Data
 
     
         public virtual ICollection<Purchasing> Purchasing_Model { get; set; }
-
         public virtual ICollection<message> Messages { get; set; }
         public virtual ICollection<Notifications> Notifications { get; set; }
         public virtual ICollection<Order> Order_Model { get; set; }       

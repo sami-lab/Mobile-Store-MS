@@ -177,7 +177,7 @@ namespace Mobile_Store_MS.Controllers
         {
             if (Cusref != null)
             {
-                var users = userManager.Users.SingleOrDefault(x => x.CusRef == Cusref);
+                var users = userManager.Users.FirstOrDefault(x => x.CusRef == Cusref);
                 if (users != null)
                 {
                     var UserData = iOrderRepositery.UserOrders((int)users.CusRef);
@@ -481,8 +481,6 @@ namespace Mobile_Store_MS.Controllers
                 pricesArray.ForEach(x => TotalPrices += prices.FirstOrDefault(p => p.Item1 == x.modelId).Item2 * x.Quantity);
 
                 ViewBag.TotalPrices = TotalPrices-orderView.TotalAmount;
-                //orderView.Products.com_Name = util.GetAllCompany().FirstOrDefault(x => x.Phoneid == orderView.Phoneid).Com_name;
-                //orderView.model_name = util.getModelList(orderView.Phoneid).FirstOrDefault(x => x.modelId == orderView.modelId).model_name;
                 orderView.StoreName = util.GetAllStores().FirstOrDefault(x => x.store_id == orderView.store_id).StoreName;
                 if (String.IsNullOrEmpty(Convert.ToString(orderView.CityId)))
                 {
@@ -646,7 +644,8 @@ namespace Mobile_Store_MS.Controllers
                     result = iOrderRepositery.delete(id, true);
                     if (result)
                     {
-                        return RedirectToAction("Index");
+                        if(User.IsInRole("User")) return RedirectToAction("MyOrders");
+                        return RedirectToAction("StoreOrders");
                     }
                 }
                 else

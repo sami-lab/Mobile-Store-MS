@@ -28,7 +28,7 @@ namespace Mobile_Store_MS.Data.Repositeries
         {
             dashboard d = new dashboard();
             //Purchase and Sale
-            d.LastMonthSales = context.Order.OrderBy(x => x.Date).Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Products.Select(t=> t.price).Sum());
+            d.LastMonthSales = context.Order.OrderBy(x => x.Date).Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Products != null? x.Products.Select(t=> t.price).Sum(): 0);
             d.LastMonthPurchasing = context.Purchasings.OrderBy(x => x.Date).Where(x => (x.Date - DateTime.Now).TotalDays <= 30).Sum(x => x.Amount);
             d.TotalSalesCount = context.Order.Count();
             d.TotalPurchasingCount = context.Purchasings.Count();
@@ -111,7 +111,7 @@ namespace Mobile_Store_MS.Data.Repositeries
                        Day = pr.Key.ToString(),
                        Amount = pr.Select(x=> x.Products.Select(t=> t.price).Sum()).Sum()
                    });
-            var json = JsonConvert.SerializeObject(DailyGraphSale);
+           // var json = JsonConvert.SerializeObject(DailyGraphSale);
             //d.Sales = json;
             d.Sales = DailyGraphSale.ToList();
             var DailyGraphPurchasing = context.Purchasings.Where(x => (x.Date - DateTime.Now).TotalDays <= 30).ToList()

@@ -215,7 +215,7 @@ namespace Mobile_Store_MS.Controllers
                     return View(model);
                 }
                 var result = await Signinmanager.PasswordSignInAsync(
-                    model.Email, model.Password, model.RememberMe, false);
+                    user, model.Password, model.RememberMe, false);
 
 
                 if (result.Succeeded)

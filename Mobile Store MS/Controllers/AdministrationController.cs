@@ -158,13 +158,7 @@ namespace Mobile_Store_MS.Controllers
             ViewBag.cities = util.getCities();
             ViewBag.Stores = util.GetAllStores();
             return View(model);
-            //await Usermanager.AddToRolesAsync(user,
-            // model.Where(x => x.IsSelected).Select(y => y.RoleName));
-            //if (Signinmanager.IsSignedIn(User) && User.IsInRole("Admin"))
-            // await UserManager.AddToRoleAsync(user.Id, model.UserRole);
-            // Create customized claim 
-            // await UserManager.AddClaimAsync(user.Id, new Claim("newCustomClaim", "claimValue"));
-            //    return RedirectToAction("ListUsers", "Administration");
+           
 
         }
 
@@ -395,6 +389,7 @@ namespace Mobile_Store_MS.Controllers
             var data = new List<ApplicationUser>();
             int totalUsers;
             decimal totalpages;
+           
             switch (searchList)
             {
 

@@ -48,16 +48,7 @@ namespace Mobile_Store_MS.Services
             
             var plainTextContent = message;
             var htmlContent =message;
-
-            //ViewToStringRenderer viewToStringRenderer = new ViewToStringRenderer();
-            //string str = await viewToStringRenderer.RenderViewToStringAsync(HttpContext.RequestServices, $"~/Views/Emails/MyEmailTemplate.cshtml", data);
-
             var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-
-
-
-            //msg.TemplateId = "";
-            //msg.SetTemplateData(data);
 
             try
             {

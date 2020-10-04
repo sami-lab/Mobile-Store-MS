@@ -145,7 +145,7 @@
                                                 Details
                                             </a>
                                         </li>
-                                        @if (User.HasClaim(claim => claim.Type == "Allow Purchasing" && claim.Value == "true"))
+                                        @if (User.IsInRole("Super Admin") || User.HasClaim(claim => claim.Type == "Allow Purchasing" && claim.Value == "true"))
                                         {
                                             <li>
                                                 <a asp-controller="Purchasing" asp-action="Create">Create Purchasing</a>
@@ -189,6 +189,26 @@
 
                                         <li>
                                             <a asp-controller="Company" asp-action="Index">Company Details</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="sidebar-dropdown">
+                                <a href="#">
+                                    <i class="far fa-copyright"></i>
+                                    <span>Store</span>
+                                </a>
+                                <div class="sidebar-submenu">
+                                    <ul>
+                                        @if (User.IsInRole("Super Admin"))
+                                        {
+                                            <li>
+                                                <a asp-controller="Store" asp-action="Create">Add Store</a>
+                                            </li>
+                                        }
+
+                                        <li>
+                                            <a asp-controller="Store" asp-action="Index">Store Details</a>
                                         </li>
                                     </ul>
                                 </div>

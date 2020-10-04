@@ -273,7 +273,7 @@ namespace Mobile_Store_MS.Data
             return RefNo;
         }
 
-        //Calculate Price Based On Quantity
+        //Calculate Price of Models
         public List<Tuple<int, int>> Price(int[] modelIds)
         {
             var result = context.BrandModel.Select(x => new { x.modelId, x.Price }).Where(x => modelIds.Contains(x.modelId)).Select(c => new Tuple<int, int>(c.modelId, c.Price)).ToList();
@@ -451,7 +451,7 @@ namespace Mobile_Store_MS.Data
             }
         }
 
-
+        
     }
     public struct modelList
     {
